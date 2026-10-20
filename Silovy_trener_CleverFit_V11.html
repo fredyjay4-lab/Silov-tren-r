@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="cs" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#09090b">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Silový trenér</title>
+<style>
+:root{--bg:#09090b;--card:#18181b;--card2:#27272a;--border:#27272a;--text:#f4f4f5;--muted:#a1a1aa;--brand:#10b981;--brand2:#34d399;--danger:#ef4444}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#000;color:var(--text);font-family:Inter,system-ui,-apple-system,sans-serif}
+button,input,select{font:inherit}button{cursor:pointer;border:0}
+.app{width:100%;max-width:520px;min-height:100vh;margin:auto;background:var(--bg);padding-bottom:84px}
+header{position:sticky;top:0;z-index:20;background:rgba(9,9,11,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:14px 18px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;gap:10px;align-items:center}.logo-icon{width:40px;height:40px;border-radius:12px;background:rgba(16,185,129,.16);display:grid;place-items:center;font-size:22px}
+h1,h2,h3,p{margin:0}.title{font-size:15px;font-weight:900;letter-spacing:.5px}.sub{font-size:11px;color:var(--muted);margin-top:2px}
+main{padding:16px}.screen{display:none}.screen.active{display:block}
+.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:15px;margin-bottom:12px}
+.section-title{font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);font-weight:800;margin-bottom:10px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.btn{background:var(--card2);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:11px 12px;font-weight:700;font-size:12px}
+.btn.active{background:rgba(16,185,129,.16);border-color:var(--brand);color:var(--brand2)}
+.btn.primary{background:var(--brand);color:#001b12;border-color:var(--brand)}.btn.danger{background:rgba(239,68,68,.14);color:#fca5a5;border-color:rgba(239,68,68,.3)}
+.btn:active{transform:scale(.98)}
+.chips{display:flex;flex-wrap:wrap;gap:7px}.chip{padding:8px 11px;border-radius:999px;background:var(--card2);border:1px solid var(--border);font-size:11px;font-weight:700;color:var(--muted)}.chip.active{color:var(--brand2);border-color:var(--brand);background:rgba(16,185,129,.13)}
+label{display:block;color:#d4d4d8;font-size:11px;font-weight:700;margin:14px 0 7px}
+input{width:100%;background:#111113;border:1px solid var(--border);color:white;border-radius:11px;padding:11px;outline:none}input:focus,select:focus{border-color:var(--brand)}select{width:100%;background:#111113;border:1px solid var(--border);color:white;border-radius:11px;padding:11px;outline:none}
+.big{font-size:28px;font-weight:900}.muted{color:var(--muted)}.green{color:var(--brand2)}.small{font-size:11px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.stack{display:flex;flex-direction:column;gap:8px}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;height:72px;background:rgba(24,24,27,.97);border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(4,1fr);z-index:30}
+.nav button{background:none;color:#71717a;font-size:10px;font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}.nav button.active{color:var(--brand2)}.nav b{font-size:20px}
+.exercise{padding:14px;border:1px solid var(--border);border-radius:16px;background:#141416;margin-bottom:10px}
+.exercise.current{border-color:var(--brand);box-shadow:0 0 0 1px rgba(16,185,129,.18)}
+.exercise-name{font-weight:900;font-size:15px}.target{font-size:10px;color:var(--muted);margin-top:3px}
+.sets{margin-top:10px}.set{display:grid;grid-template-columns:34px 1fr 1fr 42px;gap:6px;align-items:center;margin-top:6px}.set span{font-size:11px;color:var(--muted);text-align:center}.set input{padding:8px;text-align:center;font-size:12px}.set.done input{border-color:var(--brand);background:rgba(16,185,129,.08)}.check{height:36px;border-radius:10px;background:var(--card2);color:var(--muted);font-weight:900}.check.done{background:var(--brand);color:#001b12}
+.timer{background:linear-gradient(145deg,#10271f,#18181b);border:1px solid rgba(16,185,129,.35);border-radius:20px;padding:18px;text-align:center;position:sticky;top:70px;z-index:15;margin-bottom:12px}.timer-value{font-size:46px;font-weight:950;font-variant-numeric:tabular-nums}.timer-label{font-size:11px;color:var(--muted);margin-bottom:5px}
+.progress{height:7px;background:#27272a;border-radius:99px;overflow:hidden}.progress>i{display:block;height:100%;background:var(--brand);width:0}
+.statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px}.stat strong{font-size:18px;display:block}.stat span{font-size:10px;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:88px;transform:translateX(-50%) translateY(15px);opacity:0;pointer-events:none;background:#f4f4f5;color:#09090b;padding:11px 15px;border-radius:12px;font-size:12px;font-weight:800;z-index:50;transition:.2s;max-width:90%;text-align:center}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.empty{text-align:center;padding:30px;color:var(--muted)}.badge{font-size:10px;padding:4px 7px;border-radius:7px;background:rgba(16,185,129,.13);color:var(--brand2);font-weight:800}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="logo"><div class="logo-icon">🏋️</div><div><div class="title">SILOVÝ TRENÉR • V8</div><div class="sub" id="headerSub">Připraven k tréninku</div></div></div>
+  <button class="btn" style="padding:8px 10px" onclick="openSettings()">⚙️</button>
+</header>
+
+<main>
+<section id="home" class="screen active">
+  <div class="card" id="profileCard" style="border:2px solid var(--brand);background:linear-gradient(145deg,#10271f,#18181b)">
+    <div class="section-title green">1️⃣ TVŮJ PROFIL</div>
+    <h2 style="font-size:24px;margin-bottom:5px">Nastav svoje údaje</h2>
+    <p class="small muted">Věk, výška a váha se uloží automaticky do telefonu.</p>
+    <div class="grid3">
+      <div><label>VĚK</label><input id="profileAge" type="number" inputmode="numeric" placeholder="32"></div>
+      <div><label>VÝŠKA (CM)</label><input id="profileHeight" type="number" inputmode="decimal" placeholder="180"></div>
+      <div><label>VÁHA (KG)</label><input id="profileWeight" type="number" inputmode="decimal" placeholder="90"></div>
+    </div>
+    <button class="btn primary" style="width:100%;margin-top:12px" onclick="saveProfile()">💾 Uložit údaje</button>
+    <div id="profileStats" class="statgrid" style="margin-top:12px"></div>
+  </div>
+
+  <div class="card" id="coachCard" style="border-color:rgba(16,185,129,.35);background:linear-gradient(145deg,#0f211b,#18181b)">
+    <div class="row"><div>
+      <div class="section-title green">🧠 CHYTRÝ TRENÉR</div>
+      <h2 style="font-size:21px">Učím se z tvých tréninků</h2>
+    </div><span class="badge">AUTOMATICKY</span></div>
+    <p id="coachTip" class="small muted" style="margin-top:9px;line-height:1.55"></p>
+    <div id="coachStats" class="statgrid" style="margin-top:12px"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Cíl</div>
+    <div class="chips">
+      <button class="chip active" data-goal="strength" onclick="selectGoal('strength')">💪 Síla</button>
+      <button class="chip" data-goal="muscle" onclick="selectGoal('muscle')">🔥 Svaly</button>
+      <button class="chip" data-goal="fatloss" onclick="selectGoal('fatloss')">⚡ Hubnutí</button>
+      <button class="chip" data-goal="maintain" onclick="selectGoal('maintain')">⚖️ Udržovat</button>
+    </div>
+  </div>
+
+
+  <div class="card">
+    <div class="section-title">Nový trénink</div>
+    <h2 style="font-size:22px;margin-bottom:5px">Co dnes odjedeš? 💪</h2>
+    <p class="small muted">Vyber zaměření, délku a vybavení. Trenér poskládá celý trénink.</p>
+
+    <label>Zaměření</label>
+    <div class="grid3" id="focusBtns">
+      <button class="btn" data-focus="upper" onclick="selectFocus('upper')">Vrch těla</button>
+      <button class="btn" data-focus="lower" onclick="selectFocus('lower')">Nohy & břicho</button>
+      <button class="btn active" data-focus="full" onclick="selectFocus('full')">Full Body</button>
+    </div>
+
+    <label>Délka tréninku</label>
+    <div class="grid3" id="timeBtns">
+      <button class="btn" data-time="60" onclick="selectTime(60)">60 min</button>
+      <button class="btn active" data-time="75" onclick="selectTime(75)">75 min</button>
+      <button class="btn" data-time="90" onclick="selectTime(90)">90 min</button>
+    </div>
+
+    <label>Vybavení</label>
+    <div class="chips" id="equipBtns">
+      <button class="chip active" data-equip="barbell" onclick="toggleEquip('barbell')">Velká osa</button>
+      <button class="chip active" data-equip="dumbbell" onclick="toggleEquip('dumbbell')">Jednoručky</button>
+      <button class="chip active" data-equip="cable" onclick="toggleEquip('cable')">Kladky</button>
+      <button class="chip active" data-equip="machine" onclick="toggleEquip('machine')">Klasické stroje</button>
+      <button class="chip active" data-equip="kinesis" onclick="toggleEquip('kinesis')">Kinesis</button>
+      <button class="chip active" data-equip="octagon" onclick="toggleEquip('octagon')">Octagon</button>
+      <button class="chip active" data-equip="pullup" onclick="toggleEquip('pullup')">Hrazda</button>
+      <button class="chip active" data-equip="bodyweight" onclick="toggleEquip('bodyweight')">Vlastní váha</button>
+    </div>
+    <div class="small muted" style="margin-top:9px">⚠️ E-GYM a automatické stroje jsou záměrně vynechané.</div>
+
+    <button class="btn primary" style="width:100%;margin-top:15px;font-size:14px" onclick="generateWorkout()">⚡ Vygenerovat trénink</button>
+  </div>
+
+  <div class="statgrid">
+    <div class="stat"><strong id="statWorkouts">0</strong><span>tréninků</span></div>
+    <div class="stat"><strong id="statPR">0</strong><span>PR</span></div>
+    <div class="stat"><strong id="statVolume">0</strong><span>kg objemu</span></div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <div class="row"><div><div class="section-title" style="margin:0">Poslední trénink</div><div id="lastWorkout" class="small" style="margin-top:6px">Zatím žádný uložený trénink.</div></div><span class="badge">HISTORIE</span></div>
+    <button class="btn" style="width:100%;margin-top:12px" onclick="showScreen('history')">Zobrazit historii</button>
+  </div>
+</section>
+
+<section id="workout" class="screen">
+  <div id="timerBox" class="timer" style="display:none">
+    <div class="timer-label" id="timerLabel">PAUZA</div>
+    <div class="timer-value" id="timerValue">03:00</div>
+    <div class="progress"><i id="timerProgress"></i></div>
+    <div class="grid" style="margin-top:12px">
+      <button class="btn" onclick="addTimer(-30)">−30 s</button>
+      <button class="btn" onclick="addTimer(30)">+30 s</button>
+      <button class="btn danger" onclick="stopTimer()">Ukončit pauzu</button>
+      <button class="btn" onclick="toggleTimer()">▶ / ❚❚</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row"><div><div class="section-title" style="margin:0">Aktivní trénink</div><h2 id="workoutTitle" style="font-size:20px;margin-top:4px">Full Body</h2></div><span id="workoutTime" class="badge">75 min</span></div>
+    <div class="progress" style="margin-top:12px"><i id="workoutProgress"></i></div>
+    <div class="row small muted" style="margin-top:7px"><span id="workoutProgressText">0 / 0 sérií</span><span id="workoutVolume">0 kg</span></div>
+  </div>
+
+  <div id="exerciseList"></div>
+  <button class="btn primary" style="width:100%;margin-top:4px" onclick="finishWorkout()">✅ Dokončit trénink</button>
+</section>
+
+<section id="history" class="screen">
+  <div class="card"><div class="section-title">Historie</div><h2 style="font-size:22px">Tvoje odtrénováno</h2></div>
+  <div id="historyList"></div>
+</section>
+
+<section id="progress" class="screen">
+  <div class="card"><div class="section-title">Progres</div><h2 style="font-size:22px">Síla & osobní rekordy</h2></div>
+  <div class="statgrid" style="margin-bottom:12px">
+    <div class="stat"><strong id="totalVolume">0</strong><span>kg celkem</span></div>
+    <div class="stat"><strong id="best1rm">0</strong><span>nejlepší 1RM</span></div>
+    <div class="stat"><strong id="bestPR">0</strong><span>PR</span></div>
+  </div>
+  <div class="card"><div class="section-title">Osobní rekordy</div><div id="prList" class="stack"></div></div>
+  <div class="card"><div class="section-title">🧮 KALKULAČKA SÍLY</div>
+    <h2 style="font-size:21px">Maximálka + pracovní váhy</h2>
+    <p class="small muted" style="margin-top:5px">Velká osa = 20 kg + kotouče na obou stranách. Jednoručky se počítají jako váha jedné ruky. Pokud neznáš maximálku, můžeš ji odhadnout z váhy a opakování.</p>
+    <label>Cvik</label>
+    <select id="rmExercise" style="width:100%;background:#111113;border:1px solid var(--border);color:white;border-radius:11px;padding:11px"></select>
+    <div class="chips" style="margin:8px 0 4px">
+      <button id="rmModeMax" class="chip active" type="button" onclick="setRMMode('max')">Znám maximálku</button>
+      <button id="rmModeEstimate" class="chip" type="button" onclick="setRMMode('estimate')">Odhad z opakování</button>
+    </div>
+    <div id="rmMaxMode">
+      <label>Moje maximálka (kg)</label>
+      <input id="rmMaxWeight" type="number" inputmode="decimal" value="40" min="0" step="0.5">
+      <p class="small muted" style="margin-top:6px">U jednoruček zadávej váhu <strong>jedné ruky</strong>. U velké osy je váha včetně 20kg tyče.</p>
+    </div>
+    <div id="rmEstimateMode" style="display:none">
+      <div class="grid">
+        <div><label>Váha (kg)</label><input id="rmWeight" type="number" inputmode="decimal" value="100" min="0" step="0.5"></div>
+        <div><label>Opakování</label><input id="rmReps" type="number" inputmode="numeric" value="5" min="1" max="30"></div>
+      </div>
+    </div>
+    <button class="btn primary" style="width:100%;margin-top:10px" onclick="calc1RM()">🧮 Spočítat pracovní váhy</button>
+    <div id="rmResult" style="margin-top:12px;text-align:center"></div>
+    <div id="rmZones" style="margin-top:12px"></div>
+  </div>
+</section>
+
+
+<section id="library" class="screen">
+  <div class="card">
+    <div class="section-title">🏋️ Moje fitko</div>
+    <div class="small muted" style="line-height:1.5">Clever fit Kladno uvádí 53 silových strojů Technogym, 9 polohovacích lavic, kladky, činky a další příslušenství. Kompletní názvy všech 53 strojů web veřejně nerozepisuje, takže do aplikace nepřidávám vymyšlené názvy jako „ověřené“ stroje.</div>
+    <h2 style="font-size:22px;margin-top:8px;margin-bottom:5px">Cvičím klasicky</h2>
+    <p class="small muted">EGYM a automatické chytré stroje jsou vypnuté. Vyber jen vybavení, které máš v Clever Fitu k dispozici.</p>
+    <div class="chips" id="gymFilters">
+      <button class="chip active" data-filter="all" onclick="setGymFilter('all')">Vše</button>
+      <button class="chip active" data-filter="machine" onclick="setGymFilter('machine')">Stroje</button>
+      <button class="chip active" data-filter="cable" onclick="setGymFilter('cable')">Kladky</button>
+      <button class="chip active" data-filter="barbell" onclick="setGymFilter('barbell')">Činky</button>
+      <button class="chip active" data-filter="dumbbell" onclick="setGymFilter('dumbbell')">Jednoručky</button>
+      <button class="chip active" data-filter="kinesis" onclick="setGymFilter('kinesis')">Kinesis</button>
+      <button class="chip active" data-filter="octagon" onclick="setGymFilter('octagon')">Octagon</button>
+    </div>
+  </div>
+
+  <div class="card"><div class="section-title">Katalog cviků</div><h2 style="font-size:22px">Cviky</h2><input id="search" placeholder="🔎 Hledat cvik, sval nebo vybavení…" oninput="renderLibrary()"></div>
+  <div id="libraryList"></div>
+</section>
+</main>
+
+<nav class="nav">
+<button class="active" data-screen="home" onclick="showScreen('home')"><b>⌂</b>Domů</button>
+<button data-screen="workout" onclick="showScreen('workout')"><b>🏋️</b>Trénink</button>
+<button data-screen="progress" onclick="showScreen('progress')"><b>📈</b>Progres</button>
+<button data-screen="library" onclick="showScreen('library')"><b>📚</b>Cviky</button>
+</nav>
+<div id="toast" class="toast"></div>
+</div>
+
+<script>
+const KEY='silovy_trener_v2';
+const equipmentLabels={barbell:'Velká osa',dumbbell:'Jednoručky',cable:'Kladka',machine:'Klasický stroj',kinesis:'Kinesis',octagon:'Octagon',pullup:'Hrazda',bodyweight:'Vlastní váha'};
+const db=[
+{id:'bench',name:'Bench Press',target:'Hrudník',equip:'barbell',sets:4,reps:'6-8',rest:180,base:80,sub:['machine_press','cable_press']},
+{id:'incline_db',name:'Tlaky jednoruček na šikmé lavici',target:'Hrudník',equip:'dumbbell',sets:3,reps:'8-12',rest:120,base:28,sub:['incline_machine']},
+{id:'machine_press',name:'Chest Press vsedě',target:'Hrudník',equip:'machine',sets:3,reps:'8-12',rest:120,base:70,sub:['bench','cable_press']},
+{id:'cable_press',name:'Stahování kladek před tělem',target:'Hrudník',equip:'cable',sets:3,reps:'10-15',rest:90,base:20,sub:['machine_press']},
+{id:'latpulldown',name:'Stahování horní kladky',target:'Záda',equip:'cable',sets:4,reps:'8-12',rest:120,base:65,sub:['pullups','machine_row']},
+{id:'machine_row',name:'Přítahy na stroji',target:'Záda',equip:'machine',sets:4,reps:'8-12',rest:120,base:65,sub:['latpulldown','cable_row']},
+{id:'cable_row',name:'Veslování na spodní kladce',target:'Záda',equip:'cable',sets:3,reps:'10-12',rest:105,base:55,sub:['machine_row']},
+{id:'pullups',name:'Shyby',target:'Záda',equip:'pullup',sets:3,reps:'6-10',rest:120,base:0,sub:['latpulldown']},
+{id:'ohp',name:'Tlaky nad hlavu',target:'Ramena',equip:'barbell',sets:3,reps:'6-10',rest:120,base:50,sub:['shoulder_machine']},
+{id:'shoulder_machine',name:'Shoulder Press stroj',target:'Ramena',equip:'machine',sets:3,reps:'8-12',rest:105,base:45,sub:['ohp','db_shoulder']},
+{id:'db_shoulder',name:'Tlaky jednoruček vsedě',target:'Ramena',equip:'dumbbell',sets:3,reps:'8-12',rest:105,base:22,sub:['shoulder_machine']},
+{id:'lateral',name:'Upažování na stroji/kladce',target:'Ramena',equip:'cable',sets:3,reps:'12-15',rest:75,base:12,sub:['db_lateral']},
+{id:'db_lateral',name:'Upažování jednoruček',target:'Ramena',equip:'dumbbell',sets:3,reps:'12-15',rest:75,base:8,sub:['lateral']},
+{id:'legpress',name:'Leg Press',target:'Kvadricepsy / nohy',equip:'machine',sets:4,reps:'8-12',rest:150,base:160,sub:['squat','hack_squat']},
+{id:'hack_squat',name:'Hack Squat',target:'Kvadricepsy',equip:'machine',sets:3,reps:'8-12',rest:150,base:80,sub:['legpress','squat']},
+{id:'squat',name:'Dřep s velkou osou',target:'Nohy',equip:'barbell',sets:4,reps:'5-8',rest:180,base:100,sub:['legpress','hack_squat']},
+{id:'legcurl',name:'Zakopávání',target:'Hamstringy',equip:'machine',sets:3,reps:'10-15',rest:90,base:45,sub:['rdl']},
+{id:'legext',name:'Předkopávání',target:'Kvadricepsy',equip:'machine',sets:3,reps:'10-15',rest:90,base:45,sub:['legpress']},
+{id:'rdl',name:'Rumunský mrtvý tah',target:'Hamstringy / hýždě',equip:'barbell',sets:3,reps:'8-10',rest:135,base:80,sub:['legcurl']},
+{id:'calf',name:'Lýtka na stroji',target:'Lýtka',equip:'machine',sets:4,reps:'10-15',rest:60,base:60,sub:['calf_standing']},
+{id:'calf_standing',name:'Výpony ve stoje',target:'Lýtka',equip:'machine',sets:4,reps:'10-15',rest:60,base:50,sub:['calf']},
+{id:'biceps',name:'Bicepsový zdvih na kladce',target:'Biceps',equip:'cable',sets:3,reps:'10-15',rest:75,base:20,sub:['db_curl']},
+{id:'db_curl',name:'Bicepsový zdvih jednoruček',target:'Biceps',equip:'dumbbell',sets:3,reps:'10-12',rest:75,base:14,sub:['biceps']},
+{id:'triceps',name:'Stahování lana',target:'Triceps',equip:'cable',sets:3,reps:'10-15',rest:75,base:25,sub:['triceps_machine']},
+{id:'triceps_machine',name:'Tricepsový stroj',target:'Triceps',equip:'machine',sets:3,reps:'10-15',rest:75,base:40,sub:['triceps']},
+{id:'abs',name:'Břicho na kladce',target:'Břicho',equip:'cable',sets:3,reps:'12-20',rest:60,base:25,sub:['plank']},
+{id:'plank',name:'Plank',target:'Břicho',equip:'bodyweight',sets:3,reps:'30-60 s',rest:60,base:0,sub:['abs']}
+,
+{id:'incline_machine',name:'Incline Chest Press',target:'Horní hrudník',equip:'machine',sets:3,reps:'8-12',rest:120,base:60,sub:['incline_db','bench']},
+{id:'cable_fly_low',name:'Spodní kladky – rozpažování',target:'Horní hrudník',equip:'cable',sets:3,reps:'10-15',rest:90,base:12,sub:['cable_press']},
+{id:'cable_fly_high',name:'Horní kladky – rozpažování',target:'Hrudník',equip:'cable',sets:3,reps:'10-15',rest:90,base:12,sub:['cable_press']},
+{id:'assisted_pullup',name:'Přítahy na asistovaném stroji',target:'Záda',equip:'machine',sets:3,reps:'6-10',rest:120,base:40,sub:['latpulldown']},
+{id:'pullover',name:'Pullover na kladce',target:'Latissimy',equip:'cable',sets:3,reps:'10-15',rest:90,base:25,sub:['latpulldown']},
+{id:'tbar',name:'T-Bar Row',target:'Záda',equip:'machine',sets:3,reps:'8-12',rest:120,base:60,sub:['machine_row']},
+{id:'rear_delt',name:'Reverse Fly stroj',target:'Zadní ramena',equip:'machine',sets:3,reps:'12-15',rest:75,base:35,sub:['lateral']},
+{id:'facepull',name:'Face Pull',target:'Zadní ramena',equip:'cable',sets:3,reps:'12-20',rest:75,base:20,sub:['rear_delt']},
+{id:'cable_front_raise',name:'Předpažování na kladce',target:'Přední ramena',equip:'cable',sets:3,reps:'10-15',rest:75,base:10,sub:['db_shoulder']},
+{id:'preacher',name:'Bicepsový stroj / Scott',target:'Biceps',equip:'machine',sets:3,reps:'8-12',rest:90,base:30,sub:['biceps','db_curl']},
+{id:'hammer_cable',name:'Kladivové zdvihy na laně',target:'Biceps',equip:'cable',sets:3,reps:'10-15',rest:75,base:20,sub:['db_curl']},
+{id:'overhead_triceps',name:'Triceps nad hlavou na laně',target:'Triceps',equip:'cable',sets:3,reps:'10-15',rest:75,base:20,sub:['triceps']},
+{id:'dip_machine',name:'Dipy na stroji',target:'Triceps / hrudník',equip:'machine',sets:3,reps:'8-12',rest:105,base:45,sub:['triceps','machine_press']},
+{id:'adductor',name:'Addukce',target:'Vnitřní stehna',equip:'machine',sets:3,reps:'12-20',rest:75,base:45,sub:['legpress']},
+{id:'abductor',name:'Abdukce',target:'Hýždě / boky',equip:'machine',sets:3,reps:'12-20',rest:75,base:45,sub:['legpress']},
+{id:'glute',name:'Glute Drive / Hip Thrust stroj',target:'Hýždě',equip:'machine',sets:4,reps:'8-12',rest:120,base:60,sub:['rdl']},
+{id:'smith_squat',name:'Dřep na Smithově stroji',target:'Nohy',equip:'machine',sets:4,reps:'6-10',rest:150,base:80,sub:['legpress','squat']},
+{id:'smith_incline',name:'Šikmé tlaky na Smithovi',target:'Hrudník',equip:'machine',sets:3,reps:'6-10',rest:120,base:60,sub:['incline_machine']},
+{id:'back_extension',name:'Hyperextenze',target:'Spodní záda / hýždě',equip:'machine',sets:3,reps:'10-15',rest:90,base:0,sub:['rdl']},
+{id:'seated_legcurl',name:'Zakopávání vsedě',target:'Hamstringy',equip:'machine',sets:3,reps:'8-12',rest:90,base:45,sub:['legcurl']},
+{id:'standing_calf_machine',name:'Lýtka ve stoje na stroji',target:'Lýtka',equip:'machine',sets:4,reps:'10-15',rest:60,base:60,sub:['calf']},
+{id:'cable_crunch',name:'Cable Crunch',target:'Břicho',equip:'cable',sets:3,reps:'10-20',rest:60,base:25,sub:['abs']},
+{id:'ab_machine',name:'Břicho na stroji',target:'Břicho',equip:'machine',sets:3,reps:'10-20',rest:60,base:45,sub:['abs']},
+{id:'leg_raise',name:'Zvedání nohou',target:'Břicho',equip:'bodyweight',sets:3,reps:'8-15',rest:60,base:0,sub:['plank']}
+,
+{id:'chest_press',name:'Chest Press vsedě',target:'Hrudník',equip:'machine',sets:3,reps:'8-12',rest:120,base:60,sub:['bench','incline_machine']},
+{id:'high_row',name:'High Row',target:'Záda',equip:'machine',sets:3,reps:'8-12',rest:120,base:60,sub:['machine_row','latpulldown']},
+{id:'machine_row',name:'Přítahy na stroji',target:'Záda',equip:'machine',sets:3,reps:'8-12',rest:120,base:60,sub:['tbar','cable_row']},
+{id:'cable_row',name:'Veslování na spodní kladce',target:'Záda',equip:'cable',sets:3,reps:'8-12',rest:120,base:40,sub:['machine_row']},
+{id:'latpulldown_wide',name:'Stahování horní kladky širokým úchopem',target:'Záda',equip:'cable',sets:3,reps:'8-12',rest:120,base:50,sub:['latpulldown']},
+{id:'cable_lateral',name:'Upažování na spodní kladce',target:'Ramena',equip:'cable',sets:3,reps:'12-15',rest:75,base:7.5,sub:['lateral']},
+{id:'triceps_rope',name:'Triceps – stahování lana',target:'Triceps',equip:'cable',sets:3,reps:'10-15',rest:75,base:20,sub:['triceps']},
+{id:'cable_curl',name:'Biceps – zdvih na kladce',target:'Biceps',equip:'cable',sets:3,reps:'10-15',rest:75,base:20,sub:['biceps']},
+{id:'leg_extension',name:'Předkopávání',target:'Kvadricepsy',equip:'machine',sets:3,reps:'10-15',rest:90,base:40,sub:['legpress']},
+{id:'leg_curl_lying',name:'Zakopávání vleže',target:'Hamstringy',equip:'machine',sets:3,reps:'10-15',rest:90,base:35,sub:['legcurl']},
+{id:'calf_machine',name:'Lýtka na stroji',target:'Lýtka',equip:'machine',sets:4,reps:'10-15',rest:60,base:50,sub:['calf']},
+{id:'hack_squat',name:'Hack Squat',target:'Kvadricepsy / hýždě',equip:'machine',sets:4,reps:'6-10',rest:150,base:80,sub:['legpress','smith_squat']}
+,{id:'vertical_chest',name:'Vertical Chest Press',target:'Hrudník',equip:'machine',sets:3,reps:'10-15',rest:90,base:30,sub:[]},{id:'decline_chest',name:'Decline Chest Press',target:'Hrudník',equip:'machine',sets:3,reps:'10-15',rest:90,base:30,sub:[]},{id:'low_row',name:'Low Row',target:'Záda',equip:'machine',sets:3,reps:'10-15',rest:90,base:30,sub:[]},{id:'lat_machine',name:'Lat Machine',target:'Záda',equip:'machine',sets:3,reps:'10-15',rest:90,base:30,sub:[]},{id:'pulldown_neutral',name:'Stahování horní kladky neutrálně',target:'Záda',equip:'cable',sets:3,reps:'10-15',rest:90,base:30,sub:[]},{id:'pulldown_under',name:'Stahování horní kladky podhmatem',target:'Záda',equip:'cable',sets:3,reps:'10-15',rest:90,base:30,sub:[]},{id:'pullover_machine',name:'Pullover stroj',target:'Latissimy',equip:'machine',sets:3,reps:'10-15',rest:90,base:30,sub:[]},{id:'lowerback',name:'Spodní záda – stroj',target:'Spodní záda',equip:'machine',sets:3,reps:'10-15',rest:90,base:30,sub:[]},{id:'lateral_machine',name:'Lateral Raise stroj',target:'Boční ramena',equip:'machine',sets:3,reps:'10-15',rest:90,base:30,sub:[]},{id:'rear_machine',name:'Rear Delt / Reverse Fly',target:'Zadní ramena',equip:'machine',sets:3,reps:'10-15',rest:90,base:30,sub:[]},{id:'biceps_machine2',name:'Bicepsový stroj',target:'Biceps',equip:'machine',sets:3,reps:'10-15',rest:90,base:30,sub:[]},{id:'triceps_machine2',name:'Tricepsový stroj',target:'Triceps',equip:'machine',sets:3,reps:'10-15',rest:90,base:30,sub:[]},{id:'legpress_h',name:'Horizontální Leg Press',target:'Nohy',equip:'machine',sets:3,reps:'10-15',rest:90,base:30,sub:[]},{id:'pendulum',name:'Pendulum Squat',target:'Nohy',equip:'machine',sets:3,reps:'10-15',rest:90,base:30,sub:[]},{id:'legext_single',name:'Předkopávání jednonož',target:'Kvadricepsy',equip:'machine',sets:3,reps:'10-15',rest:90,base:30,sub:[]},{id:'legcurl_single',name:'Zakopávání jednonož',target:'Hamstringy',equip:'machine',sets:3,reps:'10-15',rest:90,base:30,sub:[]},{id:'glutekick',name:'Glute Kickback',target:'Hýždě',equip:'machine',sets:3,reps:'10-15',rest:90,base:30,sub:[]},{id:'hipthrust',name:'Hip Thrust stroj',target:'Hýždě',equip:'machine',sets:3,reps:'10-15',rest:90,base:30,sub:[]},{id:'calf_seated',name:'Lýtka vsedě',target:'Lýtka',equip:'machine',sets:3,reps:'10-15',rest:90,base:30,sub:[]},{id:'calf_press',name:'Lýtka na Leg Pressu',target:'Lýtka',equip:'machine',sets:3,reps:'10-15',rest:90,base:30,sub:[]},{id:'torso',name:'Rotace trupu stroj',target:'Core',equip:'machine',sets:3,reps:'10-15',rest:90,base:30,sub:[]},{id:'woodchop',name:'Woodchop na kladce',target:'Core',equip:'cable',sets:3,reps:'10-15',rest:90,base:30,sub:[]},{id:'cable_rotation',name:'Rotace trupu na kladce',target:'Core',equip:'cable',sets:3,reps:'10-15',rest:90,base:30,sub:[]},{id:'backext_machine',name:'Back Extension stroj',target:'Spodní záda',equip:'machine',sets:3,reps:'10-15',rest:90,base:30,sub:[]},{id:'smith_bench',name:'Bench Press na Smithovi',target:'Hrudník',equip:'machine',sets:3,reps:'10-15',rest:90,base:30,sub:[]},{id:'smith_row',name:'Přítahy na Smithovi',target:'Záda',equip:'machine',sets:3,reps:'10-15',rest:90,base:30,sub:[]},{id:'smith_rdl',name:'Rumunský tah na Smithovi',target:'Hamstringy / hýždě',equip:'machine',sets:3,reps:'10-15',rest:90,base:30,sub:[]},{id:'pullthrough',name:'Pull Through na kladce',target:'Hýždě / hamstringy',equip:'cable',sets:3,reps:'10-15',rest:90,base:30,sub:[]},{id:'cable_squat',name:'Dřep na kladce',target:'Nohy',equip:'cable',sets:3,reps:'10-15',rest:90,base:30,sub:[]}];
+
+
+/* Clever fit Kladno: další klasické možnosti mimo E-GYM */
+db.push(
+{id:'kinesis_press',name:'Kinesis Chest Press',target:'Hrudník',equip:'kinesis',sets:3,reps:'10-15',rest:90,base:10,sub:['cable_press','machine_press']},
+{id:'kinesis_row',name:'Kinesis Row',target:'Záda',equip:'kinesis',sets:3,reps:'10-15',rest:90,base:10,sub:['cable_row','machine_row']},
+{id:'kinesis_lateral',name:'Kinesis Upažování',target:'Ramena',equip:'kinesis',sets:3,reps:'12-15',rest:75,base:5,sub:['cable_lateral','db_lateral']},
+{id:'kinesis_chop',name:'Kinesis Woodchop',target:'Core',equip:'kinesis',sets:3,reps:'10-15',rest:75,base:5,sub:['woodchop','cable_rotation']},
+{id:'oct_pullup',name:'Shyby na Octagonu',target:'Záda',equip:'octagon',sets:3,reps:'6-12',rest:120,base:0,sub:['pullups','latpulldown']},
+{id:'oct_dip',name:'Dipy na Octagonu',target:'Triceps / hrudník',equip:'octagon',sets:3,reps:'6-12',rest:105,base:0,sub:['dip_machine','triceps']},
+{id:'oct_trx_row',name:'TRX přítahy',target:'Záda',equip:'octagon',sets:3,reps:'8-15',rest:90,base:0,sub:['cable_row','machine_row']},
+{id:'oct_pushup',name:'Kliky na Octagonu',target:'Hrudník / triceps',equip:'octagon',sets:3,reps:'8-20',rest:75,base:0,sub:['bench','machine_press']}
+);
+
+// Ochrana proti duplicitám v databázi: pro každý ID zůstane první definice.
+const seenExerciseIds=new Set();
+for(let i=db.length-1;i>=0;i--){if(seenExerciseIds.has(db[i].id))db.splice(i,1);else seenExerciseIds.add(db[i].id);}
+let state=loadState();
+
+state.gymFilters=state.gymFilters||{machine:true,cable:true,barbell:true,dumbbell:true,kinesis:true,octagon:true};
+function setGymFilter(v){
+  if(v==='all'){
+    state.gymFilters={machine:true,cable:true,barbell:true,dumbbell:true};
+  }else{
+    state.gymFilters[v]=!state.gymFilters[v];
+  }
+  save();
+  document.querySelectorAll('#gymFilters .chip').forEach(b=>{
+    const f=b.dataset.filter;
+    b.classList.toggle('active',f==='all'?Object.values(state.gymFilters).every(Boolean):!!state.gymFilters[f]);
+  });
+  renderLibrary();
+}
+function allowedForGym(ex){
+  if(!ex.equip)return true;
+  if(ex.equip==='bodyweight')return true;
+  return state.gymFilters[ex.equip]!==false;
+}
+
+state.profile=state.profile||{age:'',height:'',weight:''};
+let settings={focus:'full',time:75,goal:'strength',equip:new Set(['barbell','dumbbell','cable','machine','kinesis','octagon'])};
+let workout=null, timer=null, timerEnd=0, timerTotal=0, paused=false, progressChart=null;
+
+function loadState(){try{return JSON.parse(localStorage.getItem(KEY))||{history:[],prs:{}}}catch(e){return{history:[],prs:{}}}}
+function save(){localStorage.setItem(KEY,JSON.stringify(state)); updateStats()}
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function toast(t){$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2200)}
+function showScreen(id){
+ document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');
+ document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.screen===id));
+ if(id==='history')renderHistory();if(id==='progress')renderProgress();if(id==='library')renderLibrary();
+}
+function selectFocus(v){settings.focus=v;document.querySelectorAll('[data-focus]').forEach(x=>x.classList.toggle('active',x.dataset.focus===v))}
+function selectTime(v){settings.time=v;document.querySelectorAll('[data-time]').forEach(x=>x.classList.toggle('active',+x.dataset.time===v))}
+function selectGoal(v){
+ settings.goal=v;
+ document.querySelectorAll('[data-goal]').forEach(x=>x.classList.toggle('active',x.dataset.goal===v));
+ renderCoachTip();
+}
+function coachAdvice(){
+ if(!state.history.length)return'Zatím nemám dost tréninků. Odcvič první trénink a začnu sledovat progres.';
+ const recent=state.history.slice(0,5);
+ const last=recent[0];
+ const prev=recent[1];
+ let msg=`Poslední trénink: ${last.name}, ${last.tonnage.toLocaleString('cs-CZ')} kg objemu. `;
+ if(prev){
+   const diff=last.tonnage-prev.tonnage;
+   msg+=diff>0?`Objem šel nahoru o ${Math.abs(diff).toLocaleString('cs-CZ')} kg. 🔥 `:diff<0?`Objem byl nižší o ${Math.abs(diff).toLocaleString('cs-CZ')} kg — příště zkus postupně dorovnat výkon. `:'Objem je podobný jako minule. ';
+ }
+ const labels={strength:'Priorita: síla. U hlavních cviků drž kvalitní techniku a postupně přidávej váhu.',muscle:'Priorita: svaly. Drž kontrolované opakování a snaž se postupně přidávat opakování nebo váhu.',fatloss:'Priorita: hubnutí. Drž pravidelný trénink a sleduj váhu i výkon, ne jen číslo na váze.',maintain:'Priorita: udržování. Snaž se držet podobný výkon a konzistentní počet tréninků.'};
+ return msg+(labels[settings.goal]||labels.strength);
+}
+function renderCoachTip(){if($('coachTip'))$('coachTip').textContent=coachAdvice();renderCoachStats()}
+function toggleEquip(v){settings.equip.has(v)?settings.equip.delete(v):settings.equip.add(v);document.querySelector(`[data-equip="${v}"]`).classList.toggle('active',settings.equip.has(v))}
+function eligible(id){const x=db.find(x=>x.id===id);return !!x&&settings.equip.has(x.equip)}
+function findLast(id){for(const h of state.history){const e=h.exercises.find(x=>x.id===id);if(e&&e.sets?.length)return e}}
+function recommendedWeight(ex){
+ const last=findLast(ex.id);
+ if(!last)return ex.base||0;
+ const valid=last.sets.filter(s=>(+s.weight||0)>0&&(+s.reps||0)>0);
+ if(!valid.length)return ex.base||0;
+ const avg=valid.reduce((a,s)=>a+s.weight,0)/valid.length;
+ const avgReps=valid.reduce((a,s)=>a+s.reps,0)/valid.length;
+ const topE1rm=Math.max(...valid.map(s=>e1rm(s.weight,s.reps)));
+ const oldBest=state.prs[ex.id]?.e1rm||0;
+ const step=settings.goal==='strength'?5:2.5;
+ const repMax=parseInt(String(ex.reps).split('-').pop())||12;
+ const repMin=parseInt(String(ex.reps).split('-')[0])||8;
+ let next=avg;
+ if(avgReps>=repMax) next=avg+step;
+ else if(avgReps>=repMin && settings.goal==='strength') next=avg+step;
+ else if(avgReps<repMin) next=avg;
+ // Never recommend a jump larger than one normal increment.
+ next=Math.round(next/2.5)*2.5;
+ return Math.max(0,next);
+}
+function choose(ids,n){
+ return ids.map(id=>db.find(x=>x.id===id)).filter(x=>x&&settings.equip.has(x.equip)).slice(0,n);
+}
+function generateWorkout(){
+ let ids;
+ if(settings.focus==='full'){
+   ids=['bench','latpulldown','legpress','incline_db','machine_row','legcurl','shoulder_machine','rear_delt','triceps','biceps','calf','cable_crunch','facepull','adductor','abductor','kinesis_press','kinesis_row','oct_pullup','oct_dip'];
+ }else if(settings.focus==='upper'){
+   ids=['bench','latpulldown','incline_db','machine_row','shoulder_machine','lateral','triceps','biceps'];
+ }else{
+   ids=['legpress','rdl','legcurl','legext','calf','abs'];
+ }
+ let list=choose(ids,99);
+ const max={60:6,75:8,90:10}[settings.time]||8;
+ list=list.slice(0,max);
+ // Pokud kvůli vybavení něco vypadlo, doplň vhodnými cviky.
+ if(list.length<Math.min(max,5)){
+   for(const e of db){if(settings.equip.has(e.equip)&&!list.some(x=>x.id===e.id)){list.push(e);if(list.length>=Math.min(max,5))break}}
+ }
+ workout={title:settings.focus==='full'?'Full Body':settings.focus==='upper'?'Vrch těla':'Nohy & břicho',goal:settings.goal,time:settings.time,started:Date.now(),exercises:list.map(e=>{const ww=roundTrainingWeight(e, recommendedWeight(e));return {id:e.id,name:e.name,target:e.target,warmup:makeWarmup(ww).map(x=>({weight:x[0],reps:x[1],done:false,warmup:true})),sets:Array.from({length:e.sets},()=>({weight:ww,reps:parseInt(e.reps)||10,done:false,warmup:false})),rest:e.rest}})};
+ renderWorkout();showScreen('workout');toast('Trénink je připraven 💪');
+}
+function getRecommendation(e){
+ const last=findLast(e.id);
+ if(!last)return `První trénink je základ. Zapiš každou sérii — od dalšího tréninku už budu doporučení stavět na tvém skutečném výkonu.`;
+ const weights=last.sets.map(s=>+s.weight||0).filter(Boolean);
+ const reps=last.sets.map(s=>+s.reps||0).filter(Boolean);
+ if(!weights.length)return `Minule nebyla zapsaná váha. Dnes ji zapiš, ať můžu doporučení zpřesnit.`;
+ const w=Math.max(...weights);
+ const r=Math.round(reps.reduce((a,b)=>a+b,0)/Math.max(1,reps.length));
+ const next=recommendedWeight(e);
+ if(r>=12)return `Minule ${w} kg × průměrně ${r}. Dnes zkus ${next} kg. Pokud dáš horní hranici, příště můžeme znovu přidat.`;
+ if(r>=8)return `Minule ${w} kg × průměrně ${r}. 🎯 Zkus ${next} kg a míř na ${e.reps}.`;
+ return `Minule ${w} kg × průměrně ${r}. Nejdřív dorovnej opakování; pokud technika drží, nech ${next} kg.`;
+}
+function renderWorkout(){
+ if(!workout)return;
+ $('workoutTitle').textContent=workout.title;$('workoutTime').textContent=workout.time+' min';
+ $('exerciseList').innerHTML=workout.exercises.map((e,ei)=>`
+ <div class="exercise ${ei===0?'current':''}" id="ex-${ei}">
+  <div class="row"><div><div class="exercise-name">${esc(e.name)}</div><div class="target">${esc(e.target)} • pauza ${Math.round(e.rest/60)} min</div></div><button class="btn" onclick="replaceExercise(${ei})">🔄 Vyměnit</button></div>
+  <div class="card" style="padding:10px;margin:10px 0 0;background:#101012">
+    <div class="small green" style="font-weight:900">🎯 DNEŠNÍ DOPORUČENÍ</div>
+    <div style="font-size:13px;font-weight:800;margin-top:3px">${esc(getRecommendation(e))}</div>
+  </div>
+  ${e.warmup?.length?`<div class="card" style="padding:10px;margin:10px 0;background:#101012">
+    <div class="small" style="font-weight:900">🔥 ZAHŘÍVACÍ SÉRIE</div>
+    <div class="small muted" style="margin:4px 0 8px">Nejsou započítané do pracovního objemu. Mají tě připravit, ne unavit.</div>
+    <div class="sets">${e.warmup.map((s,wi)=>`<div class="set ${s.done?'done':''}">
+      <span>W${wi+1}</span><input type="number" inputmode="decimal" value="${s.weight}" onchange="updateWarmup(${ei},${wi},'weight',this.value)"><input type="number" inputmode="numeric" value="${s.reps}" onchange="updateWarmup(${ei},${wi},'reps',this.value)"><button class="check ${s.done?'done':''}" onclick="completeWarmup(${ei},${wi})">${s.done?'✓':'○'}</button>
+    </div>`).join('')}</div>
+  </div>`:''} 
+  <div class="small green" style="font-weight:900;margin-top:12px">💪 PRACOVNÍ SÉRIE</div>
+  <div class="sets">${e.sets.map((s,si)=>`<div class="set ${s.done?'done':''}">
+    <span>${si+1}</span><input type="number" inputmode="decimal" value="${s.weight}" onchange="updateSet(${ei},${si},'weight',this.value)"><input type="number" inputmode="numeric" value="${s.reps}" onchange="updateSet(${ei},${si},'reps',this.value)"><button class="check ${s.done?'done':''}" onclick="completeSet(${ei},${si})">${s.done?'✓':'○'}</button>
+  </div>`).join('')}</div>
+  <div class="row small muted" style="margin-top:9px"><span>${e.sets.filter(s=>s.done).length}/${e.sets.length} sérií</span><button class="btn" onclick="startRest(${e.rest})">⏱️ Start pauzu</button></div>
+ </div>`).join('');
+ updateWorkoutStats();
+}
+function updateSet(ei,si,k,v){workout.exercises[ei].sets[si][k]=Number(v)||0}
+function updateWarmup(ei,wi,k,v){workout.exercises[ei].warmup[wi][k]=Number(v)||0}
+function completeWarmup(ei,wi){
+ const s=workout.exercises[ei].warmup[wi];s.done=!s.done;renderWorkout();
+ if(s.done){startRest(60);toast('Zahřívací série zapsaná 🔥')}
+}
+function completeSet(ei,si){
+ const s=workout.exercises[ei].sets[si];s.done=!s.done;renderWorkout();
+ if(s.done){startRest(workout.exercises[ei].rest);toast('Pracovní série zapsaná — pauza spuštěna ⏱️')}
+}
+function replaceExercise(i){
+ const old=workout.exercises[i], ex=db.find(x=>x.id===old.id);
+ const alternatives=(ex?.sub||[]).map(id=>db.find(x=>x.id===id)).filter(x=>x&&settings.equip.has(x.equip));
+ if(!alternatives.length){toast('Pro tento cvik nemáš vybrané vhodné vybavení.');return}
+ const next=alternatives[0];
+ const ww=roundTrainingWeight(next, recommendedWeight(next));workout.exercises[i]={id:next.id,name:next.name,target:next.target,warmup:makeWarmup(ww).map(x=>({weight:x[0],reps:x[1],done:false,warmup:true})),sets:Array.from({length:next.sets},()=>({weight:ww,reps:parseInt(next.reps)||10,done:false,warmup:false})),rest:next.rest};
+ renderWorkout();toast('Cvik vyměněn za '+next.name);
+}
+function updateWorkoutStats(){
+ if(!workout)return;
+ let total=0,done=0,count=0,wDone=0,wCount=0;
+ workout.exercises.forEach(e=>{(e.warmup||[]).forEach(s=>{wCount++;if(s.done)wDone++;});e.sets.forEach(s=>{count++;if(s.done)done++;total+=(+s.weight||0)*(+s.reps||0)});});
+ $('workoutProgressText').textContent=`${done} / ${count} pracovních sérií`; if($('workoutWarmupText'))$('workoutWarmupText').textContent=`🔥 ${wDone} / ${wCount} zahřívacích`;$('workoutVolume').textContent=Math.round(total).toLocaleString('cs-CZ')+' kg';
+ $('workoutProgress').style.width=(count?done/count*100:0)+'%';
+}
+function startRest(sec){
+ clearInterval(timer);timerTotal=sec;timerEnd=Date.now()+sec*1000;paused=false;$('timerBox').style.display='block';$('timerLabel').textContent='PAUZA';
+ tickTimer();timer=setInterval(tickTimer,250);
+}
+function tickTimer(){
+ if(paused)return;
+ const left=Math.max(0,Math.ceil((timerEnd-Date.now())/1000));$('timerValue').textContent=fmt(left);$('timerProgress').style.width=(timerTotal?Math.max(0,Math.min(100,(timerTotal-left)/timerTotal*100)):0)+'%';
+ if(left<=0){clearInterval(timer);timer=null;beep();toast('Pauza skončila — další série! 💥');notify('Silový trenér','Pauza skončila. Další série!');$('timerBox').style.display='block';$('timerLabel').textContent='HOTOVO';}
+}
+function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+function addTimer(s){if(!timerEnd)return;timerEnd+=s*1000;timerTotal=Math.max(timerTotal,Math.ceil((timerEnd-Date.now())/1000));tickTimer()}
+function toggleTimer(){paused=!paused;if(!paused)timerEnd=Date.now()+Math.max(0,parseInt($('timerValue').textContent.split(':')[0])*60+parseInt($('timerValue').textContent.split(':')[1]))*1000}
+function stopTimer(){clearInterval(timer);timer=null;$('timerBox').style.display='none'}
+function beep(){
+ try{const c=new (window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.frequency.value=880;g.gain.value=.18;o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.7)}catch(e){}
+}
+function notify(title,body){if('Notification' in window&&Notification.permission==='granted')new Notification(title,{body})}
+function requestNotifications(){if('Notification' in window)Notification.requestPermission().then(x=>toast(x==='granted'?'Notifikace povoleny 🔔':'Notifikace nebyly povoleny'))}
+function finishWorkout(){
+ if(!workout)return;
+ const exercises=workout.exercises.map(e=>({id:e.id,name:e.name,warmup:(e.warmup||[]).map(s=>({...s})),sets:e.sets.map(s=>({...s}))}));
+ const volume=exercises.reduce((a,e)=>a+e.sets.reduce((b,s)=>b+(+s.weight||0)*(+s.reps||0),0),0);
+ const duration=Math.max(1,Math.round((Date.now()-workout.started)/60000));
+ let prs=0;
+ exercises.forEach(e=>e.sets.forEach(s=>{if(s.warmup||!s.weight||!s.reps)return;const rm=e1rm(s.weight,s.reps);const old=state.prs[e.id]?.e1rm||0;if(rm>old){state.prs[e.id]={weight:s.weight,reps:s.reps,e1rm:Math.round(rm*10)/10,date:new Date().toLocaleDateString('cs-CZ')};prs++}}));
+ state.history.unshift({id:Date.now(),name:workout.title,date:new Date().toLocaleDateString('cs-CZ'),duration,tonnage:Math.round(volume),prsHit:prs,goal:workout.goal,exercises});
+ state.history=state.history.slice(0,100);save();workout=null;stopTimer();showScreen('home');toast(`Trénink uložen • ${prs} nové PR 🏆`);
+}
+function e1rm(w,r){return r<=1?w:w*(1+r/30)}
+let rmMode='max';
+function setRMMode(mode){
+ rmMode=mode;
+ $('rmModeMax').classList.toggle('active',mode==='max');
+ $('rmModeEstimate').classList.toggle('active',mode==='estimate');
+ $('rmMaxMode').style.display=mode==='max'?'block':'none';
+ $('rmEstimateMode').style.display=mode==='estimate'?'block':'none';
+ calc1RM();
+}
+function calc1RM(){
+  const exEl=document.getElementById('rmExercise');
+  const ex=exEl ? db.find(x=>x.id===exEl.value) : null;
+  const maxEl=document.getElementById('rmMaxWeight');
+  const weightEl=document.getElementById('rmWeight');
+  const repsEl=document.getElementById('rmReps');
+  const result=document.getElementById('rmResult');
+  const zonesEl=document.getElementById('rmZones');
+  if(!result || !zonesEl) return;
+
+  let rm=0, reps=1, source='';
+  if(rmMode==='max'){
+    rm=parseFloat(maxEl?.value)||0;
+    source='Zadaná maximálka';
+  }else{
+    const w=parseFloat(weightEl?.value)||0;
+    reps=Math.max(1,parseInt(repsEl?.value||'1',10));
+    rm=e1rm(w,reps);
+    source='Odhadované 1RM';
+  }
+
+  if(rm<=0){
+    result.innerHTML='<div class="small muted">Zadej platnou váhu.</div>';
+    zonesEl.innerHTML='';
+    return;
+  }
+
+  const goal=(typeof settings!=='undefined' && settings.goal)||'muscle';
+  const workPct=goal==='strength'?0.85:goal==='muscle'?0.75:goal==='fatloss'?0.65:0.70;
+  const working=roundTrainingWeight(ex,rm*workPct);
+  const loading=ex?.equip==='barbell'?plateLoading(working):'';
+  const isDB=ex?.equip==='dumbbell';
+
+  // Zahřívací série jsou navázané přímo na dnešní pracovní váhu.
+  const warmups=makeWarmup(working,ex).map((x,i)=>
+    `<div class="row" style="padding:7px 0;border-bottom:1px solid var(--border)">
+      <span>🔥 Zahřívací ${i+1}</span><strong>${x[0]} kg × ${x[1]}</strong>
+    </div>`
+  ).join('');
+
+  result.innerHTML=
+    `<div class="big green">${rm.toFixed(1)} kg</div>
+     <div class="small muted">${source}${ex?' • '+esc(ex.name):''}${rmMode==='estimate'?' • '+reps+' opakování':''}</div>
+     <div class="card" style="margin:10px 0 0;padding:11px;background:#101012">
+       <div class="small muted">Doporučená pracovní váha (${Math.round(workPct*100)} % 1RM)</div>
+       <strong style="font-size:22px">${working} kg</strong>
+       ${isDB?'<div class="small muted" style="margin-top:5px">🏋️ Váha jedné jednoručky</div>':''}
+       ${loading?`<div class="small" style="margin-top:9px">🏋️ <strong>Naložení osy:</strong> ${loading}</div>`:''}
+     </div>
+     <div class="card" style="margin:10px 0 0;padding:11px;background:#101012;text-align:left">
+       <div class="section-title" style="margin:0 0 4px">🔥 Zahřívací série</div>
+       <div class="small muted" style="margin-bottom:5px">Před pracovními sériemi. Nejezdi je do selhání.</div>
+       ${warmups || '<div class="small muted">Pracovní váha je příliš nízká pro automatický warm-up.</div>'}
+     </div>`;
+
+  const zones=[50,60,65,70,75,80,85,90,95,100];
+  zonesEl.innerHTML=zones.map(p=>{
+    const wt=roundTrainingWeight(ex,rm*p/100);
+    const detail=ex?.equip==='barbell'
+      ? `<span class="small muted">${plateLoading(wt)}</span>`
+      : ex?.equip==='dumbbell'
+        ? `<span class="small muted">1 jednoručka</span>`
+        : '';
+    return `<div class="row" style="padding:8px 0;border-bottom:1px solid var(--border)">
+      <span><strong>${p} %</strong> <span class="small muted">${zoneLabel(p)}</span></span>
+      <span style="text-align:right"><strong>${wt} kg</strong><br>${detail}</span>
+    </div>`;
+  }).join('');
+}
+
+let progGoal='muscle';
+function setProgGoal(g){
+  progGoal=g;
+  ['muscle','strength'].forEach(x=>{
+    const el=$('prog'+x.charAt(0).toUpperCase()+x.slice(1));
+    if(el) el.classList.toggle('active',x===g);
+  });
+}
+function smartProgress(){
+  const w=+$('progWeight').value||0;
+  const target=+$('progTarget').value||1;
+  const reps=($('progReps').value||'').split(',').map(x=>parseInt(x.trim(),10)).filter(x=>Number.isFinite(x));
+  if(!w||!reps.length){
+    $('progResult').innerHTML='<div class="small muted">Vyplň váhu a poslední série.</div>'; return;
+  }
+  const allHit=reps.every(r=>r>=target);
+  const nearHit=reps.filter(r=>r>=target-1).length===reps.length;
+  const avg=reps.reduce((a,b)=>a+b,0)/reps.length;
+  let action='', reason='', next=w;
+  if(allHit){
+    const inc = w>=80 ? 2.5 : w>=40 ? 2 : 1;
+    next=w+inc;
+    action='⬆️ PŘIDEJ';
+    reason=`Všechny série splnily cíl ${target} opakování.`;
+  }else if(nearHit && avg>=target-0.75){
+    action='➡️ DRŽ';
+    reason='Jsi těsně pod cílem. Zkus stejnou váhu a dorovnej opakování.';
+    next=w;
+  }else{
+    const dec = w>=80 ? 5 : w>=40 ? 2.5 : 1;
+    next=Math.max(0,w-dec);
+    action='⬇️ UBER';
+    reason='Výkon je pod cílem. Priorita je kvalitní technika a dokončení pracovních sérií.';
+  }
+  const goalText=progGoal==='muscle'?'pro růst svalů':'pro sílu';
+  $('progResult').innerHTML=`
+    <div class="card" style="padding:12px;background:#101012">
+      <div class="small muted">${goalText}</div>
+      <div style="font-size:24px;font-weight:800">${action}</div>
+      <div style="margin-top:5px">${reason}</div>
+      <div style="margin-top:10px"><span class="small muted">Doporučení příště:</span> <strong>${roundPlate(next)} kg</strong></div>
+      <div class="small muted" style="margin-top:6px">Poslední série: ${reps.join(' / ')} • průměr ${avg.toFixed(1)}</div>
+    </div>`;
+}
+function makeWarmup(workWeight, ex){
+  const w=+workWeight||0;
+  if(!w) return [];
+  const sets=[];
+  if(w<=30) sets.push([Math.max(5,roundTrainingWeight(ex,w*.4)),8],[Math.max(5,roundTrainingWeight(ex,w*.65)),5]);
+  else if(w<=60) sets.push([roundTrainingWeight(ex,w*.35),10],[roundTrainingWeight(ex,w*.55),6],[roundTrainingWeight(ex,w*.75),3]);
+  else sets.push([roundTrainingWeight(ex,w*.35),10],[roundTrainingWeight(ex,w*.55),6],[roundTrainingWeight(ex,w*.70),3],[roundTrainingWeight(ex,w*.82),1]);
+  return sets.filter(x=>x[0]>0 && x[0]<w);
+}
+function showWarmup(){
+  const w=+$('progWeight')?.value||0;
+  const sets=makeWarmup(w);
+  if(!sets.length){$('warmupResult').innerHTML='<div class="small muted">Zadej pracovní váhu výše.</div>';return;}
+  $('warmupResult').innerHTML=sets.map((s,i)=>`
+    <div class="row" style="padding:8px 0;border-bottom:1px solid var(--border)">
+      <span>🔥 Zahřívací ${i+1}</span><strong>${s[0]} kg × ${s[1]}</strong>
+    </div>`).join('')+
+    `<div class="small muted" style="margin-top:8px">Nejezdi zahřívací série do selhání. Mají tě připravit, ne unavit.</div>`;
+}
+document.addEventListener('input',e=>{
+  if(e.target && e.target.id==='progWeight') showWarmup();
+});
+setTimeout(showWarmup,300);
+
+// Skutečné vybavení: bench osa 20 kg + kotouče 20 / 15 / 10 / 5 / 2,5 / 1,25 kg.
+// Kotouče jsou vždy párově na obou stranách osy.
+const BAR_WEIGHT=20;
+const PLATES=[20,15,10,5,2.5,1.25];
+
+function roundPlate(x){
+  return Math.max(0,Math.round((+x||0)/2.5)*2.5);
+}
+function roundDumbbell(x){
+  // Jednoručka = váha jedné ruky, ne součet obou rukou.
+  return Math.max(0,Math.round((+x||0)/2.5)*2.5);
+}
+function roundTrainingWeight(ex,x){
+  if(ex?.equip==='dumbbell') return roundDumbbell(x);
+  if(ex?.equip==='barbell') return loadableBarbellWeight(x);
+  return roundPlate(x);
+}
+function loadableBarbellWeight(target){
+  target=Math.max(BAR_WEIGHT,+target||BAR_WEIGHT);
+  const desiredPerSide=Math.max(0,(target-BAR_WEIGHT)/2);
+  let best={side:0,diff:Infinity,pieces:Infinity};
+  for(let a=0;a<=8;a++) for(let b=0;b<=8;b++) for(let c=0;c<=6;c++)
+  for(let d=0;d<=6;d++) for(let e=0;e<=4;e++) for(let f=0;f<=4;f++){
+    const counts=[a,b,c,d,e,f];
+    const side=a*1.25+b*2.5+c*5+d*10+e*15+f*20;
+    const diff=Math.abs(side-desiredPerSide);
+    const pieces=counts.reduce((x,y)=>x+y,0);
+    if(diff<best.diff-1e-9||(Math.abs(diff-best.diff)<1e-9&&pieces<best.pieces)){
+      best={side,diff,pieces};
+    }
+  }
+  return BAR_WEIGHT+best.side*2;
+}
+function plateLoading(totalWeight){
+  totalWeight=loadableBarbellWeight(totalWeight);
+  const side=Math.max(0,(totalWeight-BAR_WEIGHT)/2);
+  if(side<=0) return 'jen tyč 20 kg';
+  let remaining=side,used=[];
+  for(const p of PLATES){
+    const n=Math.floor((remaining+1e-9)/p);
+    if(n>0){
+      used.push(`${n}×${p} kg`);
+      remaining=Math.round((remaining-n*p)*100)/100;
+    }
+  }
+  return used.length?`${used.join(' + ')} na každou stranu`:'jen tyč 20 kg';
+}
+function zoneLabel(p){return p<=60?'lehké':p<=75?'objem':p<=85?'pracovní':p<=95?'síla':'maximum'}
+function renderHistory(){
+ const box=$('historyList');if(!state.history.length){box.innerHTML='<div class="empty">Zatím nemáš žádný dokončený trénink.</div>';return}
+ box.innerHTML=state.history.map(h=>`<div class="card"><div class="row"><div><h3 style="font-size:15px">${esc(h.name)}</h3><div class="small muted" style="margin-top:4px">${h.date} • ${h.duration} min</div></div><span class="badge">${h.prsHit||0} PR</span></div><div class="row small" style="margin-top:12px"><span>${h.exercises.length} cviků</span><strong class="green">${h.tonnage.toLocaleString('cs-CZ')} kg</strong></div></div>`).join('');
+}
+
+function renderCoachStats(){
+ const box=$('coachStats'); if(!box)return;
+ const sessions=state.history.length;
+ const last=state.history[0];
+ const avgVol=sessions?Math.round(state.history.slice(0,5).reduce((a,h)=>a+(h.tonnage||0),0)/Math.min(5,sessions)):0;
+ const prs=Object.keys(state.prs).length;
+ box.innerHTML=`<div class="stat"><strong>${sessions}</strong><span>tréninků</span></div>
+ <div class="stat"><strong>${prs}</strong><span>PR</span></div>
+ <div class="stat"><strong>${avgVol?avgVol.toLocaleString('cs-CZ'):'—'}</strong><span>Ø objem / 5</span></div>`;
+}
+function populateRMExercises(){
+ const s=$('rmExercise'); if(!s)return;
+ const current=s.value;
+ const items=[...new Map(db.map(e=>[e.id,e])).values()]
+   .filter(e=>e.equip!=='bodyweight')
+   .sort((a,b)=>a.target.localeCompare(b.target,'cs'));
+ s.innerHTML=items.map(e=>`<option value="${e.id}">${esc(e.name)} • ${esc(e.target)}</option>`).join('');
+ if(current && items.some(e=>e.id===current))s.value=current;
+}
+
+function renderProgress(){
+ const all=state.history.flatMap(h=>h.exercises.flatMap(e=>e.sets.map(s=>({...s,id:e.id}))));
+ const vol=all.reduce((a,s)=>a+(+s.weight||0)*(+s.reps||0),0);const prs=Object.values(state.prs);
+ $('totalVolume').textContent=Math.round(vol).toLocaleString('cs-CZ');$('bestPR').textContent=prs.length;
+ $('best1rm').textContent=(prs.length?Math.max(...prs.map(x=>x.e1rm)):0).toFixed(1);
+ $('prList').innerHTML=prs.length?Object.entries(state.prs).map(([id,p])=>{const e=db.find(x=>x.id===id);return `<div class="row" style="padding:10px 0;border-bottom:1px solid var(--border)"><div><strong>${esc(e?.name||id)}</strong><div class="small muted">${p.date} • ${p.weight} kg × ${p.reps}</div></div><span class="green">${p.e1rm} kg 1RM</span></div>`}).join(''):'<div class="empty">Zatím žádné PR. První přijde při dokončení série.</div>';
+}
+function renderGymFilters(){document.querySelectorAll('#gymFilters .chip').forEach(b=>{const f=b.dataset.filter;b.classList.toggle('active',f==='all'?Object.values(state.gymFilters).every(Boolean):!!state.gymFilters[f]);});}
+function renderLibrary(){
+ const q=($('search').value||'').toLowerCase().trim();const items=db.filter(e=>allowedForGym(e)&&`${e.name} ${e.target} ${equipmentLabels[e.equip]}`.toLowerCase().includes(q));
+ $('libraryList').innerHTML=items.map(e=>`<div class="card" style="padding:13px"><div class="row"><div><strong>${esc(e.name)}</strong><div class="small muted" style="margin-top:4px">${esc(e.target)} • ${equipmentLabels[e.equip]}</div></div><span class="badge">${e.sets}× ${esc(e.reps)}</span></div><div class="small muted" style="margin-top:9px">Doporučená pauza: ${Math.round(e.rest/60)} min • start ${recommendedWeight(e)||'dle výkonu'} kg</div></div>`).join('');
+}
+function saveProfile(){
+ state.profile.age=+$('profileAge').value||'';
+ state.profile.height=+$('profileHeight').value||'';
+ state.profile.weight=+$('profileWeight').value||'';
+ save();renderProfile();renderCoachTip();
+}
+function bmi(){
+ const h=+state.profile.height,w=+state.profile.weight;
+ return h&&w?(w/((h/100)**2)):0;
+}
+function renderProfile(){
+ if(!$('profileAge'))return;
+ $('profileAge').value=state.profile.age||'';
+ $('profileHeight').value=state.profile.height||'';
+ $('profileWeight').value=state.profile.weight||'';
+ const b=bmi();
+ const cat=b?(b<18.5?'Podváha':b<25?'Normální':b<30?'Nadváha':'Obezita'):'—';
+ const bmr=state.profile.weight&&state.profile.height&&state.profile.age ? Math.round(10*state.profile.weight+6.25*state.profile.height-5*state.profile.age+5):0;
+ $('profileStats').innerHTML=`
+ <div class="stat"><strong>${b?b.toFixed(1):'—'}</strong><span>BMI • ${cat}</span></div>
+ <div class="stat"><strong>${bmr||'—'}</strong><span>BMR kcal/den</span></div>
+ <div class="stat"><strong>${state.profile.weight||'—'}</strong><span>kg aktuálně</span></div>`;
+}
+function updateStats(){
+ $('statWorkouts').textContent=state.history.length;$('statPR').textContent=Object.keys(state.prs).length;
+ const v=state.history.reduce((a,h)=>a+(h.tonnage||0),0);$('statVolume').textContent=v>999?(v/1000).toFixed(1)+'k':v;
+ if(state.history[0])$('lastWorkout').textContent=`${state.history[0].name} • ${state.history[0].date} • ${state.history[0].tonnage.toLocaleString('cs-CZ')} kg`;renderCoachTip();
+}
+function openSettings(){
+ const ok=confirm('Povolit zvukové/notifikační upozornění na konec pauzy?');
+ if(ok)requestNotifications(); else toast('Nastavení ponecháno beze změny');
+}
+document.addEventListener('DOMContentLoaded',()=>{updateStats();renderLibrary();renderGymFilters();renderProgress();renderProfile();populateRMExercises();calc1RM();});
+</script>
+</body>
+</html>
