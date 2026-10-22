@@ -45,7 +45,7 @@ input{width:100%;background:#111113;border:1px solid var(--border);color:white;b
 <body>
 <div class="app">
 <header>
-  <div class="logo"><div class="logo-icon">🏋️</div><div><div class="title">SILOVÝ TRENÉR • <span id="appVersion">V17</span></div><div class="sub" id="headerSub">Připraven k tréninku</div></div></div>
+  <div class="logo"><div class="logo-icon">🏋️</div><div><div class="title">SILOVÝ TRENÉR • <span id="appVersion">V18</span></div><div class="sub" id="headerSub">Připraven k tréninku</div></div></div>
   <button class="btn" style="padding:8px 10px" onclick="openSettings()">⚙️</button>
 </header>
 
@@ -68,7 +68,7 @@ input{width:100%;background:#111113;border:1px solid var(--border);color:white;b
     <div class="row"><div>
       <div class="section-title green">🧠 CHYTRÝ TRENÉR</div>
       <h2 style="font-size:21px">Učím se z tvých tréninků</h2>
-    </div><span class="badge"><span id="coachVersion">V17</span> • AUTOMATICKY</span></div>
+    </div><span class="badge"><span id="coachVersion">V18</span> • AUTOMATICKY</span></div>
     <p id="coachTip" class="small muted" style="margin-top:9px;line-height:1.55"></p>
     <div id="coachStats" class="statgrid" style="margin-top:12px"></div>
   </div>
@@ -163,7 +163,7 @@ input{width:100%;background:#111113;border:1px solid var(--border);color:white;b
   <div class="card" style="border-color:rgba(168,85,247,.35);background:linear-gradient(145deg,#1d1028,#18181b)">
     <div class="section-title" style="color:#c084fc">🔄 AKTUALIZACE A VERZE</div>
     <p class="small muted" style="line-height:1.5">Aktuální verze se doplňuje automaticky. Při každé nové verzi, kterou ti připravím, nemusíš číslo nikde ručně měnit.</p>
-    <div class="row" style="margin-top:10px"><span class="small muted">Nainstalovaná verze</span><span class="badge" id="settingsVersion">V17</span></div>
+    <div class="row" style="margin-top:10px"><span class="small muted">Nainstalovaná verze</span><span class="badge" id="settingsVersion">V18</span></div>
     <button class="btn primary" style="width:100%;margin-top:12px" onclick="document.getElementById('updateHtmlFile').click()">📦 Importovat aktualizaci HTML</button>
     <input id="updateHtmlFile" type="file" accept="text/html,.html" style="display:none" onchange="updateFromHtml(this.files[0])">
     <p class="small muted" style="margin-top:8px;line-height:1.5">Vyber nový HTML soubor, který ti připravím. Před aktualizací se automaticky uloží záloha tvých dat. Po aktualizaci zůstanou tréninky a nastavení v telefonu.</p>
@@ -270,9 +270,18 @@ input{width:100%;background:#111113;border:1px solid var(--border);color:white;b
 </section>
 </main>
 
+<div id="editWorkoutModal" class="modal" onclick="if(event.target===this)closeEditWorkout()">
+  <div class="modal-card">
+    <div class="row"><div><div class="section-title" style="margin:0;color:#c084fc">✏️ ÚPRAVA TRÉNINKU</div><h2 id="editWorkoutTitle" style="font-size:22px;margin-top:5px">Trénink</h2></div><button class="btn" onclick="closeEditWorkout()">✕</button></div>
+    <p class="small muted" style="margin-top:8px">Uprav váhy, opakování nebo RIR. Po uložení Coach použije upravená data pro další doporučení.</p>
+    <div id="editWorkoutBody"></div>
+    <div class="grid2" style="margin-top:12px"><button class="btn" onclick="closeEditWorkout()">Zrušit</button><button class="btn primary" onclick="saveEditedWorkout()">💾 Uložit změny</button></div>
+  </div>
+</div>
+
 <div id="settingsModal" class="modal" onclick="if(event.target===this)closeSettings()">
   <div class="modal-card">
-    <div class="row"><div><div class="section-title" style="margin:0;color:#c084fc">⚙️ NASTAVENÍ</div><h2 style="font-size:22px;margin-top:5px">Silový trenér <span id="modalVersion">V17</span></h2></div><button class="btn" onclick="closeSettings()">✕</button></div>
+    <div class="row"><div><div class="section-title" style="margin:0;color:#c084fc">⚙️ NASTAVENÍ</div><h2 style="font-size:22px;margin-top:5px">Silový trenér <span id="modalVersion">V18</span></h2></div><button class="btn" onclick="closeSettings()">✕</button></div>
     <div class="card" style="margin-top:12px">
       <div class="section-title">🔔 Upozornění</div>
       <p class="small muted">Zvukové upozornění po skončení pauzy.</p>
@@ -290,7 +299,7 @@ input{width:100%;background:#111113;border:1px solid var(--border);color:white;b
       <p class="small muted">Stáhneš-li ode mě novou verzi HTML, můžeš ji vybrat tady. Aplikace před aktualizací automaticky zazálohuje tvoje data.</p>
       <button class="btn primary" style="width:100%;margin-top:8px" onclick="document.getElementById('updateHtmlFile').click();closeSettings()">📦 Vybrat novou HTML verzi</button>
     </div>
-    <div class="small muted" style="margin-top:10px;text-align:center">Aktuální verze: <strong id="modalVersion2">V17</strong></div>
+    <div class="small muted" style="margin-top:10px;text-align:center">Aktuální verze: <strong id="modalVersion2">V18</strong></div>
   </div>
 </div>
 
@@ -304,7 +313,7 @@ input{width:100%;background:#111113;border:1px solid var(--border);color:white;b
 </div>
 
 <script>
-const APP_VERSION='V17';
+const APP_VERSION='V18';
 const KEY='silovy_trener_v2';
 const equipmentLabels={barbell:'Velká osa',dumbbell:'Jednoručky',cable:'Kladka',machine:'Klasický stroj',kinesis:'Kinesis',octagon:'Octagon',pullup:'Hrazda',bodyweight:'Vlastní váha'};
 const db=[
@@ -774,12 +783,71 @@ function plateLoading(totalWeight){
 }
 function zoneLabel(p){return p<=60?'lehké':p<=75?'objem':p<=85?'pracovní':p<=95?'síla':'maximum'}
 function toggleHistoryDetail(id){const el=$('hist-detail-'+id);if(el)el.style.display=el.style.display==='none'?'block':'none'}
+let editingHistoryId=null;
+function openEditWorkout(id){
+ const h=state.history.find(x=>x.id===id); if(!h)return;
+ editingHistoryId=id;
+ $('editWorkoutTitle').textContent=h.name||'Trénink';
+ $('editWorkoutBody').innerHTML=`<div class="card" style="margin-top:12px"><label>NÁZEV TRÉNINKU</label><input id="editWorkoutName" value="${esc(h.name||'Trénink')}" style="margin-top:6px"></div>`+h.exercises.map((e,ei)=>`
+  <div class="card" style="margin-top:10px">
+   <div class="row"><strong>${esc(e.name)}</strong><span class="badge">${esc(e.target||'')}</span></div>
+   <div class="small muted" style="margin-top:5px">Pracovní série</div>
+   ${(e.sets||[]).map((set,si)=>`<div class="grid3" style="margin-top:8px;align-items:end">
+    <div><label>SÉRIE ${si+1}</label><input id="edit-w-${ei}-${si}" type="number" inputmode="decimal" step="0.5" value="${Number(set.weight)||0}"></div>
+    <div><label>OPAK.</label><input id="edit-r-${ei}-${si}" type="number" inputmode="numeric" step="1" value="${Number(set.reps)||0}"></div>
+    <div><label>RIR</label><select id="edit-rir-${ei}-${si}">${['0','1','2','3','4+'].map(v=>`<option value="${v}" ${String(set.rir??'')===v?'selected':''}>${v}</option>`).join('')}</select></div>
+   </div>`).join('')}
+  </div>`).join('');
+ $('editWorkoutModal').classList.add('show');
+}
+function closeEditWorkout(){editingHistoryId=null;$('editWorkoutModal').classList.remove('show')}
+function editHistoryWorkout(id){openEditWorkout(id)}
+function recalcHistoryMetrics(){
+ state.history.forEach(h=>{
+  h.tonnage=Math.round((h.exercises||[]).reduce((sum,e)=>sum+(e.sets||[]).reduce((a,s)=>a+(+s.weight||0)*(+s.reps||0),0),0));
+  h.prsHit=0;
+ });
+ const prs={};
+ state.history.slice().reverse().forEach(h=>(h.exercises||[]).forEach(e=>(e.sets||[]).forEach(s=>{
+  if(s.warmup||!s.weight||!s.reps)return;
+  const rm=e1rm(+s.weight,+s.reps); const old=prs[e.id]?.e1rm||0;
+  if(rm>old)prs[e.id]={weight:+s.weight,reps:+s.reps,e1rm:Math.round(rm*10)/10,date:h.date};
+ })));
+ state.history.forEach(h=>{h.prsHit=(h.exercises||[]).reduce((count,e)=>(e.sets||[]).reduce((c,s)=>{
+  if(s.warmup||!s.weight||!s.reps)return c; const rm=e1rm(+s.weight,+s.reps); const p=prs[e.id];
+  return c+(p&&Math.abs(p.e1rm-Math.round(rm*10)/10)<0.0001&&p.date===h.date?1:0);
+ },count),0);
+ });
+ state.prs=prs;
+}
+function saveEditedWorkout(){
+ const h=state.history.find(x=>x.id===editingHistoryId); if(!h)return;
+ h.name=$('editWorkoutName').value.trim()||'Trénink';
+ h.exercises.forEach((e,ei)=>(e.sets||[]).forEach((set,si)=>{
+  set.weight=Math.max(0,parseFloat($(`edit-w-${ei}-${si}`).value)||0);
+  set.reps=Math.max(0,parseInt($(`edit-r-${ei}-${si}`).value,10)||0);
+  const rir=$(`edit-rir-${ei}-${si}`).value; set.rir=rir==='4+'?'4+':parseInt(rir,10);
+ }));
+ recalcHistoryMetrics(); makeAutoBackup(); save(); renderHistory(); renderProgress(); renderCoachTip(); closeEditWorkout(); toast('Trénink upraven a Coach používá nová data ✅');
+}
+function deleteHistoryWorkout(id){
+ const h=state.history.find(x=>x.id===id); if(!h)return;
+ if(!confirm(`Opravdu smazat celý trénink „${h.name}“ z ${h.date}?\n\nPo smazání ho Coach už nebude používat pro doporučení.`))return;
+ makeAutoBackup();
+ state.history=state.history.filter(x=>x.id!==id);
+ recalcHistoryMetrics(); save(); renderHistory(); renderProgress(); renderCoachTip(); toast('Trénink byl smazán 🗑️');
+}
+
 function renderHistory(){
  const box=$('historyList');if(!state.history.length){box.innerHTML='<div class="empty">Zatím nemáš žádný dokončený trénink.</div>';return}
  box.innerHTML=state.history.map(h=>`<div class="card">
   <div class="row"><div><h3 style="font-size:15px">${esc(h.name)}</h3><div class="small muted" style="margin-top:4px">${h.date} • ${h.duration} min</div></div><span class="badge">${h.prsHit||0} PR</span></div>
   <div class="row small" style="margin-top:12px"><span>${h.exercises.length} cviků</span><strong class="green">${h.tonnage.toLocaleString('cs-CZ')} kg</strong></div>
-  <button class="btn" style="width:100%;margin-top:10px" onclick="toggleHistoryDetail(${h.id})">📋 Zobrazit váhy a opakování</button>
+  <div class="grid2" style="margin-top:10px">
+   <button class="btn" onclick="toggleHistoryDetail(${h.id})">📋 Váhy a opakování</button>
+   <button class="btn" onclick="editHistoryWorkout(${h.id})">✏️ Upravit</button>
+  </div>
+  <button class="btn" style="width:100%;margin-top:8px;border:1px solid rgba(239,68,68,.45);color:#fca5a5" onclick="deleteHistoryWorkout(${h.id})">🗑️ Smazat celý trénink</button>
   <div id="hist-detail-${h.id}" style="display:none;margin-top:10px">
    ${h.exercises.map(e=>`<div style="padding:10px 0;border-top:1px solid var(--border)"><div class="row"><strong>${esc(e.name)}</strong><span class="small muted">${esc(e.target||'')}</span></div><div class="small muted" style="margin-top:6px">${(e.sets||[]).map((s,i)=>`Série ${i+1}: <strong style="color:var(--text)">${s.weight||0} kg × ${s.reps||0}</strong>${s.rir!==undefined&&s.rir!==''?` • RIR ${s.rir}`:''}`).join(' • ')}</div></div>`).join('')}
   </div>
