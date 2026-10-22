@@ -27,7 +27,7 @@ main{padding:16px}.screen{display:none}.screen.active{display:block}
 label{display:block;color:#d4d4d8;font-size:11px;font-weight:700;margin:14px 0 7px}
 input{width:100%;background:#111113;border:1px solid var(--border);color:white;border-radius:11px;padding:11px;outline:none}input:focus,select:focus{border-color:var(--brand)}select{width:100%;background:#111113;border:1px solid var(--border);color:white;border-radius:11px;padding:11px;outline:none}
 .big{font-size:28px;font-weight:900}.muted{color:var(--muted)}.green{color:var(--brand2)}.small{font-size:11px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.stack{display:flex;flex-direction:column;gap:8px}
-.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;height:72px;background:rgba(24,24,27,.97);border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(4,1fr);z-index:30}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;height:72px;background:rgba(24,24,27,.97);border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(5,1fr);z-index:30}
 .nav button{background:none;color:#71717a;font-size:10px;font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}.nav button.active{color:var(--brand2)}.nav b{font-size:20px}
 .exercise{padding:14px;border:1px solid var(--border);border-radius:16px;background:#141416;margin-bottom:10px}
 .exercise.current{border-color:var(--brand);box-shadow:0 0 0 1px rgba(16,185,129,.18)}
@@ -45,7 +45,7 @@ input{width:100%;background:#111113;border:1px solid var(--border);color:white;b
 <body>
 <div class="app">
 <header>
-  <div class="logo"><div class="logo-icon">🏋️</div><div><div class="title">SILOVÝ TRENÉR • <span id="appVersion">V19</span></div><div class="sub" id="headerSub">Připraven k tréninku</div></div></div>
+  <div class="logo"><div class="logo-icon">🏋️</div><div><div class="title">SILOVÝ TRENÉR • <span id="appVersion">V20</span></div><div class="sub" id="headerSub">Připraven k tréninku</div></div></div>
   <button class="btn" style="padding:8px 10px" onclick="openSettings()">⚙️</button>
 </header>
 
@@ -68,7 +68,7 @@ input{width:100%;background:#111113;border:1px solid var(--border);color:white;b
     <div class="row"><div>
       <div class="section-title green">🧠 CHYTRÝ TRENÉR</div>
       <h2 style="font-size:21px">Učím se z tvých tréninků</h2>
-    </div><span class="badge"><span id="coachVersion">V19</span> • AUTOMATICKY</span></div>
+    </div><span class="badge"><span id="coachVersion">V20</span> • AUTOMATICKY</span></div>
     <p id="coachTip" class="small muted" style="margin-top:9px;line-height:1.55"></p>
     <div id="coachStats" class="statgrid" style="margin-top:12px"></div>
   </div>
@@ -163,7 +163,7 @@ input{width:100%;background:#111113;border:1px solid var(--border);color:white;b
   <div class="card" style="border-color:rgba(168,85,247,.35);background:linear-gradient(145deg,#1d1028,#18181b)">
     <div class="section-title" style="color:#c084fc">🔄 AKTUALIZACE A VERZE</div>
     <p class="small muted" style="line-height:1.5">Aktuální verze se doplňuje automaticky. Při každé nové verzi, kterou ti připravím, nemusíš číslo nikde ručně měnit.</p>
-    <div class="row" style="margin-top:10px"><span class="small muted">Nainstalovaná verze</span><span class="badge" id="settingsVersion">V19</span></div>
+    <div class="row" style="margin-top:10px"><span class="small muted">Nainstalovaná verze</span><span class="badge" id="settingsVersion">V20</span></div>
     <button class="btn primary" style="width:100%;margin-top:12px" onclick="document.getElementById('updateHtmlFile').click()">📦 Importovat aktualizaci HTML</button>
     <input id="updateHtmlFile" type="file" accept="text/html,.html" style="display:none" onchange="updateFromHtml(this.files[0])">
     <p class="small muted" style="margin-top:8px;line-height:1.5">Vyber nový HTML soubor, který ti připravím. Před aktualizací se automaticky uloží záloha tvých dat. Po aktualizaci zůstanou tréninky a nastavení v telefonu.</p>
@@ -207,6 +207,15 @@ input{width:100%;background:#111113;border:1px solid var(--border);color:white;b
 <section id="history" class="screen">
   <div class="card"><div class="section-title">Historie</div><h2 style="font-size:22px">Tvoje odtrénováno</h2></div>
   <div id="historyList"></div>
+</section>
+
+<section id="performances" class="screen">
+  <div class="card">
+    <div class="section-title">🏆 Výkony</div>
+    <h2 style="font-size:22px">Tvoje aktuální výkony</h2>
+    <p class="small muted" style="margin-top:6px;line-height:1.5">Tady si můžeš ručně upravit nejlepší známý výkon. Kde maximum neznáš, nech „Nevím“ — Coach ho bude postupně odhadovat z odcvičených sérií.</p>
+  </div>
+  <div id="performanceList"></div>
 </section>
 
 <section id="progress" class="screen">
@@ -281,7 +290,7 @@ input{width:100%;background:#111113;border:1px solid var(--border);color:white;b
 
 <div id="settingsModal" class="modal" onclick="if(event.target===this)closeSettings()">
   <div class="modal-card">
-    <div class="row"><div><div class="section-title" style="margin:0;color:#c084fc">⚙️ NASTAVENÍ</div><h2 style="font-size:22px;margin-top:5px">Silový trenér <span id="modalVersion">V19</span></h2></div><button class="btn" onclick="closeSettings()">✕</button></div>
+    <div class="row"><div><div class="section-title" style="margin:0;color:#c084fc">⚙️ NASTAVENÍ</div><h2 style="font-size:22px;margin-top:5px">Silový trenér <span id="modalVersion">V20</span></h2></div><button class="btn" onclick="closeSettings()">✕</button></div>
     <div class="card" style="margin-top:12px">
       <div class="section-title">🔔 Upozornění</div>
       <p class="small muted">Zvukové upozornění po skončení pauzy.</p>
@@ -299,7 +308,7 @@ input{width:100%;background:#111113;border:1px solid var(--border);color:white;b
       <p class="small muted">Stáhneš-li ode mě novou verzi HTML, můžeš ji vybrat tady. Aplikace před aktualizací automaticky zazálohuje tvoje data.</p>
       <button class="btn primary" style="width:100%;margin-top:8px" onclick="document.getElementById('updateHtmlFile').click();closeSettings()">📦 Vybrat novou HTML verzi</button>
     </div>
-    <div class="small muted" style="margin-top:10px;text-align:center">Aktuální verze: <strong id="modalVersion2">V19</strong></div>
+    <div class="small muted" style="margin-top:10px;text-align:center">Aktuální verze: <strong id="modalVersion2">V20</strong></div>
   </div>
 </div>
 
@@ -307,13 +316,14 @@ input{width:100%;background:#111113;border:1px solid var(--border);color:white;b
 <button class="active" data-screen="home" onclick="showScreen('home')"><b>⌂</b>Domů</button>
 <button data-screen="workout" onclick="showScreen('workout')"><b>🏋️</b>Trénink</button>
 <button data-screen="progress" onclick="showScreen('progress')"><b>📈</b>Progres</button>
+<button data-screen="performances" onclick="showScreen('performances')"><b>🏆</b>Výkony</button>
 <button data-screen="library" onclick="showScreen('library')"><b>📚</b>Cviky</button>
 </nav>
 <div id="toast" class="toast"></div>
 </div>
 
 <script>
-const APP_VERSION='V19';
+const APP_VERSION='V20';
 const KEY='silovy_trener_v2';
 const equipmentLabels={barbell:'Velká osa',dumbbell:'Jednoručky',cable:'Kladka',machine:'Klasický stroj',kinesis:'Kinesis',octagon:'Octagon',pullup:'Hrazda',bodyweight:'Vlastní váha'};
 const db=[
@@ -424,6 +434,7 @@ function allowedForGym(ex){
 
 state.profile=state.profile||{age:'',height:'',weight:''};
 state.goals=state.goals||{bench:0,squat:0,deadlift:0};
+state.performances=state.performances||{};
 state.checkin=state.checkin||{date:'',sleep:'',energy:'',pain:''};
 let savedSettings={};try{savedSettings=JSON.parse(localStorage.getItem(KEY+'_settings')||'{}')}catch(e){}
 let settings={focus:savedSettings.focus||'full',time:savedSettings.time||75,goal:savedSettings.goal||'strength',warmupMode:savedSettings.warmupMode||'normal',equip:new Set(savedSettings.equip||['barbell','dumbbell','cable','machine','kinesis','octagon'])};
@@ -445,7 +456,7 @@ function showScreen(id){
  document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');
  document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.screen===id));
  saveLastScreen(id);
- if(id==='history')renderHistory();if(id==='progress')renderProgress();if(id==='library')renderLibrary();
+ if(id==='history')renderHistory();if(id==='progress')renderProgress();if(id==='performances')renderPerformances();if(id==='library')renderLibrary();
 }
 function persistSettings(){try{localStorage.setItem(KEY+'_settings',JSON.stringify({focus:settings.focus,time:settings.time,goal:settings.goal,warmupMode:settings.warmupMode||'normal',equip:[...settings.equip]}))}catch(e){}}
 function selectFocus(v){settings.focus=v;persistSettings();document.querySelectorAll('[data-focus]').forEach(x=>x.classList.toggle('active',x.dataset.focus===v))}
@@ -465,6 +476,11 @@ function coachAdvice(){
  if(prev){
    const diff=last.tonnage-prev.tonnage;
    msg+=diff>0?`Objem šel nahoru o ${Math.abs(diff).toLocaleString('cs-CZ')} kg. 🔥 `:diff<0?`Objem byl nižší o ${Math.abs(diff).toLocaleString('cs-CZ')} kg — příště zkus postupně dorovnat výkon. `:'Objem je podobný jako minule. ';
+ }
+ const perfIds=lastExercises.map(e=>e.id).filter((id,i,a)=>a.indexOf(id)===i).slice(0,4);
+ if(perfIds.length){
+   out.push('<strong style="display:block;margin-top:8px">🏆 Výkony, které Coach bere v potaz</strong>');
+   perfIds.forEach(id=>{const ex=db.find(x=>x.id===id);const p=getBestPerformance(id);if(ex){if(p.manual)out.push(`• <strong>${esc(ex.name)}</strong>: ručně nastaveno <strong>${p.manual.weight} kg × ${p.manual.reps}</strong>`);else if(p.best)out.push(`• <strong>${esc(ex.name)}</strong>: nejlepší zaznamenaná série <strong>${p.best.weight} kg × ${p.best.reps}</strong>, odhad 1RM <strong>${(Math.round(p.best.rm*10)/10)} kg</strong>`);}});
  }
  const labels={strength:'Priorita: síla. U hlavních cviků drž kvalitní techniku a postupně přidávej váhu.',muscle:'Priorita: svaly. Drž kontrolované opakování a snaž se postupně přidávat opakování nebo váhu.',fatloss:'Priorita: hubnutí. Drž pravidelný trénink a sleduj váhu i výkon, ne jen číslo na váze.',maintain:'Priorita: udržování. Snaž se držet podobný výkon a konzistentní počet tréninků.'};
  return msg+(labels[settings.goal]||labels.strength);
@@ -930,6 +946,37 @@ function renderGoals(){
   $('goalSummary').innerHTML=['bench','squat','deadlift'].map(k=>{const goal=+g[k]||0;const pr=state.prs[k]?.weight||0;return goal?`${labels[k]}: ${pr} / ${goal} kg`:''}).filter(Boolean).join(' • ')||'Nastav si cíle pro hlavní cviky.';
  }
 }
+function getBestPerformance(id){
+ const manual=state.performances?.[id];
+ const exHistory=state.history.flatMap(h=>(h.exercises||[]).filter(e=>e.id===id).flatMap(e=>(e.sets||[]).filter(s=>!s.warmup&&(+s.weight||0)>0&&(+s.reps||0)>0).map(s=>({weight:+s.weight,reps:+s.reps,date:h.date,rm:e1rm(+s.weight,+s.reps)}))));
+ const best=exHistory.length?exHistory.reduce((a,b)=>b.rm>a.rm?b:a):null;
+ return {manual:manual&&manual.known?manual:null,best};
+}
+function performanceSummary(id){
+ const x=getBestPerformance(id);
+ if(x.manual)return `🏆 ${x.manual.weight} kg × ${x.manual.reps}${x.manual.reps===1?' — maximum':' — nejlepší známý výkon'}`;
+ if(x.best)return `🧠 Odhad 1RM ${Math.round(x.best.rm*10)/10} kg • ${x.best.weight} kg × ${x.best.reps} (${x.best.date})`;
+ return '❓ Nevím — zatím bez zaznamenaného výkonu';
+}
+function savePerformance(id){
+ const known=$(`perf-known-${id}`).value==='known';
+ if(!known){delete state.performances[id];save();renderPerformances();renderCoachTip();toast('Maximum nastaveno na „Nevím“');return}
+ const weight=Math.max(0,parseFloat($(`perf-weight-${id}`).value)||0);const reps=Math.max(1,parseInt($(`perf-reps-${id}`).value,10)||0);
+ if(!weight){toast('Zadej váhu nebo zvol „Nevím“.');return}
+ state.performances[id]={known:true,weight,reps,updatedAt:new Date().toISOString()};save();renderPerformances();renderCoachTip();toast('Výkon uložen 🏆');
+}
+function renderPerformances(){
+ const box=$('performanceList');if(!box)return;
+ box.innerHTML=db.map(ex=>{
+   const m=state.performances?.[ex.id];const b=getBestPerformance(ex.id);const known=!!m;
+   const est=b.best?`<div class="small muted" style="margin-top:6px">🧠 Odhad 1RM z tréninku: <strong>${(Math.round(b.best.rm*10)/10).toLocaleString('cs-CZ')} kg</strong></div>`:'<div class="small muted" style="margin-top:6px">Zatím nemám dost dat pro odhad maxima.</div>';
+   return `<div class="card" style="margin-bottom:10px"><div class="row"><div><strong>${esc(ex.name)}</strong><div class="small muted" style="margin-top:3px">${esc(ex.target||'')}</div></div><span class="badge">${esc(equipmentLabels[ex.equip]||'')}</span></div><div style="margin-top:12px"><label>TVŮJ ZNÁMÝ NEJLEPŠÍ VÝKON</label><select id="perf-known-${ex.id}" onchange="renderPerformanceInputs('${ex.id}')"><option value="unknown" ${!known?'selected':''}>❓ Nevím</option><option value="known" ${known?'selected':''}>🏆 Znám výkon</option></select><div id="perf-inputs-${ex.id}" style="${known?'':'display:none'};margin-top:8px"><div class="grid"><div><label>Váha (kg)</label><input id="perf-weight-${ex.id}" type="number" inputmode="decimal" step="0.5" value="${known?m.weight:''}" placeholder="např. 65"></div><div><label>Opakování</label><input id="perf-reps-${ex.id}" type="number" inputmode="numeric" min="1" max="30" step="1" value="${known?m.reps:''}" placeholder="např. 7"></div></div><button class="btn primary" style="width:100%;margin-top:8px" onclick="savePerformance('${ex.id}')">💾 Uložit výkon</button></div>${known?`<div class="small" style="margin-top:8px">🏆 <strong>${m.weight} kg × ${m.reps}</strong></div>`:''}${est}</div></div>`;
+ }).join('');
+}
+function renderPerformanceInputs(id){
+ const sel=$(`perf-known-${id}`),wrap=$(`perf-inputs-${id}`);if(!sel||!wrap)return;
+ wrap.style.display=sel.value==='known'?'block':'none';
+}
 function advancedCoachText(){
  const hs=state.history||[];
  if(!hs.length)return'Po prvním tréninku tady uvidíš konkrétní shrnutí výkonu, porovnání s minulým výkonem a doporučení pro další trénink.';
@@ -986,6 +1033,11 @@ function advancedCoachText(){
      out.push(`• <strong>${esc(c.name)}</strong>: ${c.text} (${detail}; průměr ${c.curAvgW.toFixed(1)} kg × ${c.curAvgR.toFixed(1)} op. vs ${c.oldAvgW.toFixed(1)} kg × ${c.oldAvgR.toFixed(1)} op.)`);
    });
  }
+ const perfIds=lastExercises.map(e=>e.id).filter((id,i,a)=>a.indexOf(id)===i).slice(0,4);
+ if(perfIds.length){
+   out.push('<strong style="display:block;margin-top:8px">🏆 Výkony, které Coach bere v potaz</strong>');
+   perfIds.forEach(id=>{const ex=db.find(x=>x.id===id);const p=getBestPerformance(id);if(ex){if(p.manual)out.push(`• <strong>${esc(ex.name)}</strong>: ručně nastaveno <strong>${p.manual.weight} kg × ${p.manual.reps}</strong>`);else if(p.best)out.push(`• <strong>${esc(ex.name)}</strong>: nejlepší zaznamenaná série <strong>${p.best.weight} kg × ${p.best.reps}</strong>, odhad 1RM <strong>${(Math.round(p.best.rm*10)/10)} kg</strong>`);}});
+ }
  const labels={strength:'💪 Priorita síla: pokud se opakování drží v horní části rozsahu a RIR zůstává kolem 1–2, postupně přidej váhu.',muscle:'🔥 Priorita svaly: drž kontrolované série v rozsahu a postupně přidávej opakování nebo váhu.',fatloss:'⚡ Priorita hubnutí: sleduj hlavně konzistenci a výkon; nemusíš tlačit každou sérii do selhání.',maintain:'⚖️ Priorita udržovat: snaž se držet podobný výkon a pravidelný počet sérií.'};
  out.push(`<strong style="display:block;margin-top:8px">🤖 Doporučení</strong>${labels[settings.goal]||labels.strength}`);
  return out.join('<br>');
@@ -1014,7 +1066,7 @@ function importData(file){
       const incoming=raw&&raw.state?raw.state:raw;
       if(!incoming||!Array.isArray(incoming.history)||typeof incoming.prs!=='object')throw new Error('Neplatná záloha');
       if(!confirm(`Importovat ${incoming.history.length} tréninků a ${Object.keys(incoming.prs||{}).length} PR?\n\nStávající data v této aplikaci budou nahrazena.`))return;
-      makeAutoBackup();state={history:incoming.history,prs:incoming.prs||{},profile:incoming.profile||{age:'',height:'',weight:''},goals:incoming.goals||{bench:0,squat:0,deadlift:0},checkin:incoming.checkin||{date:'',sleep:'',energy:'',pain:''},gymFilters:incoming.gymFilters||state.gymFilters};
+      makeAutoBackup();state={history:incoming.history,prs:incoming.prs||{},profile:incoming.profile||{age:'',height:'',weight:''},goals:incoming.goals||{bench:0,squat:0,deadlift:0},checkin:incoming.checkin||{date:'',sleep:'',energy:'',pain:''},gymFilters:incoming.gymFilters||state.gymFilters,performances:incoming.performances||{}};
       workout=raw.workout||null;if(raw.settings){settings.focus=raw.settings.focus||settings.focus;settings.time=raw.settings.time||settings.time;settings.goal=raw.settings.goal||settings.goal;settings.warmupMode=raw.settings.warmupMode||settings.warmupMode||'normal';settings.equip=new Set(raw.settings.equip||[...settings.equip]);persistSettings();setWarmupMode(settings.warmupMode)}
       save();renderProfile();renderProgress();renderHistory();renderCoachTip();renderCheckin();renderGoals();if(workout)saveActiveWorkout();
       toast('Data úspěšně importována ✅');
@@ -1060,7 +1112,7 @@ function updateFromHtml(file){
 }
 document.addEventListener('DOMContentLoaded',()=>{
  applyAppVersion();
- updateStats();renderLibrary();renderGymFilters();renderProgress();renderProfile();populateRMExercises();calc1RM();renderCheckin();renderGoals();
+ updateStats();renderLibrary();renderGymFilters();renderProgress();renderPerformances();renderProfile();populateRMExercises();calc1RM();renderCheckin();renderGoals();
  workout=loadActiveWorkout();
  setWarmupMode(settings.warmupMode||'normal');
  if(workout){renderWorkout();showScreen('workout');toast('Pokračujeme v rozpracovaném tréninku 💪')}else{showScreen(getLastScreen())}
