@@ -40,11 +40,9 @@ input{width:100%;background:#111113;border:1px solid var(--border);color:white;b
 .empty{text-align:center;padding:30px;color:var(--muted)}.badge{font-size:10px;padding:4px 7px;border-radius:7px;background:rgba(16,185,129,.13);color:var(--brand2);font-weight:800}
 .calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.cal-day{min-height:38px;border:1px solid var(--border);border-radius:8px;padding:5px;text-align:center;font-size:10px}.cal-day.done{border-color:var(--brand);background:rgba(16,185,129,.12)}.cal-day.today{box-shadow:0 0 0 1px #60a5fa}.bar{height:8px;background:var(--card2);border-radius:99px;overflow:hidden;margin-top:5px}.bar i{display:block;height:100%;background:var(--brand)}.goalbar{height:9px;background:var(--card2);border-radius:99px;overflow:hidden}.goalbar i{display:block;height:100%;background:var(--brand2)}
 .modal{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.72);display:none;align-items:flex-end;justify-content:center;padding:12px}.modal.show{display:flex}.modal-card{width:min(680px,100%);max-height:90vh;overflow:auto;background:#111216;border:1px solid rgba(255,255,255,.12);border-radius:22px;padding:16px;box-shadow:0 20px 60px rgba(0,0,0,.45)}
-.muscle-mini{width:46px;height:54px;display:grid;place-items:center;flex:0 0 46px}
-.muscle-mini svg{width:44px;height:52px}
+.muscle-mini{width:42px;height:46px;display:grid;place-items:center;flex:0 0 42px}.muscle-mini svg{width:40px;height:44px;display:block}
 .perf-card{background:#141416;border:1px solid var(--border);border-radius:16px;padding:13px;margin-bottom:9px}
 .perf-input{max-width:86px;text-align:center;padding:9px!important}
-.move-btn{width:38px;height:36px;border-radius:10px;background:var(--card2);color:var(--text);font-weight:900}
 .coach-good{color:#34d399}.coach-warn{color:#fbbf24}.coach-bad{color:#f87171}
 
 </style>
@@ -156,25 +154,7 @@ input{width:100%;background:#111113;border:1px solid var(--border);color:white;b
     <div id="goalSummary" class="small muted" style="margin-top:8px"></div>
   </div>
 
-  <div class="card" style="border-color:rgba(59,130,246,.35);background:linear-gradient(145deg,#101a2b,#18181b)">
-    <div class="section-title" style="color:#60a5fa">💾 DATA A ZÁLOHA</div>
-    <p class="small muted" style="line-height:1.5">Zálohuj si historii tréninků. Záloha funguje i při přechodu na novou verzi aplikace.</p>
-    <div class="grid3" style="margin-top:10px">
-      <button class="btn" onclick="exportData()">⬇️ Exportovat</button>
-      <button class="btn" onclick="document.getElementById('importDataFile').click()">⬆️ Importovat</button>
-      <button class="btn" onclick="confirmClearData()">🗑️ Smazat data</button>
-    </div>
-    <input id="importDataFile" type="file" accept="application/json,.json" style="display:none" onchange="importData(this.files[0])">
-  </div>
 
-  <div class="card" style="border-color:rgba(168,85,247,.35);background:linear-gradient(145deg,#1d1028,#18181b)">
-    <div class="section-title" style="color:#c084fc">🔄 AKTUALIZACE A VERZE</div>
-    <p class="small muted" style="line-height:1.5">Aktuální verze se doplňuje automaticky. Při každé nové verzi, kterou ti připravím, nemusíš číslo nikde ručně měnit.</p>
-    <div class="row" style="margin-top:10px"><span class="small muted">Nainstalovaná verze</span><span class="badge" id="settingsVersion">V21</span></div>
-    <button class="btn primary" style="width:100%;margin-top:12px" onclick="document.getElementById('updateHtmlFile').click()">📦 Importovat aktualizaci HTML</button>
-    <input id="updateHtmlFile" type="file" accept="text/html,.html" style="display:none" onchange="updateFromHtml(this.files[0])">
-    <p class="small muted" style="margin-top:8px;line-height:1.5">Vyber nový HTML soubor, který ti připravím. Před aktualizací se automaticky uloží záloha tvých dat. Po aktualizaci zůstanou tréninky a nastavení v telefonu.</p>
-  </div>
 
   <div class="statgrid">
     <div class="stat"><strong id="statWorkouts">0</strong><span>tréninků</span></div>
@@ -298,24 +278,40 @@ input{width:100%;background:#111113;border:1px solid var(--border);color:white;b
 <div id="settingsModal" class="modal" onclick="if(event.target===this)closeSettings()">
   <div class="modal-card">
     <div class="row"><div><div class="section-title" style="margin:0;color:#c084fc">⚙️ NASTAVENÍ</div><h2 style="font-size:22px;margin-top:5px">Silový trenér <span id="modalVersion">V21</span></h2></div><button class="btn" onclick="closeSettings()">✕</button></div>
+
     <div class="card" style="margin-top:12px">
       <div class="section-title">🔔 Upozornění</div>
-      <p class="small muted">Zvukové upozornění po skončení pauzy.</p>
+      <p class="small muted">Nastavení zvuku a upozornění po skončení pauzy.</p>
       <button class="btn" style="width:100%;margin-top:8px" onclick="toggleSoundSetting()">🔔 Nastavit zvuková upozornění</button>
     </div>
+
     <div class="card">
-      <div class="section-title">💾 Data</div>
-      <div class="grid2">
+      <div class="section-title">💾 DATA A ZÁLOHA</div>
+      <p class="small muted">Záloha obsahuje tvoje tréninky, výkony, maxima, cíle a nastavení. Před aktualizací si můžeš data kdykoliv vyexportovat.</p>
+      <div class="grid2" style="margin-top:10px">
         <button class="btn" onclick="exportData()">⬇️ Export zálohy</button>
-        <button class="btn" onclick="document.getElementById('importDataFile').click();closeSettings()">⬆️ Import zálohy</button>
+        <button class="btn" onclick="document.getElementById('importDataFile').click()">⬆️ Import zálohy</button>
+      </div>
+      <button class="btn" style="width:100%;margin-top:8px;border-color:rgba(239,68,68,.35)" onclick="confirmClearData()">🗑️ Smazat všechna data</button>
+      <input id="importDataFile" type="file" accept="application/json,.json" style="display:none" onchange="importData(this.files[0])">
+    </div>
+
+    <div class="card" style="border-color:rgba(168,85,247,.35)">
+      <div class="section-title" style="color:#c084fc">📦 AKTUALIZACE</div>
+      <p class="small muted">Vyber nový HTML soubor, který ti připravím. Před aktualizací se automaticky zazálohují tvoje data.</p>
+      <div class="row" style="margin-top:10px"><span class="small muted">Nainstalovaná verze</span><span class="badge" id="settingsVersion">V21</span></div>
+      <button class="btn primary" style="width:100%;margin-top:12px" onclick="document.getElementById('updateHtmlFile').click()">📦 Vybrat novou HTML verzi</button>
+      <input id="updateHtmlFile" type="file" accept="text/html,.html" style="display:none" onchange="updateFromHtml(this.files[0])">
+      <p class="small muted" style="margin-top:8px;line-height:1.5">Po aktualizaci zůstávají tvoje data v telefonu. Pro jistotu doporučuji před větší aktualizací vytvořit export zálohy.</p>
+    </div>
+
+    <div class="card" style="border-color:rgba(59,130,246,.35)">
+      <div class="section-title" style="color:#60a5fa">🔧 INFORMACE</div>
+      <div class="small muted" style="line-height:1.7">
+        <div>Verze aplikace: <strong id="modalVersion2">V21</strong></div>
+        <div>Stav: <strong style="color:var(--brand)">Připraveno</strong></div>
       </div>
     </div>
-    <div class="card" style="border-color:rgba(168,85,247,.35)">
-      <div class="section-title" style="color:#c084fc">📦 Aktualizace</div>
-      <p class="small muted">Stáhneš-li ode mě novou verzi HTML, můžeš ji vybrat tady. Aplikace před aktualizací automaticky zazálohuje tvoje data.</p>
-      <button class="btn primary" style="width:100%;margin-top:8px" onclick="document.getElementById('updateHtmlFile').click();closeSettings()">📦 Vybrat novou HTML verzi</button>
-    </div>
-    <div class="small muted" style="margin-top:10px;text-align:center">Aktuální verze: <strong id="modalVersion2">V21</strong></div>
   </div>
 </div>
 
@@ -587,7 +583,7 @@ function renderWorkout(){
  $('workoutTitle').textContent=workout.title;$('workoutTime').textContent=workout.time+' min';
  $('exerciseList').innerHTML=workout.exercises.map((e,ei)=>`
  <div class="exercise ${ei===0?'current':''}" id="ex-${ei}">
-  <div class="row"><div class="row" style="justify-content:flex-start"><div class="muscle-mini">${anatomyMini(e)}</div><div><div class="exercise-name">${esc(e.name)}</div><div class="target">${esc(e.target)} • pauza ${Math.round(e.rest/60)} min</div></div></div><div style="display:flex;gap:5px"><button class="move-btn" onclick="moveExercise(${ei},-1)" title="Posunout nahoru">↑</button><button class="move-btn" onclick="moveExercise(${ei},1)" title="Posunout dolů">↓</button><button class="btn" onclick="replaceExercise(${ei})">🔄 Vyměnit</button></div></div>
+  <div class="row"><div class="row" style="justify-content:flex-start"><div class="muscle-mini">${anatomyMini(e)}</div><div><div class="exercise-name">${esc(e.name)}</div><div class="target">${esc(e.target)} • pauza ${Math.round(e.rest/60)} min</div></div></div><div><button class="btn" onclick="replaceExercise(${ei})">🔄 Vyměnit</button></div></div>
   <div class="card" style="padding:10px;margin:10px 0 0;background:#101012">
     <div class="small green" style="font-weight:900">🎯 DNEŠNÍ DOPORUČENÍ</div>
     <div style="font-size:13px;font-weight:800;margin-top:3px">${esc(getRecommendation(e))}</div>
@@ -808,11 +804,10 @@ function makeWarmup(workWeight, ex){
   if(compound){
     if(w<=40) sets=[[Math.max(5,roundTrainingWeight(ex,w*.55)),8]];
     else if(w<=70) sets=[[roundTrainingWeight(ex,w*.45),8],[roundTrainingWeight(ex,w*.70),4]];
-    else sets=[[roundTrainingWeight(ex,w*.40),8],[roundTrainingWeight(ex,w*.60),5],[roundTrainingWeight(ex,w*.80),2]];
+    else sets=[[roundTrainingWeight(ex,w*.45),6],[roundTrainingWeight(ex,w*.70),3]];
   }else{
     if(w<=25) sets=[];
-    else if(w<=60) sets=[[roundTrainingWeight(ex,w*.55),8]];
-    else sets=[[roundTrainingWeight(ex,w*.50),8],[roundTrainingWeight(ex,w*.70),4]];
+    else sets=[[roundTrainingWeight(ex,w*.55),8]];
   }
   if(settings.warmupMode==='ready') sets=sets.slice(Math.max(0,sets.length-1));
   return sets.filter(x=>x[0]>0 && x[0]<w);
@@ -983,19 +978,58 @@ function renderProgress(){
 
 function renderGymFilters(){document.querySelectorAll('#gymFilters .chip').forEach(b=>{const f=b.dataset.filter;b.classList.toggle('active',f==='all'?Object.values(state.gymFilters).every(Boolean):!!state.gymFilters[f]);});}
 function anatomyMini(e){
+ const id=(e?.id||'').toLowerCase();
  const t=(e?.target||'').toLowerCase();
- const part=t.includes('zád')||t.includes('lat')?'back':t.includes('nohy')||t.includes('kvadr')||t.includes('hamstring')||t.includes('lýtka')||t.includes('hýžd')?'legs':t.includes('hrud')?'chest':t.includes('ramen')?'shoulders':t.includes('biceps')||t.includes('triceps')?'arms':t.includes('břicho')?'core':'body';
- const f=k=>part===k?'#34d399':'#3f3f46';
- return `<svg viewBox="0 0 44 56" aria-label="${esc(e?.target||'svalová partie')}">
- <circle cx="22" cy="7" r="4" fill="#52525b"/>
- <path d="M17 13Q22 10 27 13L29 25Q28 29 26 31L26 46L22 52L18 46L18 31Q16 29 15 25Z" fill="${f('body')}" stroke="#71717a" stroke-width="1"/>
- <path d="M15 16L9 22L12 25L18 20Z M29 16L35 22L32 25L26 20Z" fill="${f('chest')}"/>
- <path d="M18 17Q22 20 26 17V28Q22 31 18 28Z" fill="${f('back')}"/>
- <path d="M18 30L12 36L17 38L20 32Z M26 30L32 36L27 38L24 32Z" fill="${f('legs')}"/>
- <circle cx="13" cy="23" r="2" fill="${f('arms')}"/><circle cx="31" cy="23" r="2" fill="${f('arms')}"/>
- <path d="M19 13Q22 16 25 13V17Q22 19 19 17Z" fill="${f('shoulders')}"/>
- <path d="M19 24Q22 26 25 24V29Q22 31 19 29Z" fill="${f('core')}"/>
- </svg>`;
+ let part='body';
+ if(/lat|pulldown|pullup|pullover/.test(id)||t.includes('latiss'))part='lats';
+ else if(/row|veslov|high_row|rear_delt|facepull/.test(id)||t.includes('horní záda')||t.includes('střední záda'))part='upperback';
+ else if(t.includes('spodní záda')||/back_extension|lowerback/.test(id))part='lowerback';
+ else if(t.includes('hrud')||/bench|chest|fly|dip/.test(id))part=t.includes('horní')||id.includes('incline')?'upperchest':'chest';
+ else if(t.includes('biceps')||/curl|preacher/.test(id))part='biceps';
+ else if(t.includes('triceps')||/triceps/.test(id))part='triceps';
+ else if(t.includes('ramen')||/shoulder|lateral|ohp|front_raise/.test(id))part=t.includes('zadní')||id.includes('rear')?'rearshoulder':t.includes('přední')||id.includes('front')?'frontshoulder':'sideshoulder';
+ else if(t.includes('kvadr')||/legpress|legext|leg_extension|hack_squat|squat/.test(id))part='quads';
+ else if(t.includes('hamstring')||/legcurl|leg_curl|rdl|romanian|smith_rdl/.test(id))part='hamstrings';
+ else if(t.includes('hýžd')||/glute|hipthrust|hip_thrust|pullthrough/.test(id))part='glutes';
+ else if(t.includes('lýtka')||/calf/.test(id))part='calves';
+ else if(t.includes('břicho')||t.includes('core')||/abs|plank|crunch|leg_raise|woodchop|rotation|torso/.test(id))part='core';
+ const A='#34d399', M='#3f3f46', O='#71717a', B='#1c1c20';
+ const fill=(name)=>part===name?A:M;
+ let body='';
+ if(['chest','upperchest','core'].includes(part)) body=`
+   <path d="M12 13 Q27 6 42 13 L38 37 Q27 44 16 37Z" fill="${B}" stroke="${O}" stroke-width="1.4"/>
+   <path d="M13 14 L6 22 L10 25 L17 19 M41 14 L48 22 L44 25 L37 19" fill="none" stroke="${O}" stroke-width="2" stroke-linecap="round"/>
+   <path d="M15 17 Q20 13 27 18 Q20 24 15 20Z" fill="${fill('chest')}"/>
+   <path d="M39 17 Q34 13 27 18 Q34 24 39 20Z" fill="${fill('chest')}"/>
+   <path d="M16 16 Q21 12 27 17 Q21 19 16 18Z M38 16 Q33 12 27 17 Q33 19 38 18Z" fill="${fill('upperchest')}"/>
+   <path d="M19 24 Q27 21 35 24 L33 35 Q27 39 21 35Z" fill="${fill('core')}"/>
+   <path d="M27 23 L27 36" stroke="#52525b" stroke-width="1"/>`;
+ else if(['lats','upperback','lowerback','glutes'].includes(part)) body=`
+   <path d="M13 13 Q27 6 41 13 L38 37 Q27 45 16 37Z" fill="${B}" stroke="${O}" stroke-width="1.4"/>
+   <path d="M14 14 L7 22 L11 25 L18 19 M40 14 L47 22 L43 25 L36 19" fill="none" stroke="${O}" stroke-width="2" stroke-linecap="round"/>
+   <path d="M15 15 Q20 11 27 17 Q20 22 14 20Z M39 15 Q34 11 27 17 Q34 22 40 20Z" fill="${fill('lats')}"/>
+   <path d="M20 13 L27 18 L34 13 L32 23 L27 27 L22 23Z" fill="${fill('upperback')}"/>
+   <path d="M21 24 Q27 27 33 24 L31 33 Q27 36 23 33Z" fill="${fill('lowerback')}"/>
+   <path d="M18 31 Q22 28 27 33 Q32 28 36 31 L34 39 Q27 44 20 39Z" fill="${fill('glutes')}"/>`;
+ else if(['biceps','triceps','frontshoulder','rearshoulder','sideshoulder'].includes(part)) body=`
+   <path d="M19 10 Q27 5 35 10 L39 20 L34 23 L32 17 L29 21 L31 38 L27 43 L23 38 L25 21 L21 17 L19 23 L14 20Z" fill="${B}" stroke="${O}" stroke-width="1.4"/>
+   <path d="M20 11 Q23 7 27 9 Q23 13 20 16Z M34 11 Q31 7 27 9 Q31 13 34 16Z" fill="${fill('frontshoulder')}"/>
+   <path d="M15 19 L20 14 L24 20 L21 27 L16 24Z" fill="${fill('biceps')}"/>
+   <path d="M39 19 L34 14 L30 20 L33 27 L38 24Z" fill="${fill('triceps')}"/>
+   <path d="M18 12 Q27 7 36 12 L34 18 Q27 14 20 18Z" fill="${fill('sideshoulder')}"/>
+   <path d="M15 19 L20 14 L24 20 L21 27 L16 24Z M39 19 L34 14 L30 20 L33 27 L38 24Z" fill="${fill('rearshoulder')}" opacity=".85"/>`;
+ else if(['quads','hamstrings','calves'].includes(part)) body=`
+   <path d="M17 9 Q27 6 37 9 L35 25 L31 31 L32 42 L27 48 L22 42 L23 31 L19 25Z" fill="${B}" stroke="${O}" stroke-width="1.4"/>
+   <path d="M21 12 Q27 8 33 12 L31 24 Q27 28 23 24Z" fill="${fill('quads')}"/>
+   <path d="M21 13 Q27 17 33 13 L31 25 Q27 29 23 25Z" fill="${fill('hamstrings')}"/>
+   <path d="M22 30 L27 27 L32 30 L31 41 L27 46 L23 41Z" fill="${fill('calves')}"/>
+   <path d="M27 10 L27 43" stroke="#52525b" stroke-width="1"/>`;
+ else body=`
+   <path d="M17 12 Q27 6 37 12 L34 37 L27 44 L20 37Z" fill="${B}" stroke="${O}" stroke-width="1.4"/>
+   <path d="M18 14 L9 22 M36 14 L45 22" stroke="${O}" stroke-width="2" stroke-linecap="round"/>
+   <circle cx="27" cy="8" r="3.5" fill="${O}"/>
+   <path d="M21 17 Q27 13 33 17 L31 27 Q27 31 23 27Z" fill="${M}"/>`;
+ return `<svg viewBox="0 0 54 52" aria-label="${esc(e?.target||'svalová partie')}" role="img">${body}</svg>`;
 }
 function bestHistoricalPerformance(id){
  let best=null;
