@@ -313,7 +313,7 @@ input{width:100%;background:#111113;border:1px solid var(--border);color:white;b
 </div>
 
 <script>
-const APP_VERSION='V18';
+const APP_VERSION='V19';
 const KEY='silovy_trener_v2';
 const equipmentLabels={barbell:'Velká osa',dumbbell:'Jednoručky',cable:'Kladka',machine:'Klasický stroj',kinesis:'Kinesis',octagon:'Octagon',pullup:'Hrazda',bodyweight:'Vlastní váha'};
 const db=[
@@ -931,12 +931,64 @@ function renderGoals(){
  }
 }
 function advancedCoachText(){
- const hs=state.history||[];if(!hs.length)return'Po prvním tréninku tady uvidíš konkrétní doporučení podle výkonu, objemu, RIR a únavy.';
- const last=hs[0],prev=hs[1];let out=[];const c=state.checkin||{};
- if(c.date===new Date().toISOString().slice(0,10)){if(+c.pain>=7)out.push('🔴 Dnes máš vysokou bolest. Necpi výkon přes bolest a zvaž vynechání bolestivého cviku.');else if(+c.energy<=4||+c.sleep<5)out.push('🟡 Dnes jsi spíš unavený. Drž váhu nebo uber jednu pracovní sérii.');else if(+c.energy>=8)out.push('🟢 Energie je dobrá — můžeš se pokusit o plánovaný progres, pokud technika drží.');}
- if(prev){const d=(last.tonnage||0)-(prev.tonnage||0);out.push(d>0?`📈 Poslední objem byl vyšší o ${Math.round(d).toLocaleString('cs-CZ')} kg.`:d<0?`📉 Poslední objem klesl o ${Math.round(Math.abs(d)).toLocaleString('cs-CZ')} kg.`:'➡️ Objem je podobný jako minule.');}
- const sets=last.exercises.flatMap(e=>e.sets||[]).filter(s=>s.done&&+s.reps);const rir=sets.map(s=>+s.rir).filter(Number.isFinite);if(rir.length){const avg=rir.reduce((a,b)=>a+b,0)/rir.length;out.push(`🎯 Průměrné RIR posledního tréninku: ${avg.toFixed(1)}. Progres drž hlavně v plánovaném rozsahu, ne za cenu selhání.`)}
- return out.join('<br>')||'Pokračuj podle plánu a zapisuj každou pracovní sérii.';
+ const hs=state.history||[];
+ if(!hs.length)return'Po prvním tréninku tady uvidíš konkrétní shrnutí výkonu, porovnání s minulým výkonem a doporučení pro další trénink.';
+ const last=hs[0], prev=hs[1];
+ const lastExercises=(last.exercises||[]).filter(e=>(e.sets||[]).some(s=>(+s.weight||0)>0&&(+s.reps||0)>0));
+ const workSets=lastExercises.flatMap(e=>(e.sets||[]).filter(s=>(+s.weight||0)>0&&(+s.reps||0)>0));
+ const avgRirVals=workSets.map(s=>parseFloat(s.rir)).filter(Number.isFinite);
+ const avgRir=avgRirVals.length?avgRirVals.reduce((a,b)=>a+b,0)/avgRirVals.length:null;
+ const doneSets=lastExercises.reduce((a,e)=>a+(e.sets||[]).filter(s=>s.done).length,0);
+ const totalSets=lastExercises.reduce((a,e)=>a+(e.sets||[]).length,0);
+ const vol=last.tonnage||0;
+ const prevVol=prev?.tonnage||0;
+ const volDiff=prev?vol-prevVol:null;
+ const prevById={};
+ if(prev){(prev.exercises||[]).forEach(e=>{prevById[e.id]=e})}
+ const comparisons=[];
+ lastExercises.forEach(e=>{
+   const cur=(e.sets||[]).filter(s=>(+s.weight||0)>0&&(+s.reps||0)>0);
+   if(!cur.length)return;
+   const old=prevById[e.id];
+   if(!old)return;
+   const oldSets=(old.sets||[]).filter(s=>(+s.weight||0)>0&&(+s.reps||0)>0);
+   if(!oldSets.length)return;
+   const curVol=cur.reduce((a,s)=>a+(+s.weight||0)*(+s.reps||0),0);
+   const oldVol=oldSets.reduce((a,s)=>a+(+s.weight||0)*(+s.reps||0),0);
+   const curAvgW=cur.reduce((a,s)=>a+(+s.weight||0),0)/cur.length;
+   const oldAvgW=oldSets.reduce((a,s)=>a+(+s.weight||0),0)/oldSets.length;
+   const curAvgR=cur.reduce((a,s)=>a+(+s.reps||0),0)/cur.length;
+   const oldAvgR=oldSets.reduce((a,s)=>a+(+s.reps||0),0)/oldSets.length;
+   const curBest=Math.max(...cur.map(s=>e1rm(+s.weight,+s.reps)));
+   const oldBest=Math.max(...oldSets.map(s=>e1rm(+s.weight,+s.reps)));
+   let text='➡️ podobný výkon';
+   if(curBest>oldBest*1.025 || curVol>oldVol*1.05) text='📈 zlepšení';
+   else if(curBest<oldBest*0.95 || curVol<oldVol*0.90) text='📉 pokles';
+   comparisons.push({name:e.name,text,curAvgW,oldAvgW,curAvgR,oldAvgR,curVol,oldVol});
+ });
+ comparisons.sort((a,b)=>Math.abs(b.curVol-b.oldVol)-Math.abs(a.curVol-a.oldVol));
+ const out=[];
+ out.push(`<strong>🧠 Shrnutí posledního tréninku</strong>`);
+ out.push(`🏋️ <strong>${esc(last.name||'Trénink')}</strong> • ${last.date||''} • ${last.duration||0} min`);
+ out.push(`📊 ${lastExercises.length} cviků • ${doneSets}/${totalSets} zapsaných pracovních sérií • <strong>${Math.round(vol).toLocaleString('cs-CZ')} kg</strong> objemu`);
+ if(avgRir!==null)out.push(`🎯 Průměrné RIR: <strong>${avgRir.toFixed(1)}</strong> — ${avgRir<=1?'hodně blízko selhání, příště hlídej techniku a regeneraci.':avgRir<=2?'velmi dobrá rezerva pro silový progres.':'větší rezerva; pokud byl výkon stabilní, můžeš postupně přidat.'}`);
+ if(last.prsHit)out.push(`🏆 Dnes padlo <strong>${last.prsHit} PR</strong>. To je dobrý signál pro progres.`);
+ if(prev){
+   if(volDiff>0)out.push(`📈 Proti minulému tréninku šel celkový objem nahoru o <strong>${Math.round(volDiff).toLocaleString('cs-CZ')} kg</strong>.`);
+   else if(volDiff<0)out.push(`📉 Proti minulému tréninku byl celkový objem nižší o <strong>${Math.round(Math.abs(volDiff)).toLocaleString('cs-CZ')} kg</strong>.`);
+   else out.push('➡️ Celkový objem je proti minulému tréninku prakticky stejný.');
+ }
+ if(comparisons.length){
+   out.push('<strong style="display:block;margin-top:8px">🔎 Cviky, které šly porovnat s minulem</strong>');
+   comparisons.slice(0,4).forEach(c=>{
+     const diff=c.curVol-c.oldVol;
+     const detail=diff>0?`+${Math.round(diff).toLocaleString('cs-CZ')} kg objemu`:diff<0?`−${Math.round(Math.abs(diff)).toLocaleString('cs-CZ')} kg objemu`:'stejný objem';
+     out.push(`• <strong>${esc(c.name)}</strong>: ${c.text} (${detail}; průměr ${c.curAvgW.toFixed(1)} kg × ${c.curAvgR.toFixed(1)} op. vs ${c.oldAvgW.toFixed(1)} kg × ${c.oldAvgR.toFixed(1)} op.)`);
+   });
+ }
+ const labels={strength:'💪 Priorita síla: pokud se opakování drží v horní části rozsahu a RIR zůstává kolem 1–2, postupně přidej váhu.',muscle:'🔥 Priorita svaly: drž kontrolované série v rozsahu a postupně přidávej opakování nebo váhu.',fatloss:'⚡ Priorita hubnutí: sleduj hlavně konzistenci a výkon; nemusíš tlačit každou sérii do selhání.',maintain:'⚖️ Priorita udržovat: snaž se držet podobný výkon a pravidelný počet sérií.'};
+ out.push(`<strong style="display:block;margin-top:8px">🤖 Doporučení</strong>${labels[settings.goal]||labels.strength}`);
+ return out.join('<br>');
 }
 function renderAdvancedCoach(){if($('advancedCoach'))$('advancedCoach').innerHTML=advancedCoachText()}
 function renderMuscleBalance(){
