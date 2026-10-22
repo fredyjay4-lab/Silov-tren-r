@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#09090b">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Silový trenér</title>
+<title>Silový trenér • AI Strength Coach</title>
 <style>
 :root{--bg:#09090b;--card:#18181b;--card2:#27272a;--border:#27272a;--text:#f4f4f5;--muted:#a1a1aa;--brand:#10b981;--brand2:#34d399;--danger:#ef4444}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -32,18 +32,20 @@ input{width:100%;background:#111113;border:1px solid var(--border);color:white;b
 .exercise{padding:14px;border:1px solid var(--border);border-radius:16px;background:#141416;margin-bottom:10px}
 .exercise.current{border-color:var(--brand);box-shadow:0 0 0 1px rgba(16,185,129,.18)}
 .exercise-name{font-weight:900;font-size:15px}.target{font-size:10px;color:var(--muted);margin-top:3px}
-.sets{margin-top:10px}.set{display:grid;grid-template-columns:34px 1fr 1fr 42px;gap:6px;align-items:center;margin-top:6px}.set span{font-size:11px;color:var(--muted);text-align:center}.set input{padding:8px;text-align:center;font-size:12px}.set.done input{border-color:var(--brand);background:rgba(16,185,129,.08)}.check{height:36px;border-radius:10px;background:var(--card2);color:var(--muted);font-weight:900}.check.done{background:var(--brand);color:#001b12}
+.sets{margin-top:10px}.set{display:grid;grid-template-columns:28px 1fr 1fr 54px 42px;gap:6px;align-items:center;margin-top:6px}.set span{font-size:11px;color:var(--muted);text-align:center}.set input{padding:8px;text-align:center;font-size:12px}.set.done input{border-color:var(--brand);background:rgba(16,185,129,.08)}.check{height:36px;border-radius:10px;background:var(--card2);color:var(--muted);font-weight:900}.check.done{background:var(--brand);color:#001b12}
 .timer{background:linear-gradient(145deg,#10271f,#18181b);border:1px solid rgba(16,185,129,.35);border-radius:20px;padding:18px;text-align:center;position:sticky;top:70px;z-index:15;margin-bottom:12px}.timer-value{font-size:46px;font-weight:950;font-variant-numeric:tabular-nums}.timer-label{font-size:11px;color:var(--muted);margin-bottom:5px}
 .progress{height:7px;background:#27272a;border-radius:99px;overflow:hidden}.progress>i{display:block;height:100%;background:var(--brand);width:0}
 .statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px}.stat strong{font-size:18px;display:block}.stat span{font-size:10px;color:var(--muted)}
 .toast{position:fixed;left:50%;bottom:88px;transform:translateX(-50%) translateY(15px);opacity:0;pointer-events:none;background:#f4f4f5;color:#09090b;padding:11px 15px;border-radius:12px;font-size:12px;font-weight:800;z-index:50;transition:.2s;max-width:90%;text-align:center}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .empty{text-align:center;padding:30px;color:var(--muted)}.badge{font-size:10px;padding:4px 7px;border-radius:7px;background:rgba(16,185,129,.13);color:var(--brand2);font-weight:800}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.cal-day{min-height:38px;border:1px solid var(--border);border-radius:8px;padding:5px;text-align:center;font-size:10px}.cal-day.done{border-color:var(--brand);background:rgba(16,185,129,.12)}.cal-day.today{box-shadow:0 0 0 1px #60a5fa}.bar{height:8px;background:var(--card2);border-radius:99px;overflow:hidden;margin-top:5px}.bar i{display:block;height:100%;background:var(--brand)}.goalbar{height:9px;background:var(--card2);border-radius:99px;overflow:hidden}.goalbar i{display:block;height:100%;background:var(--brand2)}
+.modal{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.72);display:none;align-items:flex-end;justify-content:center;padding:12px}.modal.show{display:flex}.modal-card{width:min(680px,100%);max-height:90vh;overflow:auto;background:#111216;border:1px solid rgba(255,255,255,.12);border-radius:22px;padding:16px;box-shadow:0 20px 60px rgba(0,0,0,.45)}
 </style>
 </head>
 <body>
 <div class="app">
 <header>
-  <div class="logo"><div class="logo-icon">🏋️</div><div><div class="title">SILOVÝ TRENÉR • V8</div><div class="sub" id="headerSub">Připraven k tréninku</div></div></div>
+  <div class="logo"><div class="logo-icon">🏋️</div><div><div class="title">SILOVÝ TRENÉR • <span id="appVersion">V17</span></div><div class="sub" id="headerSub">Připraven k tréninku</div></div></div>
   <button class="btn" style="padding:8px 10px" onclick="openSettings()">⚙️</button>
 </header>
 
@@ -66,7 +68,7 @@ input{width:100%;background:#111113;border:1px solid var(--border);color:white;b
     <div class="row"><div>
       <div class="section-title green">🧠 CHYTRÝ TRENÉR</div>
       <h2 style="font-size:21px">Učím se z tvých tréninků</h2>
-    </div><span class="badge">AUTOMATICKY</span></div>
+    </div><span class="badge"><span id="coachVersion">V17</span> • AUTOMATICKY</span></div>
     <p id="coachTip" class="small muted" style="margin-top:9px;line-height:1.55"></p>
     <div id="coachStats" class="statgrid" style="margin-top:12px"></div>
   </div>
@@ -101,6 +103,13 @@ input{width:100%;background:#111113;border:1px solid var(--border);color:white;b
       <button class="btn" data-time="90" onclick="selectTime(90)">90 min</button>
     </div>
 
+    <label>Rozcvičení</label>
+    <div class="chips">
+      <button id="warmupNormalBtn" class="chip active" type="button" onclick="setWarmupMode('normal')">🔥 Normálně</button>
+      <button id="warmupReadyBtn" class="chip" type="button" onclick="setWarmupMode('ready')">⚡ Už jsem rozcvičený</button>
+    </div>
+    <p class="small muted" style="margin-top:7px;line-height:1.5">Trenér automaticky zkrátí zahřívací série u lehkých cviků a více jich nechá jen u těžkých základních cviků.</p>
+
     <label>Vybavení</label>
     <div class="chips" id="equipBtns">
       <button class="chip active" data-equip="barbell" onclick="toggleEquip('barbell')">Velká osa</button>
@@ -115,6 +124,49 @@ input{width:100%;background:#111113;border:1px solid var(--border);color:white;b
     <div class="small muted" style="margin-top:9px">⚠️ E-GYM a automatické stroje jsou záměrně vynechané.</div>
 
     <button class="btn primary" style="width:100%;margin-top:15px;font-size:14px" onclick="generateWorkout()">⚡ Vygenerovat trénink</button>
+  </div>
+
+  <div class="card" style="border-color:rgba(168,85,247,.35);background:linear-gradient(145deg,#1a1027,#18181b)">
+    <div class="section-title" style="color:#c084fc">🧠 CHECK-IN PŘED TRÉNINKEM</div>
+    <p class="small muted" style="line-height:1.5">Trenér podle dnešní energie může upravit doporučení. Nejde o diagnózu — jen o autoregulaci tréninku.</p>
+    <div class="grid3" style="margin-top:10px">
+      <div><label>SPÁNEK (H)</label><input id="checkSleep" type="number" min="0" max="14" step="0.5" placeholder="7"></div>
+      <div><label>ENERGIE / 10</label><input id="checkEnergy" type="number" min="1" max="10" step="1" placeholder="8"></div>
+      <div><label>BOLEST / 10</label><input id="checkPain" type="number" min="0" max="10" step="1" placeholder="0"></div>
+    </div>
+    <button class="btn" style="width:100%;margin-top:10px" onclick="saveCheckin()">💾 Uložit dnešní stav</button>
+    <div id="checkinSummary" class="small muted" style="margin-top:8px"></div>
+  </div>
+
+  <div class="card" style="border-color:rgba(245,158,11,.35);background:linear-gradient(145deg,#251b0b,#18181b)">
+    <div class="section-title" style="color:#fbbf24">🎯 TVÉ CÍLE</div>
+    <div class="grid3" style="margin-top:10px">
+      <div><label>BENCH PR (KG)</label><input id="goalBench" type="number" min="0" step="2.5" placeholder="130"></div>
+      <div><label>DŘEP PR (KG)</label><input id="goalSquat" type="number" min="0" step="2.5" placeholder="140"></div>
+      <div><label>MRTVÝ TAH PR (KG)</label><input id="goalDeadlift" type="number" min="0" step="2.5" placeholder="180"></div>
+    </div>
+    <button class="btn" style="width:100%;margin-top:10px" onclick="saveGoals()">🏆 Uložit cíle</button>
+    <div id="goalSummary" class="small muted" style="margin-top:8px"></div>
+  </div>
+
+  <div class="card" style="border-color:rgba(59,130,246,.35);background:linear-gradient(145deg,#101a2b,#18181b)">
+    <div class="section-title" style="color:#60a5fa">💾 DATA A ZÁLOHA</div>
+    <p class="small muted" style="line-height:1.5">Zálohuj si historii tréninků. Záloha funguje i při přechodu na novou verzi aplikace.</p>
+    <div class="grid3" style="margin-top:10px">
+      <button class="btn" onclick="exportData()">⬇️ Exportovat</button>
+      <button class="btn" onclick="document.getElementById('importDataFile').click()">⬆️ Importovat</button>
+      <button class="btn" onclick="confirmClearData()">🗑️ Smazat data</button>
+    </div>
+    <input id="importDataFile" type="file" accept="application/json,.json" style="display:none" onchange="importData(this.files[0])">
+  </div>
+
+  <div class="card" style="border-color:rgba(168,85,247,.35);background:linear-gradient(145deg,#1d1028,#18181b)">
+    <div class="section-title" style="color:#c084fc">🔄 AKTUALIZACE A VERZE</div>
+    <p class="small muted" style="line-height:1.5">Aktuální verze se doplňuje automaticky. Při každé nové verzi, kterou ti připravím, nemusíš číslo nikde ručně měnit.</p>
+    <div class="row" style="margin-top:10px"><span class="small muted">Nainstalovaná verze</span><span class="badge" id="settingsVersion">V17</span></div>
+    <button class="btn primary" style="width:100%;margin-top:12px" onclick="document.getElementById('updateHtmlFile').click()">📦 Importovat aktualizaci HTML</button>
+    <input id="updateHtmlFile" type="file" accept="text/html,.html" style="display:none" onchange="updateFromHtml(this.files[0])">
+    <p class="small muted" style="margin-top:8px;line-height:1.5">Vyber nový HTML soubor, který ti připravím. Před aktualizací se automaticky uloží záloha tvých dat. Po aktualizaci zůstanou tréninky a nastavení v telefonu.</p>
   </div>
 
   <div class="statgrid">
@@ -165,6 +217,10 @@ input{width:100%;background:#111113;border:1px solid var(--border);color:white;b
     <div class="stat"><strong id="bestPR">0</strong><span>PR</span></div>
   </div>
   <div class="card"><div class="section-title">Osobní rekordy</div><div id="prList" class="stack"></div></div>
+  <div class="card"><div class="section-title">🤖 COACH ANALÝZA</div><div id="advancedCoach" class="small" style="line-height:1.65"></div></div>
+  <div class="card"><div class="section-title">💪 ROZLOŽENÍ SVALŮ</div><div id="muscleBalance" class="stack"></div></div>
+  <div class="card"><div class="section-title">📅 KALENDÁŘ</div><div id="trainingCalendar" class="calendar-grid"></div></div>
+
   <div class="card"><div class="section-title">🧮 KALKULAČKA SÍLY</div>
     <h2 style="font-size:21px">Maximálka + pracovní váhy</h2>
     <p class="small muted" style="margin-top:5px">Velká osa = 20 kg + kotouče na obou stranách. Jednoručky se počítají jako váha jedné ruky. Pokud neznáš maximálku, můžeš ji odhadnout z váhy a opakování.</p>
@@ -214,6 +270,30 @@ input{width:100%;background:#111113;border:1px solid var(--border);color:white;b
 </section>
 </main>
 
+<div id="settingsModal" class="modal" onclick="if(event.target===this)closeSettings()">
+  <div class="modal-card">
+    <div class="row"><div><div class="section-title" style="margin:0;color:#c084fc">⚙️ NASTAVENÍ</div><h2 style="font-size:22px;margin-top:5px">Silový trenér <span id="modalVersion">V17</span></h2></div><button class="btn" onclick="closeSettings()">✕</button></div>
+    <div class="card" style="margin-top:12px">
+      <div class="section-title">🔔 Upozornění</div>
+      <p class="small muted">Zvukové upozornění po skončení pauzy.</p>
+      <button class="btn" style="width:100%;margin-top:8px" onclick="toggleSoundSetting()">🔔 Nastavit zvuková upozornění</button>
+    </div>
+    <div class="card">
+      <div class="section-title">💾 Data</div>
+      <div class="grid2">
+        <button class="btn" onclick="exportData()">⬇️ Export zálohy</button>
+        <button class="btn" onclick="document.getElementById('importDataFile').click();closeSettings()">⬆️ Import zálohy</button>
+      </div>
+    </div>
+    <div class="card" style="border-color:rgba(168,85,247,.35)">
+      <div class="section-title" style="color:#c084fc">📦 Aktualizace</div>
+      <p class="small muted">Stáhneš-li ode mě novou verzi HTML, můžeš ji vybrat tady. Aplikace před aktualizací automaticky zazálohuje tvoje data.</p>
+      <button class="btn primary" style="width:100%;margin-top:8px" onclick="document.getElementById('updateHtmlFile').click();closeSettings()">📦 Vybrat novou HTML verzi</button>
+    </div>
+    <div class="small muted" style="margin-top:10px;text-align:center">Aktuální verze: <strong id="modalVersion2">V17</strong></div>
+  </div>
+</div>
+
 <nav class="nav">
 <button class="active" data-screen="home" onclick="showScreen('home')"><b>⌂</b>Domů</button>
 <button data-screen="workout" onclick="showScreen('workout')"><b>🏋️</b>Trénink</button>
@@ -224,6 +304,7 @@ input{width:100%;background:#111113;border:1px solid var(--border);color:white;b
 </div>
 
 <script>
+const APP_VERSION='V17';
 const KEY='silovy_trener_v2';
 const equipmentLabels={barbell:'Velká osa',dumbbell:'Jednoručky',cable:'Kladka',machine:'Klasický stroj',kinesis:'Kinesis',octagon:'Octagon',pullup:'Hrazda',bodyweight:'Vlastní váha'};
 const db=[
@@ -333,23 +414,36 @@ function allowedForGym(ex){
 }
 
 state.profile=state.profile||{age:'',height:'',weight:''};
-let settings={focus:'full',time:75,goal:'strength',equip:new Set(['barbell','dumbbell','cable','machine','kinesis','octagon'])};
+state.goals=state.goals||{bench:0,squat:0,deadlift:0};
+state.checkin=state.checkin||{date:'',sleep:'',energy:'',pain:''};
+let savedSettings={};try{savedSettings=JSON.parse(localStorage.getItem(KEY+'_settings')||'{}')}catch(e){}
+let settings={focus:savedSettings.focus||'full',time:savedSettings.time||75,goal:savedSettings.goal||'strength',warmupMode:savedSettings.warmupMode||'normal',equip:new Set(savedSettings.equip||['barbell','dumbbell','cable','machine','kinesis','octagon'])};
 let workout=null, timer=null, timerEnd=0, timerTotal=0, paused=false, progressChart=null;
 
+const SCREEN_KEY='silovy_trener_last_screen_v1';
+const WORKOUT_KEY='silovy_trener_active_workout_v1';
 function loadState(){try{return JSON.parse(localStorage.getItem(KEY))||{history:[],prs:{}}}catch(e){return{history:[],prs:{}}}}
 function save(){localStorage.setItem(KEY,JSON.stringify(state)); updateStats()}
+function saveActiveWorkout(){try{if(workout)localStorage.setItem(WORKOUT_KEY,JSON.stringify(workout));else localStorage.removeItem(WORKOUT_KEY)}catch(e){}}
+function loadActiveWorkout(){try{return JSON.parse(localStorage.getItem(WORKOUT_KEY))||null}catch(e){return null}}
+function saveLastScreen(id){try{localStorage.setItem(SCREEN_KEY,id)}catch(e){}}
+function getLastScreen(){try{return localStorage.getItem(SCREEN_KEY)||'home'}catch(e){return'home'}}
 function $(id){return document.getElementById(id)}
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function toast(t){$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2200)}
+function applyAppVersion(){try{document.title='Silový trenér '+APP_VERSION+' • AI Strength Coach';if($('appVersion'))$('appVersion').textContent=APP_VERSION;if($('coachVersion'))$('coachVersion').textContent=APP_VERSION;if($('settingsVersion'))$('settingsVersion').textContent=APP_VERSION;if($('modalVersion'))$('modalVersion').textContent=APP_VERSION;if($('modalVersion2'))$('modalVersion2').textContent=APP_VERSION;}catch(e){}}
 function showScreen(id){
  document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');
  document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.screen===id));
+ saveLastScreen(id);
  if(id==='history')renderHistory();if(id==='progress')renderProgress();if(id==='library')renderLibrary();
 }
-function selectFocus(v){settings.focus=v;document.querySelectorAll('[data-focus]').forEach(x=>x.classList.toggle('active',x.dataset.focus===v))}
-function selectTime(v){settings.time=v;document.querySelectorAll('[data-time]').forEach(x=>x.classList.toggle('active',+x.dataset.time===v))}
+function persistSettings(){try{localStorage.setItem(KEY+'_settings',JSON.stringify({focus:settings.focus,time:settings.time,goal:settings.goal,warmupMode:settings.warmupMode||'normal',equip:[...settings.equip]}))}catch(e){}}
+function selectFocus(v){settings.focus=v;persistSettings();document.querySelectorAll('[data-focus]').forEach(x=>x.classList.toggle('active',x.dataset.focus===v))}
+function selectTime(v){settings.time=v;persistSettings();document.querySelectorAll('[data-time]').forEach(x=>x.classList.toggle('active',+x.dataset.time===v))}
+function setWarmupMode(v){settings.warmupMode=v;persistSettings();$('warmupNormalBtn')?.classList.toggle('active',v==='normal');$('warmupReadyBtn')?.classList.toggle('active',v==='ready');}
 function selectGoal(v){
- settings.goal=v;
+ settings.goal=v;persistSettings();
  document.querySelectorAll('[data-goal]').forEach(x=>x.classList.toggle('active',x.dataset.goal===v));
  renderCoachTip();
 }
@@ -369,61 +463,31 @@ function coachAdvice(){
 function renderCoachTip(){if($('coachTip'))$('coachTip').textContent=coachAdvice();renderCoachStats()}
 function toggleEquip(v){settings.equip.has(v)?settings.equip.delete(v):settings.equip.add(v);document.querySelector(`[data-equip="${v}"]`).classList.toggle('active',settings.equip.has(v))}
 function eligible(id){const x=db.find(x=>x.id===id);return !!x&&settings.equip.has(x.equip)}
-function findLast(id){for(const h of state.history){const e=h.exercises.find(x=>x.id===id);if(e&&e.sets?.length)return e}}
+function findLast(id){for(const h of state.history){const e=h.exercises.find(x=>x.id===id);if(e&&e.sets?.length)return e}return null}
+function recentExerciseHistory(id,limit=5){return state.history.flatMap(h=>h.exercises.filter(e=>e.id===id).map(e=>({date:h.date,goal:h.goal,sets:e.sets||[]}))).slice(0,limit)}
+function parseRepRange(ex){const nums=String(ex.reps||'8-12').match(/\d+/g)||[8,12];return{min:+nums[0]||8,max:+nums[1]||(+nums[0]||8)}}
+function normalIncrement(ex,w){if(ex?.equip==='barbell')return w>=80?5:2.5;if(ex?.equip==='dumbbell')return 2.5;return w>=80?5:2.5}
 function recommendedWeight(ex){
- const last=findLast(ex.id);
- if(!last)return ex.base||0;
- const valid=last.sets.filter(s=>(+s.weight||0)>0&&(+s.reps||0)>0);
- if(!valid.length)return ex.base||0;
- const avg=valid.reduce((a,s)=>a+s.weight,0)/valid.length;
- const avgReps=valid.reduce((a,s)=>a+s.reps,0)/valid.length;
- const topE1rm=Math.max(...valid.map(s=>e1rm(s.weight,s.reps)));
- const oldBest=state.prs[ex.id]?.e1rm||0;
- const step=settings.goal==='strength'?5:2.5;
- const repMax=parseInt(String(ex.reps).split('-').pop())||12;
- const repMin=parseInt(String(ex.reps).split('-')[0])||8;
- let next=avg;
- if(avgReps>=repMax) next=avg+step;
- else if(avgReps>=repMin && settings.goal==='strength') next=avg+step;
- else if(avgReps<repMin) next=avg;
- // Never recommend a jump larger than one normal increment.
- next=Math.round(next/2.5)*2.5;
- return Math.max(0,next);
+ const last=findLast(ex.id);if(!last)return roundTrainingWeight(ex,ex.base||0);
+ const valid=(last.sets||[]).filter(s=>(+s.weight||0)>0&&(+s.reps||0)>0);if(!valid.length)return roundTrainingWeight(ex,ex.base||0);
+ const {min,max}=parseRepRange(ex);const avgReps=valid.reduce((a,s)=>a+(+s.reps||0),0)/valid.length;const avgWeight=valid.reduce((a,s)=>a+(+s.weight||0),0)/valid.length;const firstWeight=+valid[0].weight||avgWeight;const lastWeight=+valid[valid.length-1].weight||avgWeight;const drop=firstWeight>0?lastWeight/firstWeight:1;
+ const hitMax=valid.every(s=>(+s.reps||0)>=max);const hitMin=valid.every(s=>(+s.reps||0)>=min);const failed=valid.some(s=>(+s.reps||0)<min);const severeDrop=drop<0.90||(valid.length>=3&&(+valid[valid.length-1].reps||0)<=min-2);const step=normalIncrement(ex,avgWeight);let next=avgWeight;
+ if(severeDrop||failed)next=avgWeight-(settings.goal==='strength'?step:step*0.5);else if(hitMax)next=avgWeight+step;else if(settings.goal==='strength'&&hitMin&&avgReps>=min+0.5)next=avgWeight+step;
+ return roundTrainingWeight(ex,Math.max(0,next));
 }
-function choose(ids,n){
- return ids.map(id=>db.find(x=>x.id===id)).filter(x=>x&&settings.equip.has(x.equip)).slice(0,n);
-}
+function choose(ids,n){const candidates=ids.map(id=>db.find(x=>x.id===id)).filter(x=>x&&settings.equip.has(x.equip));const recentIds=new Set(state.history.slice(0,2).flatMap(h=>h.exercises.map(e=>e.id)));const fresh=candidates.filter(e=>!recentIds.has(e.id));const familiar=candidates.filter(e=>recentIds.has(e.id));return[...fresh,...familiar].slice(0,n)}
 function generateWorkout(){
- let ids;
- if(settings.focus==='full'){
-   ids=['bench','latpulldown','legpress','incline_db','machine_row','legcurl','shoulder_machine','rear_delt','triceps','biceps','calf','cable_crunch','facepull','adductor','abductor','kinesis_press','kinesis_row','oct_pullup','oct_dip'];
- }else if(settings.focus==='upper'){
-   ids=['bench','latpulldown','incline_db','machine_row','shoulder_machine','lateral','triceps','biceps'];
- }else{
-   ids=['legpress','rdl','legcurl','legext','calf','abs'];
- }
- let list=choose(ids,99);
- const max={60:6,75:8,90:10}[settings.time]||8;
- list=list.slice(0,max);
- // Pokud kvůli vybavení něco vypadlo, doplň vhodnými cviky.
- if(list.length<Math.min(max,5)){
-   for(const e of db){if(settings.equip.has(e.equip)&&!list.some(x=>x.id===e.id)){list.push(e);if(list.length>=Math.min(max,5))break}}
- }
- workout={title:settings.focus==='full'?'Full Body':settings.focus==='upper'?'Vrch těla':'Nohy & břicho',goal:settings.goal,time:settings.time,started:Date.now(),exercises:list.map(e=>{const ww=roundTrainingWeight(e, recommendedWeight(e));return {id:e.id,name:e.name,target:e.target,warmup:makeWarmup(ww).map(x=>({weight:x[0],reps:x[1],done:false,warmup:true})),sets:Array.from({length:e.sets},()=>({weight:ww,reps:parseInt(e.reps)||10,done:false,warmup:false})),rest:e.rest}})};
- renderWorkout();showScreen('workout');toast('Trénink je připraven 💪');
+ let ids;if(settings.focus==='full')ids=['bench','latpulldown','legpress','incline_db','machine_row','legcurl','shoulder_machine','rear_delt','triceps','biceps','calf','cable_crunch','facepull','adductor','abductor','kinesis_press','kinesis_row','oct_pullup','oct_dip'];else if(settings.focus==='upper')ids=['bench','latpulldown','incline_db','machine_row','shoulder_machine','lateral','triceps','biceps','facepull'];else ids=['legpress','rdl','legcurl','legext','calf','abs','adductor','abductor'];
+ let list=choose(ids,99);const max={60:6,75:8,90:10}[settings.time]||8;list=list.slice(0,max);
+ const today=state.checkin||{}; const tired=today.date===new Date().toISOString().slice(0,10)&&((+today.energy>0&&+today.energy<=4)||(+today.sleep>0&&+today.sleep<5)); if(tired&&list.length>5)list=list.slice(0,list.length-1);
+ if(list.length<Math.min(max,5)){for(const e of db){if(settings.equip.has(e.equip)&&!list.some(x=>x.id===e.id)){list.push(e);if(list.length>=Math.min(max,5))break}}}
+ workout={title:settings.focus==='full'?'Full Body':settings.focus==='upper'?'Vrch těla':'Nohy & břicho',goal:settings.goal,time:settings.time,started:Date.now(),exercises:list.map(e=>{const ww=roundTrainingWeight(e,recommendedWeight(e));return{id:e.id,name:e.name,target:e.target,warmup:makeWarmup(ww,e).map(x=>({weight:x[0],reps:x[1],done:false,warmup:true})),sets:Array.from({length:e.sets},()=>({weight:ww,reps:parseInt(e.reps)||10,done:false,warmup:false})),rest:e.rest}})};
+ renderWorkout();saveActiveWorkout();showScreen('workout');toast('Trénink je připraven 💪')
 }
 function getRecommendation(e){
- const last=findLast(e.id);
- if(!last)return `První trénink je základ. Zapiš každou sérii — od dalšího tréninku už budu doporučení stavět na tvém skutečném výkonu.`;
- const weights=last.sets.map(s=>+s.weight||0).filter(Boolean);
- const reps=last.sets.map(s=>+s.reps||0).filter(Boolean);
- if(!weights.length)return `Minule nebyla zapsaná váha. Dnes ji zapiš, ať můžu doporučení zpřesnit.`;
- const w=Math.max(...weights);
- const r=Math.round(reps.reduce((a,b)=>a+b,0)/Math.max(1,reps.length));
- const next=recommendedWeight(e);
- if(r>=12)return `Minule ${w} kg × průměrně ${r}. Dnes zkus ${next} kg. Pokud dáš horní hranici, příště můžeme znovu přidat.`;
- if(r>=8)return `Minule ${w} kg × průměrně ${r}. 🎯 Zkus ${next} kg a míř na ${e.reps}.`;
- return `Minule ${w} kg × průměrně ${r}. Nejdřív dorovnej opakování; pokud technika drží, nech ${next} kg.`;
+ const last=findLast(e.id);if(!last)return'První trénink je základ. Zapiš každou sérii — příště už upravím váhu podle skutečného výkonu.';const valid=(last.sets||[]).filter(s=>(+s.weight||0)>0&&(+s.reps||0)>0);if(!valid.length)return'Minule nebyla zapsaná pracovní váha. Dnes ji zapiš, ať můžu progres správně vyhodnotit.';
+ const {min,max}=parseRepRange(e);const avgReps=valid.reduce((a,s)=>a+(+s.reps||0),0)/valid.length;const first=+valid[0].weight||0,lastW=+valid[valid.length-1].weight||first;const next=recommendedWeight(e);const allMin=valid.every(s=>(+s.reps||0)>=min);const allMax=valid.every(s=>(+s.reps||0)>=max);const drop=first>0?lastW/first:1;
+ if(drop<0.90||valid.some(s=>(+s.reps||0)<min))return`Minule výkon ke konci série klesl. 🛡️ Dnes ${next} kg a soustřeď se na čistou techniku a spodní hranici ${min} opakování.`;if(allMax)return`🔥 Všechny série byly na horní hranici (${max}). Dnes ${next} kg — tohle je prostor pro progres.`;if(settings.goal==='strength'&&allMin&&avgReps>=min+0.5)return`💪 Cíl splněn ve všech sériích. Dnes ${next} kg a míř na ${min}–${max} opakování.`;return`➡️ Dnes ${next} kg. Zkus dorovnat alespoň ${min} opakování v každé pracovní sérii.`
 }
 function renderWorkout(){
  if(!workout)return;
@@ -443,30 +507,30 @@ function renderWorkout(){
     </div>`).join('')}</div>
   </div>`:''} 
   <div class="small green" style="font-weight:900;margin-top:12px">💪 PRACOVNÍ SÉRIE</div>
+  <div class="small muted" style="margin:4px 0 7px;line-height:1.45">RIR = kolik čistých opakování by ti ještě zbylo. <strong>RIR 2</strong> = zvládl bys asi ještě 2.</div>
   <div class="sets">${e.sets.map((s,si)=>`<div class="set ${s.done?'done':''}">
-    <span>${si+1}</span><input type="number" inputmode="decimal" value="${s.weight}" onchange="updateSet(${ei},${si},'weight',this.value)"><input type="number" inputmode="numeric" value="${s.reps}" onchange="updateSet(${ei},${si},'reps',this.value)"><button class="check ${s.done?'done':''}" onclick="completeSet(${ei},${si})">${s.done?'✓':'○'}</button>
+    <span>${si+1}</span><input type="number" inputmode="decimal" value="${s.weight}" onchange="updateSet(${ei},${si},'weight',this.value)"><input type="number" inputmode="numeric" value="${s.reps}" onchange="updateSet(${ei},${si},'reps',this.value)"><select aria-label="RIR – opakování v rezervě" title="RIR = kolik opakování bys ještě zvládl navíc" onchange="updateSet(${ei},${si},'rir',this.value)" style="padding:8px;text-align:center"><option value="">RIR</option><option value="0" ${String(s.rir)==='0'?'selected':''}>0</option><option value="1" ${String(s.rir)==='1'?'selected':''}>1</option><option value="2" ${String(s.rir)==='2'?'selected':''}>2</option><option value="3" ${String(s.rir)==='3'?'selected':''}>3</option><option value="4" ${String(s.rir)==='4'?'selected':''}>4+</option></select><button class="check ${s.done?'done':''}" onclick="completeSet(${ei},${si})">${s.done?'✓':'○'}</button>
   </div>`).join('')}</div>
   <div class="row small muted" style="margin-top:9px"><span>${e.sets.filter(s=>s.done).length}/${e.sets.length} sérií</span><button class="btn" onclick="startRest(${e.rest})">⏱️ Start pauzu</button></div>
  </div>`).join('');
  updateWorkoutStats();
 }
-function updateSet(ei,si,k,v){workout.exercises[ei].sets[si][k]=Number(v)||0}
-function updateWarmup(ei,wi,k,v){workout.exercises[ei].warmup[wi][k]=Number(v)||0}
+function updateSet(ei,si,k,v){workout.exercises[ei].sets[si][k]=Number(v)||0;saveActiveWorkout()}
+function updateWarmup(ei,wi,k,v){workout.exercises[ei].warmup[wi][k]=Number(v)||0;saveActiveWorkout()}
 function completeWarmup(ei,wi){
- const s=workout.exercises[ei].warmup[wi];s.done=!s.done;renderWorkout();
+ const s=workout.exercises[ei].warmup[wi];s.done=!s.done;saveActiveWorkout();renderWorkout();
  if(s.done){startRest(60);toast('Zahřívací série zapsaná 🔥')}
 }
 function completeSet(ei,si){
- const s=workout.exercises[ei].sets[si];s.done=!s.done;renderWorkout();
+ const s=workout.exercises[ei].sets[si];s.done=!s.done;saveActiveWorkout();renderWorkout();
  if(s.done){startRest(workout.exercises[ei].rest);toast('Pracovní série zapsaná — pauza spuštěna ⏱️')}
 }
 function replaceExercise(i){
- const old=workout.exercises[i], ex=db.find(x=>x.id===old.id);
- const alternatives=(ex?.sub||[]).map(id=>db.find(x=>x.id===id)).filter(x=>x&&settings.equip.has(x.equip));
- if(!alternatives.length){toast('Pro tento cvik nemáš vybrané vhodné vybavení.');return}
- const next=alternatives[0];
- const ww=roundTrainingWeight(next, recommendedWeight(next));workout.exercises[i]={id:next.id,name:next.name,target:next.target,warmup:makeWarmup(ww).map(x=>({weight:x[0],reps:x[1],done:false,warmup:true})),sets:Array.from({length:next.sets},()=>({weight:ww,reps:parseInt(next.reps)||10,done:false,warmup:false})),rest:next.rest};
- renderWorkout();toast('Cvik vyměněn za '+next.name);
+ const old=workout.exercises[i],ex=db.find(x=>x.id===old.id),used=new Set(workout.exercises.map(x=>x.id));
+ const alternatives=(ex?.sub||[]).map(id=>db.find(x=>x.id===id)).filter(x=>x&&settings.equip.has(x.equip)&&!used.has(x.id));
+ if(!alternatives.length){toast('Nemám další vhodnou alternativu s vybraným vybavením.');return}
+ alternatives.sort((a,b)=>recentExerciseHistory(a.id).length-recentExerciseHistory(b.id).length);const next=alternatives[0];const ww=roundTrainingWeight(next,recommendedWeight(next));
+ workout.exercises[i]={id:next.id,name:next.name,target:next.target,warmup:makeWarmup(ww,next).map(x=>({weight:x[0],reps:x[1],done:false,warmup:true})),sets:Array.from({length:next.sets},()=>({weight:ww,reps:parseInt(next.reps)||10,done:false,warmup:false})),rest:next.rest};saveActiveWorkout();renderWorkout();toast('Cvik vyměněn za '+next.name)
 }
 function updateWorkoutStats(){
  if(!workout)return;
@@ -501,7 +565,7 @@ function finishWorkout(){
  let prs=0;
  exercises.forEach(e=>e.sets.forEach(s=>{if(s.warmup||!s.weight||!s.reps)return;const rm=e1rm(s.weight,s.reps);const old=state.prs[e.id]?.e1rm||0;if(rm>old){state.prs[e.id]={weight:s.weight,reps:s.reps,e1rm:Math.round(rm*10)/10,date:new Date().toLocaleDateString('cs-CZ')};prs++}}));
  state.history.unshift({id:Date.now(),name:workout.title,date:new Date().toLocaleDateString('cs-CZ'),duration,tonnage:Math.round(volume),prsHit:prs,goal:workout.goal,exercises});
- state.history=state.history.slice(0,100);save();workout=null;stopTimer();showScreen('home');toast(`Trénink uložen • ${prs} nové PR 🏆`);
+ state.history=state.history.slice(0,100);makeAutoBackup();save();workout=null;saveActiveWorkout();stopTimer();showScreen('home');toast(`Trénink uložen • ${prs} nové PR 🏆`);
 }
 function e1rm(w,r){return r<=1?w:w*(1+r/30)}
 let rmMode='max';
@@ -629,11 +693,21 @@ function smartProgress(){
 }
 function makeWarmup(workWeight, ex){
   const w=+workWeight||0;
-  if(!w) return [];
-  const sets=[];
-  if(w<=30) sets.push([Math.max(5,roundTrainingWeight(ex,w*.4)),8],[Math.max(5,roundTrainingWeight(ex,w*.65)),5]);
-  else if(w<=60) sets.push([roundTrainingWeight(ex,w*.35),10],[roundTrainingWeight(ex,w*.55),6],[roundTrainingWeight(ex,w*.75),3]);
-  else sets.push([roundTrainingWeight(ex,w*.35),10],[roundTrainingWeight(ex,w*.55),6],[roundTrainingWeight(ex,w*.70),3],[roundTrainingWeight(ex,w*.82),1]);
+  if(!w || ex?.equip==='bodyweight') return [];
+  const id=ex?.id||'';
+  const compoundIds=new Set(['bench','deadlift','rdl','squat','smith_squat','legpress','hack_squat','machine_press','incline_db','shoulder_press','shoulder_machine','machine_row','cable_row','latpulldown','pullups','oct_pullup','oct_dip']);
+  const compound=compoundIds.has(id);
+  let sets=[];
+  if(compound){
+    if(w<=40) sets=[[Math.max(5,roundTrainingWeight(ex,w*.55)),8]];
+    else if(w<=70) sets=[[roundTrainingWeight(ex,w*.45),8],[roundTrainingWeight(ex,w*.70),4]];
+    else sets=[[roundTrainingWeight(ex,w*.40),8],[roundTrainingWeight(ex,w*.60),5],[roundTrainingWeight(ex,w*.80),2]];
+  }else{
+    if(w<=25) sets=[];
+    else if(w<=60) sets=[[roundTrainingWeight(ex,w*.55),8]];
+    else sets=[[roundTrainingWeight(ex,w*.50),8],[roundTrainingWeight(ex,w*.70),4]];
+  }
+  if(settings.warmupMode==='ready') sets=sets.slice(Math.max(0,sets.length-1));
   return sets.filter(x=>x[0]>0 && x[0]<w);
 }
 function showWarmup(){
@@ -699,9 +773,17 @@ function plateLoading(totalWeight){
   return used.length?`${used.join(' + ')} na každou stranu`:'jen tyč 20 kg';
 }
 function zoneLabel(p){return p<=60?'lehké':p<=75?'objem':p<=85?'pracovní':p<=95?'síla':'maximum'}
+function toggleHistoryDetail(id){const el=$('hist-detail-'+id);if(el)el.style.display=el.style.display==='none'?'block':'none'}
 function renderHistory(){
  const box=$('historyList');if(!state.history.length){box.innerHTML='<div class="empty">Zatím nemáš žádný dokončený trénink.</div>';return}
- box.innerHTML=state.history.map(h=>`<div class="card"><div class="row"><div><h3 style="font-size:15px">${esc(h.name)}</h3><div class="small muted" style="margin-top:4px">${h.date} • ${h.duration} min</div></div><span class="badge">${h.prsHit||0} PR</span></div><div class="row small" style="margin-top:12px"><span>${h.exercises.length} cviků</span><strong class="green">${h.tonnage.toLocaleString('cs-CZ')} kg</strong></div></div>`).join('');
+ box.innerHTML=state.history.map(h=>`<div class="card">
+  <div class="row"><div><h3 style="font-size:15px">${esc(h.name)}</h3><div class="small muted" style="margin-top:4px">${h.date} • ${h.duration} min</div></div><span class="badge">${h.prsHit||0} PR</span></div>
+  <div class="row small" style="margin-top:12px"><span>${h.exercises.length} cviků</span><strong class="green">${h.tonnage.toLocaleString('cs-CZ')} kg</strong></div>
+  <button class="btn" style="width:100%;margin-top:10px" onclick="toggleHistoryDetail(${h.id})">📋 Zobrazit váhy a opakování</button>
+  <div id="hist-detail-${h.id}" style="display:none;margin-top:10px">
+   ${h.exercises.map(e=>`<div style="padding:10px 0;border-top:1px solid var(--border)"><div class="row"><strong>${esc(e.name)}</strong><span class="small muted">${esc(e.target||'')}</span></div><div class="small muted" style="margin-top:6px">${(e.sets||[]).map((s,i)=>`Série ${i+1}: <strong style="color:var(--text)">${s.weight||0} kg × ${s.reps||0}</strong>${s.rir!==undefined&&s.rir!==''?` • RIR ${s.rir}`:''}`).join(' • ')}</div></div>`).join('')}
+  </div>
+ </div>`).join('');
 }
 
 function renderCoachStats(){
@@ -730,7 +812,9 @@ function renderProgress(){
  $('totalVolume').textContent=Math.round(vol).toLocaleString('cs-CZ');$('bestPR').textContent=prs.length;
  $('best1rm').textContent=(prs.length?Math.max(...prs.map(x=>x.e1rm)):0).toFixed(1);
  $('prList').innerHTML=prs.length?Object.entries(state.prs).map(([id,p])=>{const e=db.find(x=>x.id===id);return `<div class="row" style="padding:10px 0;border-bottom:1px solid var(--border)"><div><strong>${esc(e?.name||id)}</strong><div class="small muted">${p.date} • ${p.weight} kg × ${p.reps}</div></div><span class="green">${p.e1rm} kg 1RM</span></div>`}).join(''):'<div class="empty">Zatím žádné PR. První přijde při dokončení série.</div>';
+ renderAdvancedCoach();renderMuscleBalance();renderCalendar();
 }
+
 function renderGymFilters(){document.querySelectorAll('#gymFilters .chip').forEach(b=>{const f=b.dataset.filter;b.classList.toggle('active',f==='all'?Object.values(state.gymFilters).every(Boolean):!!state.gymFilters[f]);});}
 function renderLibrary(){
  const q=($('search').value||'').toLowerCase().trim();const items=db.filter(e=>allowedForGym(e)&&`${e.name} ${e.target} ${equipmentLabels[e.equip]}`.toLowerCase().includes(q));
@@ -764,11 +848,103 @@ function updateStats(){
  const v=state.history.reduce((a,h)=>a+(h.tonnage||0),0);$('statVolume').textContent=v>999?(v/1000).toFixed(1)+'k':v;
  if(state.history[0])$('lastWorkout').textContent=`${state.history[0].name} • ${state.history[0].date} • ${state.history[0].tonnage.toLocaleString('cs-CZ')} kg`;renderCoachTip();
 }
-function openSettings(){
- const ok=confirm('Povolit zvukové/notifikační upozornění na konec pauzy?');
- if(ok)requestNotifications(); else toast('Nastavení ponecháno beze změny');
+function saveCheckin(){
+ const sleep=+$('checkSleep').value||0,energy=+$('checkEnergy').value||0,pain=+$('checkPain').value||0;
+ state.checkin={date:new Date().toISOString().slice(0,10),sleep,energy,pain};save();renderCheckin();toast('Dnešní stav uložen 🧠');
 }
-document.addEventListener('DOMContentLoaded',()=>{updateStats();renderLibrary();renderGymFilters();renderProgress();renderProfile();populateRMExercises();calc1RM();});
+function renderCheckin(){const c=state.checkin||{};if($('checkSleep')){$('checkSleep').value=c.date===new Date().toISOString().slice(0,10)?(c.sleep||''):'';$('checkEnergy').value=c.date===new Date().toISOString().slice(0,10)?(c.energy||''):'';$('checkPain').value=c.date===new Date().toISOString().slice(0,10)?(c.pain||''):'';$('checkinSummary').textContent=c.date===new Date().toISOString().slice(0,10)?`Dnes: spánek ${c.sleep||'—'} h • energie ${c.energy||'—'}/10 • bolest ${c.pain||0}/10`:'Dnešní check-in zatím není uložen.';}}
+function saveGoals(){state.goals={bench:+$('goalBench').value||0,squat:+$('goalSquat').value||0,deadlift:+$('goalDeadlift').value||0};save();renderGoals();toast('Cíle uloženy 🏆')}
+function renderGoals(){
+ const g=state.goals||{};
+ ['bench','squat','deadlift'].forEach(k=>{const el=$('goal'+k.charAt(0).toUpperCase()+k.slice(1));if(el)el.value=g[k]||''});
+ if($('goalSummary')){
+  const labels={bench:'Bench',squat:'Dřep',deadlift:'Mrtvý tah'};
+  $('goalSummary').innerHTML=['bench','squat','deadlift'].map(k=>{const goal=+g[k]||0;const pr=state.prs[k]?.weight||0;return goal?`${labels[k]}: ${pr} / ${goal} kg`:''}).filter(Boolean).join(' • ')||'Nastav si cíle pro hlavní cviky.';
+ }
+}
+function advancedCoachText(){
+ const hs=state.history||[];if(!hs.length)return'Po prvním tréninku tady uvidíš konkrétní doporučení podle výkonu, objemu, RIR a únavy.';
+ const last=hs[0],prev=hs[1];let out=[];const c=state.checkin||{};
+ if(c.date===new Date().toISOString().slice(0,10)){if(+c.pain>=7)out.push('🔴 Dnes máš vysokou bolest. Necpi výkon přes bolest a zvaž vynechání bolestivého cviku.');else if(+c.energy<=4||+c.sleep<5)out.push('🟡 Dnes jsi spíš unavený. Drž váhu nebo uber jednu pracovní sérii.');else if(+c.energy>=8)out.push('🟢 Energie je dobrá — můžeš se pokusit o plánovaný progres, pokud technika drží.');}
+ if(prev){const d=(last.tonnage||0)-(prev.tonnage||0);out.push(d>0?`📈 Poslední objem byl vyšší o ${Math.round(d).toLocaleString('cs-CZ')} kg.`:d<0?`📉 Poslední objem klesl o ${Math.round(Math.abs(d)).toLocaleString('cs-CZ')} kg.`:'➡️ Objem je podobný jako minule.');}
+ const sets=last.exercises.flatMap(e=>e.sets||[]).filter(s=>s.done&&+s.reps);const rir=sets.map(s=>+s.rir).filter(Number.isFinite);if(rir.length){const avg=rir.reduce((a,b)=>a+b,0)/rir.length;out.push(`🎯 Průměrné RIR posledního tréninku: ${avg.toFixed(1)}. Progres drž hlavně v plánovaném rozsahu, ne za cenu selhání.`)}
+ return out.join('<br>')||'Pokračuj podle plánu a zapisuj každou pracovní sérii.';
+}
+function renderAdvancedCoach(){if($('advancedCoach'))$('advancedCoach').innerHTML=advancedCoachText()}
+function renderMuscleBalance(){
+ const counts={};(state.history[0]?.exercises||[]).forEach(e=>{const n=e.target||'Ostatní';counts[n]=(counts[n]||0)+(e.sets||[]).filter(s=>s.done).length});const total=Object.values(counts).reduce((a,b)=>a+b,0)||1;
+ $('muscleBalance').innerHTML=Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([n,v])=>`<div><div class="row small"><span>${esc(n)}</span><strong>${v} série</strong></div><div class="bar"><i style="width:${Math.round(v/total*100)}%"></i></div></div>`).join('')||'<div class="empty">Po prvním tréninku se zobrazí rozložení svalových partií.</div>';
+}
+function renderCalendar(){const box=$('trainingCalendar');if(!box)return;const now=new Date();const y=now.getFullYear(),m=now.getMonth();const first=new Date(y,m,1).getDay();const offset=(first+6)%7;const days=new Date(y,m+1,0).getDate();const done=new Set((state.history||[]).map(h=>{const p=h.date.split('.');return `${y}-${String((+p[1]||m+1)).padStart(2,'0')}-${String(+p[0]).padStart(2,'0')}`}));let html=['Po','Út','St','Čt','Pá','So','Ne'].map(x=>`<div class="small muted" style="text-align:center">${x}</div>`).join('');for(let i=0;i<offset;i++)html+='<div></div>';for(let d=1;d<=days;d++){const key=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;html+=`<div class="cal-day ${done.has(key)?'done':''} ${d===now.getDate()?'today':''}">${d}${done.has(key)?'<br>🏋️':''}</div>`}box.innerHTML=html}
+function makeAutoBackup(){try{const payload={app:'Silovy trener',version:APP_VERSION+'-auto-backup',exportedAt:new Date().toISOString(),state:state,workout:workout};localStorage.setItem(KEY+'_last_backup',JSON.stringify(payload))}catch(e){}}
+function exportData(){
+  const payload={app:'Silovy trener',version:APP_VERSION+'-backup',exportedAt:new Date().toISOString(),state:state,workout:workout,settings:{focus:settings.focus,time:settings.time,goal:settings.goal,warmupMode:settings.warmupMode||'normal',equip:[...settings.equip]}};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='silovy-trener-zaloha-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  toast('Záloha stažena 💾');
+}
+function importData(file){
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const raw=JSON.parse(reader.result);
+      const incoming=raw&&raw.state?raw.state:raw;
+      if(!incoming||!Array.isArray(incoming.history)||typeof incoming.prs!=='object')throw new Error('Neplatná záloha');
+      if(!confirm(`Importovat ${incoming.history.length} tréninků a ${Object.keys(incoming.prs||{}).length} PR?\n\nStávající data v této aplikaci budou nahrazena.`))return;
+      makeAutoBackup();state={history:incoming.history,prs:incoming.prs||{},profile:incoming.profile||{age:'',height:'',weight:''},goals:incoming.goals||{bench:0,squat:0,deadlift:0},checkin:incoming.checkin||{date:'',sleep:'',energy:'',pain:''},gymFilters:incoming.gymFilters||state.gymFilters};
+      workout=raw.workout||null;if(raw.settings){settings.focus=raw.settings.focus||settings.focus;settings.time=raw.settings.time||settings.time;settings.goal=raw.settings.goal||settings.goal;settings.warmupMode=raw.settings.warmupMode||settings.warmupMode||'normal';settings.equip=new Set(raw.settings.equip||[...settings.equip]);persistSettings();setWarmupMode(settings.warmupMode)}
+      save();renderProfile();renderProgress();renderHistory();renderCoachTip();renderCheckin();renderGoals();if(workout)saveActiveWorkout();
+      toast('Data úspěšně importována ✅');
+    }catch(e){alert('Tuto zálohu se nepodařilo načíst. Zkontroluj, že jde o JSON zálohu Silového trenéra.');}
+  };
+  reader.readAsText(file);
+}
+function confirmClearData(){
+  if(!confirm('Opravdu smazat celou historii, PR a uložený profil? Tohle nejde vrátit zpět.'))return;
+  state={history:[],prs:{},profile:{age:'',height:'',weight:''}};save();renderProfile();renderProgress();renderHistory();renderCoachTip();toast('Data byla smazána');
+}
+
+function openSettings(){
+ const modal=document.getElementById('settingsModal');
+ if(modal)modal.classList.add('show');
+}
+function closeSettings(){
+ const modal=document.getElementById('settingsModal');
+ if(modal)modal.classList.remove('show');
+}
+function toggleSoundSetting(){
+ const ok=confirm('Povolit zvukové/notifikační upozornění na konec pauzy?');
+ if(ok){requestNotifications();toast('Zvuková upozornění povolena 🔔')}else{toast('Nastavení zvuku beze změny')}
+}
+function updateFromHtml(file){
+ if(!file)return;
+ const reader=new FileReader();
+ reader.onload=()=>{
+   try{
+     const html=String(reader.result||'');
+     if(!html.includes('<!DOCTYPE html') || !html.includes('Silový trenér') || !html.includes('const APP_VERSION=')) throw new Error('Neplatná aplikace');
+     const m=html.match(/const\s+APP_VERSION\s*=\s*['"](V\d+(?:\.\d+)?)['"]/);
+     const incomingVersion=m?m[1]:'nová verze';
+     if(!confirm(`Aktualizovat aplikaci na ${incomingVersion}?\n\nNejdřív se uloží automatická záloha. Tvoje tréninky, PR a nastavení se nepřepíšou novým HTML souborem.`))return;
+     makeAutoBackup();
+     localStorage.setItem(KEY+'_pre_update_backup',JSON.stringify({app:'Silovy trener',version:APP_VERSION+'-pre-update',exportedAt:new Date().toISOString(),state:state,workout:workout,settings:{focus:settings.focus,time:settings.time,goal:settings.goal,warmupMode:settings.warmupMode||'normal',equip:[...settings.equip]}}));
+     document.open();
+     document.write(html);
+     document.close();
+   }catch(e){alert('Tento soubor nevypadá jako aktualizace Silového trenéra. Vyber HTML soubor, který ti připravím.');}
+ };
+ reader.readAsText(file);
+}
+document.addEventListener('DOMContentLoaded',()=>{
+ applyAppVersion();
+ updateStats();renderLibrary();renderGymFilters();renderProgress();renderProfile();populateRMExercises();calc1RM();renderCheckin();renderGoals();
+ workout=loadActiveWorkout();
+ setWarmupMode(settings.warmupMode||'normal');
+ if(workout){renderWorkout();showScreen('workout');toast('Pokračujeme v rozpracovaném tréninku 💪')}else{showScreen(getLastScreen())}
+});
 </script>
 </body>
 </html>
