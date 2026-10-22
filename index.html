@@ -45,7 +45,7 @@ input{width:100%;background:#111113;border:1px solid var(--border);color:white;b
 <body>
 <div class="app">
 <header>
-  <div class="logo"><div class="logo-icon">🏋️</div><div><div class="title">SILOVÝ TRENÉR • <span id="appVersion">V18</span></div><div class="sub" id="headerSub">Připraven k tréninku</div></div></div>
+  <div class="logo"><div class="logo-icon">🏋️</div><div><div class="title">SILOVÝ TRENÉR • <span id="appVersion">V19</span></div><div class="sub" id="headerSub">Připraven k tréninku</div></div></div>
   <button class="btn" style="padding:8px 10px" onclick="openSettings()">⚙️</button>
 </header>
 
@@ -68,7 +68,7 @@ input{width:100%;background:#111113;border:1px solid var(--border);color:white;b
     <div class="row"><div>
       <div class="section-title green">🧠 CHYTRÝ TRENÉR</div>
       <h2 style="font-size:21px">Učím se z tvých tréninků</h2>
-    </div><span class="badge"><span id="coachVersion">V18</span> • AUTOMATICKY</span></div>
+    </div><span class="badge"><span id="coachVersion">V19</span> • AUTOMATICKY</span></div>
     <p id="coachTip" class="small muted" style="margin-top:9px;line-height:1.55"></p>
     <div id="coachStats" class="statgrid" style="margin-top:12px"></div>
   </div>
@@ -163,7 +163,7 @@ input{width:100%;background:#111113;border:1px solid var(--border);color:white;b
   <div class="card" style="border-color:rgba(168,85,247,.35);background:linear-gradient(145deg,#1d1028,#18181b)">
     <div class="section-title" style="color:#c084fc">🔄 AKTUALIZACE A VERZE</div>
     <p class="small muted" style="line-height:1.5">Aktuální verze se doplňuje automaticky. Při každé nové verzi, kterou ti připravím, nemusíš číslo nikde ručně měnit.</p>
-    <div class="row" style="margin-top:10px"><span class="small muted">Nainstalovaná verze</span><span class="badge" id="settingsVersion">V18</span></div>
+    <div class="row" style="margin-top:10px"><span class="small muted">Nainstalovaná verze</span><span class="badge" id="settingsVersion">V19</span></div>
     <button class="btn primary" style="width:100%;margin-top:12px" onclick="document.getElementById('updateHtmlFile').click()">📦 Importovat aktualizaci HTML</button>
     <input id="updateHtmlFile" type="file" accept="text/html,.html" style="display:none" onchange="updateFromHtml(this.files[0])">
     <p class="small muted" style="margin-top:8px;line-height:1.5">Vyber nový HTML soubor, který ti připravím. Před aktualizací se automaticky uloží záloha tvých dat. Po aktualizaci zůstanou tréninky a nastavení v telefonu.</p>
@@ -281,7 +281,7 @@ input{width:100%;background:#111113;border:1px solid var(--border);color:white;b
 
 <div id="settingsModal" class="modal" onclick="if(event.target===this)closeSettings()">
   <div class="modal-card">
-    <div class="row"><div><div class="section-title" style="margin:0;color:#c084fc">⚙️ NASTAVENÍ</div><h2 style="font-size:22px;margin-top:5px">Silový trenér <span id="modalVersion">V18</span></h2></div><button class="btn" onclick="closeSettings()">✕</button></div>
+    <div class="row"><div><div class="section-title" style="margin:0;color:#c084fc">⚙️ NASTAVENÍ</div><h2 style="font-size:22px;margin-top:5px">Silový trenér <span id="modalVersion">V19</span></h2></div><button class="btn" onclick="closeSettings()">✕</button></div>
     <div class="card" style="margin-top:12px">
       <div class="section-title">🔔 Upozornění</div>
       <p class="small muted">Zvukové upozornění po skončení pauzy.</p>
@@ -299,7 +299,7 @@ input{width:100%;background:#111113;border:1px solid var(--border);color:white;b
       <p class="small muted">Stáhneš-li ode mě novou verzi HTML, můžeš ji vybrat tady. Aplikace před aktualizací automaticky zazálohuje tvoje data.</p>
       <button class="btn primary" style="width:100%;margin-top:8px" onclick="document.getElementById('updateHtmlFile').click();closeSettings()">📦 Vybrat novou HTML verzi</button>
     </div>
-    <div class="small muted" style="margin-top:10px;text-align:center">Aktuální verze: <strong id="modalVersion2">V18</strong></div>
+    <div class="small muted" style="margin-top:10px;text-align:center">Aktuální verze: <strong id="modalVersion2">V19</strong></div>
   </div>
 </div>
 
