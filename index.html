@@ -68,12 +68,48 @@ header{padding:12px 16px}
 .bar i{border-radius:99px}
 .empty{border:1px dashed var(--border);border-radius:16px;padding:18px;text-align:center;color:var(--muted)}
 
+
+/* V23.2 Encyclopedia */
+.exercise-info-btn{margin-top:9px;width:100%;font-size:12px}
+.exercise-modal{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.72);display:none;align-items:flex-end;justify-content:center;padding:0}
+.exercise-modal.open{display:flex}
+.exercise-sheet{width:min(540px,100%);max-height:92vh;overflow:auto;background:var(--card);border:1px solid var(--border);border-radius:24px 24px 0 0;padding:18px 16px 28px;box-shadow:0 -12px 40px rgba(0,0,0,.35)}
+.exercise-sheet .hero{border:1px solid var(--border);border-radius:20px;padding:14px;background:linear-gradient(145deg,#16171b,#0d0e10);margin-bottom:14px}
+.motion{height:150px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;border-radius:16px;background:rgba(255,255,255,.025);margin-top:10px}
+.motion svg{width:100%;height:100%}
+.motion .arm{transform-origin:50% 50%;animation:lift 1.6s ease-in-out infinite alternate}
+@keyframes lift{from{transform:rotate(-8deg) translateY(5px)}to{transform:rotate(8deg) translateY(-5px)}}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.info-box{border:1px solid var(--border);border-radius:15px;padding:11px;background:rgba(255,255,255,.025)}
+.info-box b{display:block;margin-bottom:5px}
+.step{display:flex;gap:9px;margin:9px 0}
+.step i{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(16,185,129,.16);color:#6ee7b7;font-style:normal;font-weight:700;flex:0 0 24px}
+
+
+.clean-motion{height:170px;margin-top:12px;background:linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,.012));}
+.clean-motion svg{width:100%;height:150px;max-width:380px}
+.motion-label{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:11px;letter-spacing:.04em;opacity:.48}
+.motion-arrow{animation:arrowPulse 1.1s ease-in-out infinite alternate}
+.motion-arm{transform-origin:180px 88px;animation:curlMove 1.4s ease-in-out infinite alternate}
+.fly-arms{transform-origin:180px 67px;animation:flyMove 1.5s ease-in-out infinite alternate}
+@keyframes arrowPulse{from{opacity:.35;transform:translateY(4px)}to{opacity:1;transform:translateY(-3px)}}
+@keyframes curlMove{from{transform:rotate(8deg)}to{transform:rotate(-10deg)}}
+@keyframes flyMove{from{transform:scaleX(.72)}to{transform:scaleX(1)}}
+.exercise-sheet{padding:14px 14px 26px}
+.exercise-sheet .hero{padding:12px;margin-bottom:10px}
+.exercise-sheet .hero h2{font-size:26px}
+.exercise-sheet .info-grid{gap:8px}
+.exercise-sheet .card{margin-top:9px!important;padding:12px}
+
+
+.exercise-video{margin-top:12px}.video-wrap{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:#090a0c;border:1px solid var(--border)}.video-wrap iframe{width:100%;height:100%;border:0;display:block}.video-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;font-size:12px;color:var(--muted)}.video-placeholder{aspect-ratio:16/9;border-radius:16px;border:1px solid var(--border);background:linear-gradient(145deg,#17181b,#0c0d0f);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;text-align:center;color:var(--muted)}.video-placeholder b{color:var(--text);font-size:15px}.video-placeholder span{font-size:12px}.play-circle{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(16,185,129,.16);color:#6ee7b7;font-size:20px;padding-left:3px}
+
 </style>
 </head>
 <body>
 <div class="app">
 <header>
-  <div class="logo"><div class="logo-icon">🏋️</div><div><div class="title">SILOVÝ TRENÉR • <span id="appVersion">V22.3</span></div><div class="sub" id="headerSub">Připraven k tréninku</div></div></div>
+  <div class="logo"><div class="logo-icon">🏋️</div><div><div class="title">SILOVÝ TRENÉR • <span id="appVersion">V23.2</span></div><div class="sub" id="headerSub">Připraven k tréninku</div></div></div>
   <button class="btn" style="padding:8px 10px" onclick="openSettings()">⚙️</button>
 </header>
 
@@ -96,7 +132,7 @@ header{padding:12px 16px}
     <div class="row"><div>
       <div class="section-title green">🧠 CHYTRÝ TRENÉR</div>
       <h2 style="font-size:21px">Učím se z tvých tréninků</h2>
-    </div><span class="badge"><span id="coachVersion">V22.3</span> • AUTOMATICKY</span></div>
+    </div><span class="badge"><span id="coachVersion">V23.2</span> • AUTOMATICKY</span></div>
     <p id="coachTip" class="small muted" style="margin-top:9px;line-height:1.55"></p>
     <div id="coachStats" class="statgrid" style="margin-top:12px"></div>
   </div>
@@ -343,7 +379,7 @@ header{padding:12px 16px}
 
 <div id="settingsModal" class="modal" onclick="if(event.target===this)closeSettings()">
   <div class="modal-card">
-    <div class="row"><div><div class="section-title" style="margin:0;color:#c084fc">⚙️ NASTAVENÍ</div><h2 style="font-size:22px;margin-top:5px">Silový trenér <span id="modalVersion">V22.3</span></h2></div><button class="btn" onclick="closeSettings()">✕</button></div>
+    <div class="row"><div><div class="section-title" style="margin:0;color:#c084fc">⚙️ NASTAVENÍ</div><h2 style="font-size:22px;margin-top:5px">Silový trenér <span id="modalVersion">V23.2</span></h2></div><button class="btn" onclick="closeSettings()">✕</button></div>
 
     <div class="card" style="margin-top:12px">
       <div class="section-title">🔔 Upozornění</div>
@@ -365,7 +401,7 @@ header{padding:12px 16px}
     <div class="card" style="border-color:rgba(168,85,247,.35)">
       <div class="section-title" style="color:#c084fc">📦 AKTUALIZACE</div>
       <p class="small muted">Vyber nový HTML soubor, který ti připravím. Před aktualizací se automaticky zazálohují tvoje data.</p>
-      <div class="row" style="margin-top:10px"><span class="small muted">Nainstalovaná verze</span><span class="badge" id="settingsVersion">V22.3</span></div>
+      <div class="row" style="margin-top:10px"><span class="small muted">Nainstalovaná verze</span><span class="badge" id="settingsVersion">V23.2</span></div>
       <button class="btn primary" style="width:100%;margin-top:12px" onclick="document.getElementById('updateHtmlFile').click()">📦 Vybrat novou HTML verzi</button>
       <input id="updateHtmlFile" type="file" accept="text/html,.html" style="display:none" onchange="updateFromHtml(this.files[0])">
       <p class="small muted" style="margin-top:8px;line-height:1.5">Po aktualizaci zůstávají tvoje data v telefonu. Pro jistotu doporučuji před větší aktualizací vytvořit export zálohy.</p>
@@ -374,7 +410,7 @@ header{padding:12px 16px}
     <div class="card" style="border-color:rgba(59,130,246,.35)">
       <div class="section-title" style="color:#60a5fa">🔧 INFORMACE</div>
       <div class="small muted" style="line-height:1.7">
-        <div>Verze aplikace: <strong id="modalVersion2">V22.3</strong></div>
+        <div>Verze aplikace: <strong id="modalVersion2">V23.2</strong></div>
         <div>Stav: <strong style="color:var(--brand)">Připraveno</strong></div>
       </div>
     </div>
@@ -391,7 +427,7 @@ header{padding:12px 16px}
 </div>
 
 <script>
-const APP_VERSION='V22.3';
+const APP_VERSION='V23.2';
 const KEY='silovy_trener_v2';
 const equipmentLabels={barbell:'Velká osa',dumbbell:'Jednoručky',cable:'Kladka',machine:'Klasický stroj',kinesis:'Kinesis',octagon:'Octagon',pullup:'Hrazda',bodyweight:'Vlastní váha'};
 const db=[
@@ -538,6 +574,74 @@ ${Math.round(h.tonnage||0).toLocaleString('cs-CZ')} kg objemu${h.prsHit?` • �
   else if(navigator.clipboard)navigator.clipboard.writeText(text).then(()=>toast('Shrnutí zkopírováno 📋'));
   else toast(text);
 }
+
+
+const EXERCISE_GUIDES={
+ bench:{steps:["Lehni si stabilně na lavici a stáhni lopatky dozadu a dolů.","Chodidla drž pevně na zemi a nastav pevný střed těla.","Spusť osu kontrolovaně k dolní části hrudníku.","Krátce stabilizuj pozici a vytlač osu zpět nahoru.","Dráhu drž plynulou a každé opakování prováděj pod kontrolou."],errors:["zvedání zadku z lavice","odskakování činky od hrudníku","příliš roztažené lokty","ztráta napětí v horní části zad"],breath:"Nádech před spouštěním, výdech při vytlačení.",tip:"Neřeš jen váhu. Pevná pozice a kontrolovaná excentrická fáze jsou základ.",main:"Prsa",secondary:"Triceps • přední ramena",alt:"Tlaky s jednoručkami • chest press"},
+ squat:{steps:["Postav se stabilně a nastav osu na bezpečnou pozici.","Nadechni se do břicha a zpevni střed.","Klesej kontrolovaně dolů a drž kolena ve směru špiček.","Dostaň se do hloubky, kterou zvládneš bez ztráty pozice.","Vytlač se přes celé chodidlo a vrať se do stoje."],errors:["kolena padají dovnitř","ztráta pevného středu","zvedání pat","nekontrolovaný sestup"],breath:"Nádech a zpevnění před sestupem, výdech při výstupu.",tip:"Začni hloubkou, kterou zvládneš opakovat stejně kvalitně.",main:"Stehna • hýždě",secondary:"Střed těla",alt:"Leg press • hacken dřep"},
+ deadlift:{steps:["Postav chodidla přibližně pod osu a nastav pevný úchop.","Zpevni záda a střed těla před odlepením osy.","Tlač nohama do země a drž osu blízko těla.","Dokonči pohyb pevným postavením bez zaklánění.","Spusť osu zpět kontrolovaně stejnou dráhou."],errors:["zakulacení zad pod velkou zátěží","osa daleko od těla","trhnutí ze země","zaklánění v horní pozici"],breath:"Zpevni střed před zdvihem a vydechuj po dokončení opakování.",tip:"Mysli na pohyb celé osy nahoru, ne na tahání rukama.",main:"Hamstringy • hýždě • záda",secondary:"Trapézy • předloktí",alt:"Rumunský mrtvý tah • hip thrust"}
+};
+
+function guideFor(e){
+ const n=(e.name||'').toLowerCase();
+ if(n.includes('bench')||n.includes('tlak')&&n.includes('velk'))return EXERCISE_GUIDES.bench;
+ if(n.includes('dřep')||n.includes('squat'))return EXERCISE_GUIDES.squat;
+ if(n.includes('mrtv')||n.includes('deadlift'))return EXERCISE_GUIDES.deadlift;
+ return {
+  steps:["Nastav stroj nebo stanoviště tak, aby byla výchozí pozice stabilní.","Zpevni střed těla a začni pohyb kontrolovaně.","Veď pohyb přes cílový sval a vyhni se švihu.","V krajní pozici krátce zkontroluj techniku.","Vrať se pomalu do výchozí pozice a opakuj."],
+  errors:["švihání tělem","zbytečně rychlá negativní fáze","ztráta stabilní pozice","příliš velká váha na úkor techniky"],
+  breath:"Nádech při přípravě a kontrolované fázi, výdech při hlavní části pohybu.",
+  tip:"Použij váhu, se kterou zvládneš všechna opakování čistě.",
+  main:e.target||"cílová partie",secondary:"svaly podle provedení",alt:"Zvol variantu, která zachová podobný pohybový vzor."
+ };
+}
+
+const EXERCISE_VIDEOS={
+ bench:'PTzUJkPrrDw',
+ squat:'Uv_DKDl7EjA',
+ deadlift:'-4qRntuXBSc',
+ db_shoulder:'eNMl9UoO7YA'
+};
+function videoSearchUrl(name){return 'https://www.youtube.com/results?search_query='+encodeURIComponent(name+' proper form exercise short');}
+function exerciseMotion(e){
+ const id=EXERCISE_VIDEOS[e.id];
+ const search=videoSearchUrl(e.name||'exercise');
+ if(id) return `<div class="exercise-video"><div class="video-wrap"><iframe src="https://www.youtube.com/embed/${id}?rel=0&modestbranding=1" title="${esc(e.name)} – správné provedení" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div><div class="video-actions"><span>▶️ Ukázka správného provedení</span><a class="btn" href="${search}" target="_blank" rel="noopener">Další videa</a></div></div>`;
+ return `<div class="exercise-video"><div class="video-placeholder"><div class="play-circle">▶</div><b>Video správného provedení</b><span>Krátké ukázky pro tento konkrétní cvik</span></div><a class="btn primary" style="width:100%;margin-top:9px" href="${search}" target="_blank" rel="noopener">▶️ Otevřít krátká videa cviku</a></div>`;
+}
+
+function openExerciseInfo(id){
+ const e=db.find(x=>x.id===id);if(!e)return;
+ const g=guideFor(e);
+ const p=state.performances?.[id];
+ const h=findLast(id);
+ const sets=(h?.sets||[]).filter(s=>(+s.weight||0)>0&&(+s.reps||0)>0);
+ const last=sets.at(-1);
+ const best=p?.weight&&p?.reps?`${p.weight} kg × ${p.reps}`:(last?`${last.weight} kg × ${last.reps}`:'Zatím nezapsáno');
+ const modal=$('exerciseModal'),content=$('exerciseInfoContent');
+ $('infoSubtitle').textContent=`${e.target||'Cvik'} • ${equipmentLabels[e.equip]||e.equip}`;
+ content.innerHTML=`<div class="hero">
+  <h2 style="margin:0">${esc(e.name)}</h2>
+  <div class="small muted">${esc(e.target||'')}</div>
+  ${exerciseMotion(e)}
+ </div>
+ <div class="info-grid">
+  <div class="info-box"><b>🎯 Hlavní svaly</b>${esc(g.main)}</div>
+  <div class="info-box"><b>💪 Vedlejší svaly</b>${esc(g.secondary)}</div>
+  <div class="info-box"><b>📊 Tvůj výkon</b>${esc(best)}</div>
+  <div class="info-box"><b>⏱️ Pauza</b>${Math.round((e.rest||120)/60)} min</div>
+ </div>
+ <div class="card" style="margin-top:12px"><div class="section-title">▶️ SPRÁVNÉ PROVEDENÍ</div>
+  ${g.steps.map((s,i)=>`<div class="step"><i>${i+1}</i><div>${esc(s)}</div></div>`).join('')}
+ </div>
+ <div class="card"><div class="section-title">⚠️ NEJČASTĚJŠÍ CHYBY</div><ul>${g.errors.map(x=>`<li style="margin:6px 0">${esc(x)}</li>`).join('')}</ul></div>
+ <div class="card"><div class="section-title">💡 TIP TRENÉRA</div><div>${esc(g.tip)}</div></div>
+ <div class="card"><div class="section-title">🫁 DÝCHÁNÍ</div><div>${esc(g.breath)}</div></div>
+ <div class="card"><div class="section-title">🔄 ALTERNATIVY</div><div>${esc(g.alt)}</div></div>
+ <button class="btn primary" style="width:100%" onclick="closeExerciseInfo();showScreen('workout');toast('Cvik vybrán pro další trénink 💪')">🏋️ Jít cvičit</button>`;
+ modal.classList.add('open');
+}
+function closeExerciseInfo(){$('exerciseModal')?.classList.remove('open')}
 
 function setGymFilter(v){
   if(v==='all'){
@@ -1266,7 +1370,7 @@ function renderLibrary(){
   <div class="row"><div style="min-width:0"><div class="row" style="justify-content:flex-start;gap:8px"><strong>${esc(e.name)}</strong><button class="move-btn ${state.favorites.includes(e.id)?'active':''}" onclick="toggleFavorite('${e.id}')" title="Oblíbený cvik">${state.favorites.includes(e.id)?'★':'☆'}</button></div>
   <div class="small muted" style="margin-top:4px">${esc(e.target)} • ${equipmentLabels[e.equip]||e.equip}</div>
   <div class="small muted" style="margin-top:4px">${esc(lastPerformanceLabel(e.id))}</div></div><span class="badge">${e.sets}× ${esc(e.reps)}</span></div>
-  <div class="small muted" style="margin-top:9px">Doporučená pauza: ${Math.round(e.rest/60)} min • ${e.equip==='bodyweight'?'vlastní váha':('start '+(recommendedWeight(e)||'dle výkonu')+' kg')}</div>
+  <div class="small muted" style="margin-top:9px">Doporučená pauza: ${Math.round(e.rest/60)} min • ${e.equip==='bodyweight'?'vlastní váha':('start '+(recommendedWeight(e)||'dle výkonu')+' kg')}</div><button class="btn exercise-info-btn" onclick="openExerciseInfo('${e.id}')">📖 Technika a informace o cviku</button>
   ${e.custom?`<button class="btn" style="width:100%;margin-top:8px;color:#fca5a5" onclick="deleteCustomExercise('${e.id}')">🗑️ Smazat vlastní cvik</button>`:''}
  </div>`).join('')||'<div class="empty">Nic nenalezeno. Zkus jiný název nebo vypni filtr ⭐.</div>';
 }
@@ -1443,5 +1547,16 @@ document.addEventListener('DOMContentLoaded',()=>{
  if(workout){renderWorkout();showScreen('workout');toast('Pokračujeme v rozpracovaném tréninku 💪')}else{showScreen(getLastScreen())}
 });
 </script>
+
+<div id="exerciseModal" class="exercise-modal" onclick="if(event.target===this)closeExerciseInfo()">
+  <div class="exercise-sheet">
+    <div class="row" style="margin-bottom:10px">
+      <div><div class="section-title" style="margin:0">📖 ENCYKLOPEDIE CVIKŮ</div><div id="infoSubtitle" class="small muted"></div></div>
+      <button class="btn" onclick="closeExerciseInfo()">✕</button>
+    </div>
+    <div id="exerciseInfoContent"></div>
+  </div>
+</div>
+
 </body>
 </html>
