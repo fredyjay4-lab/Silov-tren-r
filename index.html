@@ -73,7 +73,7 @@ header{padding:12px 16px}
 <body>
 <div class="app">
 <header>
-  <div class="logo"><div class="logo-icon">🏋️</div><div><div class="title">SILOVÝ TRENÉR • <span id="appVersion">V22.1</span></div><div class="sub" id="headerSub">Připraven k tréninku</div></div></div>
+  <div class="logo"><div class="logo-icon">🏋️</div><div><div class="title">SILOVÝ TRENÉR • <span id="appVersion">V22.3</span></div><div class="sub" id="headerSub">Připraven k tréninku</div></div></div>
   <button class="btn" style="padding:8px 10px" onclick="openSettings()">⚙️</button>
 </header>
 
@@ -96,7 +96,7 @@ header{padding:12px 16px}
     <div class="row"><div>
       <div class="section-title green">🧠 CHYTRÝ TRENÉR</div>
       <h2 style="font-size:21px">Učím se z tvých tréninků</h2>
-    </div><span class="badge"><span id="coachVersion">V22.1</span> • AUTOMATICKY</span></div>
+    </div><span class="badge"><span id="coachVersion">V22.3</span> • AUTOMATICKY</span></div>
     <p id="coachTip" class="small muted" style="margin-top:9px;line-height:1.55"></p>
     <div id="coachStats" class="statgrid" style="margin-top:12px"></div>
   </div>
@@ -157,7 +157,7 @@ header{padding:12px 16px}
     <div class="small muted" style="margin-top:9px">⚠️ E-GYM a automatické stroje jsou záměrně vynechané.</div>
 
     <div class="grid2" style="margin-top:15px">
-      <button class="btn primary" style="font-size:14px" onclick="generateWorkout()">⚡ Vygenerovat trénink</button>
+      <button type="button" class="btn primary" style="font-size:14px" onclick="generateWorkout()">⚡ Vygenerovat trénink</button>
       <button class="btn" style="font-size:14px" onclick="quickWorkout()">🔥 Rychlý trénink</button>
     </div>
   </div>
@@ -217,6 +217,8 @@ header{padding:12px 16px}
     <div class="progress" style="margin-top:12px"><i id="workoutProgress"></i></div>
     <div class="row small muted" style="margin-top:7px"><span id="workoutProgressText">0 / 0 sérií</span><span id="workoutVolume">0 kg</span></div>
   </div>
+
+  <div id="exerciseList"></div>
 
   <div class="card" style="border-color:rgba(168,85,247,.30);background:linear-gradient(145deg,#171022,#101012)">
     <div class="section-title" style="color:#c084fc">📝 ZÁZNAM TRÉNINKU</div>
@@ -341,7 +343,7 @@ header{padding:12px 16px}
 
 <div id="settingsModal" class="modal" onclick="if(event.target===this)closeSettings()">
   <div class="modal-card">
-    <div class="row"><div><div class="section-title" style="margin:0;color:#c084fc">⚙️ NASTAVENÍ</div><h2 style="font-size:22px;margin-top:5px">Silový trenér <span id="modalVersion">V22.1</span></h2></div><button class="btn" onclick="closeSettings()">✕</button></div>
+    <div class="row"><div><div class="section-title" style="margin:0;color:#c084fc">⚙️ NASTAVENÍ</div><h2 style="font-size:22px;margin-top:5px">Silový trenér <span id="modalVersion">V22.3</span></h2></div><button class="btn" onclick="closeSettings()">✕</button></div>
 
     <div class="card" style="margin-top:12px">
       <div class="section-title">🔔 Upozornění</div>
@@ -363,7 +365,7 @@ header{padding:12px 16px}
     <div class="card" style="border-color:rgba(168,85,247,.35)">
       <div class="section-title" style="color:#c084fc">📦 AKTUALIZACE</div>
       <p class="small muted">Vyber nový HTML soubor, který ti připravím. Před aktualizací se automaticky zazálohují tvoje data.</p>
-      <div class="row" style="margin-top:10px"><span class="small muted">Nainstalovaná verze</span><span class="badge" id="settingsVersion">V22.1</span></div>
+      <div class="row" style="margin-top:10px"><span class="small muted">Nainstalovaná verze</span><span class="badge" id="settingsVersion">V22.3</span></div>
       <button class="btn primary" style="width:100%;margin-top:12px" onclick="document.getElementById('updateHtmlFile').click()">📦 Vybrat novou HTML verzi</button>
       <input id="updateHtmlFile" type="file" accept="text/html,.html" style="display:none" onchange="updateFromHtml(this.files[0])">
       <p class="small muted" style="margin-top:8px;line-height:1.5">Po aktualizaci zůstávají tvoje data v telefonu. Pro jistotu doporučuji před větší aktualizací vytvořit export zálohy.</p>
@@ -372,7 +374,7 @@ header{padding:12px 16px}
     <div class="card" style="border-color:rgba(59,130,246,.35)">
       <div class="section-title" style="color:#60a5fa">🔧 INFORMACE</div>
       <div class="small muted" style="line-height:1.7">
-        <div>Verze aplikace: <strong id="modalVersion2">V22.1</strong></div>
+        <div>Verze aplikace: <strong id="modalVersion2">V22.3</strong></div>
         <div>Stav: <strong style="color:var(--brand)">Připraveno</strong></div>
       </div>
     </div>
@@ -389,7 +391,7 @@ header{padding:12px 16px}
 </div>
 
 <script>
-const APP_VERSION='V22.1';
+const APP_VERSION='V22.3';
 const KEY='silovy_trener_v2';
 const equipmentLabels={barbell:'Velká osa',dumbbell:'Jednoručky',cable:'Kladka',machine:'Klasický stroj',kinesis:'Kinesis',octagon:'Octagon',pullup:'Hrazda',bodyweight:'Vlastní váha'};
 const db=[
@@ -606,7 +608,7 @@ function coachAdvice(){
 function renderCoachTip(){if($('coachTip'))$('coachTip').textContent=coachAdvice();renderCoachStats()}
 function toggleEquip(v){settings.equip.has(v)?settings.equip.delete(v):settings.equip.add(v);document.querySelector(`[data-equip="${v}"]`).classList.toggle('active',settings.equip.has(v))}
 function eligible(id){const x=db.find(x=>x.id===id);return !!x&&settings.equip.has(x.equip)}
-function findLast(id){for(const h of state.history){const e=h.exercises.find(x=>x.id===id);if(e&&e.sets?.length)return e}return null}
+function findLast(id){for(const h of (Array.isArray(state.history)?state.history:[])){const exs=Array.isArray(h?.exercises)?h.exercises:[];const e=exs.find(x=>x&&x.id===id);if(e&&Array.isArray(e.sets)&&e.sets.length)return e}return null}
 function recentExerciseHistory(id,limit=5){return state.history.flatMap(h=>h.exercises.filter(e=>e.id===id).map(e=>({date:h.date,goal:h.goal,sets:e.sets||[]}))).slice(0,limit)}
 function parseRepRange(ex){const nums=String(ex.reps||'8-12').match(/\d+/g)||[8,12];return{min:+nums[0]||8,max:+nums[1]||(+nums[0]||8)}}
 function normalIncrement(ex,w){if(ex?.equip==='barbell')return w>=80?5:2.5;if(ex?.equip==='dumbbell')return 2.5;return w>=80?5:2.5}
@@ -678,14 +680,26 @@ function exerciseOrderScore(e,focus){
  return group*100+ix(id)+ix2(id);
 }
 function choose(ids,n){
- const candidates=ids.map(id=>db.find(x=>x.id===id)).filter(x=>x&&settings.equip.has(x.equip));
- const recentIds=new Set(state.history.slice(0,2).flatMap(h=>h.exercises.map(e=>e.id)));
+ const equip=settings.equip instanceof Set
+   ? settings.equip
+   : new Set(Array.isArray(settings.equip)?settings.equip:['barbell','dumbbell','cable','machine','kinesis','octagon','pullup','bodyweight']);
+ settings.equip=equip;
+ const candidates=ids.map(id=>db.find(x=>x.id===id)).filter(x=>x&&equip.has(x.equip));
+ const recentIds=new Set((Array.isArray(state.history)?state.history:[])
+   .slice(0,2)
+   .flatMap(h=>Array.isArray(h?.exercises)?h.exercises:[])
+   .map(e=>e?.id)
+   .filter(Boolean));
  const fresh=candidates.filter(e=>!recentIds.has(e.id));
  const familiar=candidates.filter(e=>recentIds.has(e.id));
- return [...fresh,...familiar].sort((a,b)=>exerciseOrderScore(a,settings.focus)-exerciseOrderScore(b,settings.focus)).slice(0,n);
+ return [...fresh,...familiar]
+   .sort((a,b)=>exerciseOrderScore(a,settings.focus)-exerciseOrderScore(b,settings.focus))
+   .slice(0,n);
 }
 function generateWorkout(){
- let ids;
+ try{
+  if(!(settings.equip instanceof Set))settings.equip=new Set(Array.isArray(settings.equip)?settings.equip:['barbell','dumbbell','cable','machine','kinesis','octagon','pullup','bodyweight']);
+  let ids;
  if(settings.focus==='full')ids=['squat','bench','latpulldown','legpress','incline_db','machine_row','rdl','shoulder_machine','legcurl','rear_delt','triceps','biceps','calf','cable_crunch','facepull','adductor','abductor','kinesis_press','kinesis_row','oct_pullup','oct_dip'];
  else if(settings.focus==='upper')ids=['bench','incline_db','latpulldown','machine_row','shoulder_machine','ohp','lateral','rear_delt','triceps','biceps','facepull'];
  else ids=['squat','legpress','rdl','legcurl','legext','calf','abs','adductor','abductor'];
@@ -704,7 +718,11 @@ function generateWorkout(){
    const ww=roundTrainingWeight(e,recommendedWeight(e));
    return{id:e.id,name:e.name,target:e.target,equip:e.equip,warmup:makeWarmup(ww,e).map(x=>({weight:x[0],reps:x[1],done:false,warmup:true})),sets:Array.from({length:e.sets},()=>({weight:isBodyweightExercise(e)?(state.profile?.weight||0):ww,reps:parseInt(e.reps)||10,done:false,warmup:false,loadMode:isBodyweightExercise(e)?'bodyweight':'weight'})),rest:e.rest}
  })};
- renderWorkout();saveActiveWorkout();showScreen('workout');toast('Trénink je připraven v logickém pořadí 💪');
+  renderWorkout();saveActiveWorkout();showScreen('workout');toast('Trénink je připraven v logickém pořadí 💪');
+ }catch(err){
+  console.error('generateWorkout:',err);
+  toast('Trénink se nepodařilo vygenerovat. Zkus to znovu.');
+ }
 }
 
 function getRecommendation(e){
