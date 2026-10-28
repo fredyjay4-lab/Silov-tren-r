@@ -427,9 +427,12 @@ header{padding:12px 16px}
 </div>
 
 <script>
-const APP_VERSION='V23.2';
+const APP_VERSION='V25';
 const KEY='silovy_trener_v2';
 const equipmentLabels={barbell:'Velká osa',dumbbell:'Jednoručky',cable:'Kladka',machine:'Klasický stroj',kinesis:'Kinesis',octagon:'Octagon',pullup:'Hrazda',bodyweight:'Vlastní váha'};
+// Cviky, které trenér automaticky NEVYBÍRÁ. Zůstávají v databázi pro případné ruční použití.
+const AUTO_EXCLUDED_IDS=new Set(['squat','deadlift','rdl','smith_squat','smith_rdl','cable_squat']);
+
 const db=[
 {id:'bench',name:'Bench Press',target:'Hrudník',equip:'barbell',sets:4,reps:'6-8',rest:180,base:80,sub:['machine_press','cable_press']},
 {id:'incline_db',name:'Tlaky jednoruček na šikmé lavici',target:'Hrudník',equip:'dumbbell',sets:3,reps:'8-12',rest:120,base:28,sub:['incline_machine']},
@@ -788,45 +791,70 @@ function choose(ids,n){
    ? settings.equip
    : new Set(Array.isArray(settings.equip)?settings.equip:['barbell','dumbbell','cable','machine','kinesis','octagon','pullup','bodyweight']);
  settings.equip=equip;
- const candidates=ids.map(id=>db.find(x=>x.id===id)).filter(x=>x&&equip.has(x.equip));
- const recentIds=new Set((Array.isArray(state.history)?state.history:[])
-   .slice(0,2)
-   .flatMap(h=>Array.isArray(h?.exercises)?h.exercises:[])
-   .map(e=>e?.id)
-   .filter(Boolean));
- const fresh=candidates.filter(e=>!recentIds.has(e.id));
- const familiar=candidates.filter(e=>recentIds.has(e.id));
- return [...fresh,...familiar]
-   .sort((a,b)=>exerciseOrderScore(a,settings.focus)-exerciseOrderScore(b,settings.focus))
-   .slice(0,n);
+ const candidates=ids.map(id=>db.find(x=>x.id===id)).filter(x=>x&&equip.has(x.equip)&&!AUTO_EXCLUDED_IDS.has(x.id));
+ // The plan order is intentional: keep it stable so the workout flows logically.
+ // History is still used by recommendedWeight(), so variety does not require reordering.
+ return candidates.slice(0,n);
 }
+
+const WORKOUT_PLANS={
+ full:['bench','legpress','latpulldown','incline_db','machine_row','legcurl','shoulder_machine','rear_delt','triceps','biceps','calf','cable_crunch'],
+ upper:['bench','incline_db','latpulldown','machine_row','shoulder_machine','lateral','rear_delt','triceps','biceps','cable_fly_high','facepull'],
+ lower:['legpress','legcurl','legext','glute','calf','cable_crunch','adductor','abductor']
+};
+
+function getPlanIds(){return WORKOUT_PLANS[settings.focus]||WORKOUT_PLANS.full}
+
+function makeWorkoutExercise(e){
+ const ww=roundTrainingWeight(e,recommendedWeight(e));
+ return {id:e.id,name:e.name,target:e.target,equip:e.equip,
+   warmup:makeWarmup(ww,e).map(x=>({weight:x[0],reps:x[1],done:false,warmup:true})),
+   sets:Array.from({length:e.sets},()=>({weight:isBodyweightExercise(e)?(state.profile?.weight||0):ww,reps:parseInt(e.reps)||10,done:false,warmup:false,loadMode:isBodyweightExercise(e)?'bodyweight':'weight'})),
+   rest:e.rest};
+}
+
 function generateWorkout(){
  try{
   if(!(settings.equip instanceof Set))settings.equip=new Set(Array.isArray(settings.equip)?settings.equip:['barbell','dumbbell','cable','machine','kinesis','octagon','pullup','bodyweight']);
-  let ids;
- if(settings.focus==='full')ids=['squat','bench','latpulldown','legpress','incline_db','machine_row','rdl','shoulder_machine','legcurl','rear_delt','triceps','biceps','calf','cable_crunch','facepull','adductor','abductor','kinesis_press','kinesis_row','oct_pullup','oct_dip'];
- else if(settings.focus==='upper')ids=['bench','incline_db','latpulldown','machine_row','shoulder_machine','ohp','lateral','rear_delt','triceps','biceps','facepull'];
- else ids=['squat','legpress','rdl','legcurl','legext','calf','abs','adductor','abductor'];
- let list=choose(ids,99);
- const max={60:6,75:8,90:10}[settings.time]||8; list=list.slice(0,max);
- const today=state.checkin||{};
- const tired=today.date===new Date().toISOString().slice(0,10)&&((+today.energy>0&&+today.energy<=4)||(+today.sleep>0&&+today.sleep<5));
- if(tired&&list.length>5)list=list.slice(0,list.length-1);
- if(list.length<Math.min(max,5)){
-   for(const e of db){
-     if(settings.equip.has(e.equip)&&!list.some(x=>x.id===e.id)){list.push(e);if(list.length>=Math.min(max,5))break}
-   }
- }
- list.sort((a,b)=>exerciseOrderScore(a,settings.focus)-exerciseOrderScore(b,settings.focus));
- workout={title:settings.focus==='full'?'Full Body':settings.focus==='upper'?'Vrch těla':'Nohy & břicho',goal:settings.goal,time:settings.time,started:Date.now(),exercises:list.map(e=>{
-   const ww=roundTrainingWeight(e,recommendedWeight(e));
-   return{id:e.id,name:e.name,target:e.target,equip:e.equip,warmup:makeWarmup(ww,e).map(x=>({weight:x[0],reps:x[1],done:false,warmup:true})),sets:Array.from({length:e.sets},()=>({weight:isBodyweightExercise(e)?(state.profile?.weight||0):ww,reps:parseInt(e.reps)||10,done:false,warmup:false,loadMode:isBodyweightExercise(e)?'bodyweight':'weight'})),rest:e.rest}
- })};
+  const max={60:6,75:8,90:10}[settings.time]||8;
+  let list=choose(getPlanIds(),max);
+  const today=state.checkin||{};
+  const tired=today.date===new Date().toISOString().slice(0,10)&&((+today.energy>0&&+today.energy<=4)||(+today.sleep>0&&+today.sleep<5));
+  if(tired&&list.length>5)list=list.slice(0,list.length-1);
+
+  // Safety net: the generator can never put excluded exercises into an automatic plan.
+  list=list.filter(e=>!AUTO_EXCLUDED_IDS.has(e.id));
+  workout={title:settings.focus==='full'?'Full Body':settings.focus==='upper'?'Vrch těla':'Nohy & břicho',goal:settings.goal,time:settings.time,started:Date.now(),exercises:list.map(makeWorkoutExercise)};
   renderWorkout();saveActiveWorkout();showScreen('workout');toast('Trénink je připraven v logickém pořadí 💪');
  }catch(err){
   console.error('generateWorkout:',err);
   toast('Trénink se nepodařilo vygenerovat. Zkus to znovu.');
  }
+}
+
+function sanitizeActiveWorkout(){
+ if(!workout?.exercises)return false;
+ const original=workout.exercises;
+ const hadExcluded=original.some(e=>e&&!AUTO_EXCLUDED_IDS.has(e.id));
+ if(!hadExcluded)return false;
+
+ // A previous version may have left a forbidden automatic exercise in the saved workout.
+ // Rebuild the automatic plan in the current logical order, while preserving all logged
+ // data for exercises that are still part of the plan. Exercises added manually remain available
+ // only when the user explicitly adds/replaces them afterwards.
+ const max={60:6,75:8,90:10}[settings.time]||8;
+ const byId=new Map(original.filter(e=>e&&!AUTO_EXCLUDED_IDS.has(e.id)).map(e=>[e.id,e]));
+ const next=[];
+ for(const e of choose(getPlanIds(),max)){
+   if(byId.has(e.id)) next.push(byId.get(e.id));
+   else next.push(makeWorkoutExercise(e));
+ }
+ if(next.length){
+   workout.exercises=next;
+   saveActiveWorkout();
+   return true;
+ }
+ return false;
 }
 
 function getRecommendation(e){
@@ -1544,7 +1572,12 @@ document.addEventListener('DOMContentLoaded',()=>{
  updateStats();renderLibrary();renderGymFilters();renderProgress();renderPerformances();renderProfile();populateRMExercises();calc1RM();renderCheckin();renderGoals();
  workout=loadActiveWorkout();
  setWarmupMode(settings.warmupMode||'normal');
- if(workout){renderWorkout();showScreen('workout');toast('Pokračujeme v rozpracovaném tréninku 💪')}else{showScreen(getLastScreen())}
+ if(workout){
+   const cleaned=sanitizeActiveWorkout();
+   renderWorkout();showScreen('workout');
+   if(cleaned)toast('Aktivní trénink byl opraven podle nových plánů 💪');
+   else toast('Pokračujeme v rozpracovaném tréninku 💪');
+ }else{showScreen(getLastScreen())}
 });
 </script>
 
