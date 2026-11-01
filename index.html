@@ -2,7 +2,7 @@
 <html lang="cs" class="dark">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#09090b">
 <meta name="mobile-web-app-capable" content="yes">
 <title>Silový trenér • AI Strength Coach</title>
@@ -104,6 +104,21 @@ header{padding:12px 16px}
 
 .exercise-video{margin-top:12px}.video-wrap{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:#090a0c;border:1px solid var(--border)}.video-wrap iframe{width:100%;height:100%;border:0;display:block}.video-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;font-size:12px;color:var(--muted)}.video-placeholder{aspect-ratio:16/9;border-radius:16px;border:1px solid var(--border);background:linear-gradient(145deg,#17181b,#0c0d0f);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;text-align:center;color:var(--muted)}.video-placeholder b{color:var(--text);font-size:15px}.video-placeholder span{font-size:12px}.play-circle{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(16,185,129,.16);color:#6ee7b7;font-size:20px;padding-left:3px}
 
+
+/* V26 opravy a vylepšení */
+:root{color-scheme:dark}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+textarea{width:100%;background:#111113;border:1px solid var(--border);color:#fff;padding:11px;outline:none;font:inherit;resize:vertical}
+textarea:focus{border-color:var(--brand)}
+input,select,textarea{font-size:16px}
+.set.bw{grid-template-columns:24px 1.5fr 1fr 1fr 54px 42px}
+.set.wu{grid-template-columns:28px 1fr 1fr 42px}
+.set-head{margin-top:8px}.set-head span{font-size:10px;font-weight:800}
+.nav{height:calc(76px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom)}
+.app{padding-bottom:calc(92px + env(safe-area-inset-bottom))}
+header{padding-top:calc(12px + env(safe-area-inset-top))}
+.toast{bottom:calc(92px + env(safe-area-inset-bottom))}
+.anatomy-svg{width:44px;height:52px}
 </style>
 </head>
 <body>
@@ -115,33 +130,6 @@ header{padding:12px 16px}
 
 <main>
 <section id="home" class="screen active">
-  <div class="card" id="profileCard" style="border:2px solid var(--brand);background:linear-gradient(145deg,#10271f,#18181b)">
-    <div class="section-title green">1️⃣ TVŮJ PROFIL</div>
-    <h2 style="font-size:24px;margin-bottom:5px">Nastav svoje údaje</h2>
-    <p class="small muted">Věk, výška a váha se uloží automaticky do telefonu.</p>
-    <div class="grid3">
-      <div><label>VĚK</label><input id="profileAge" type="number" inputmode="numeric" placeholder="32"></div>
-      <div><label>VÝŠKA (CM)</label><input id="profileHeight" type="number" inputmode="decimal" placeholder="180"></div>
-      <div><label>VÁHA (KG)</label><input id="profileWeight" type="number" inputmode="decimal" placeholder="90"></div>
-    </div>
-    <button class="btn primary" style="width:100%;margin-top:12px" onclick="saveProfile()">💾 Uložit údaje</button>
-    <div id="profileStats" class="statgrid" style="margin-top:12px"></div>
-  </div>
-
-  <div class="card" id="coachCard" style="border-color:rgba(16,185,129,.35);background:linear-gradient(145deg,#0f211b,#18181b)">
-    <div class="row"><div>
-      <div class="section-title green">🧠 CHYTRÝ TRENÉR</div>
-      <h2 style="font-size:21px">Učím se z tvých tréninků</h2>
-    </div><span class="badge"><span id="coachVersion">V23.2</span> • AUTOMATICKY</span></div>
-    <p id="coachTip" class="small muted" style="margin-top:9px;line-height:1.55"></p>
-    <div id="coachStats" class="statgrid" style="margin-top:12px"></div>
-  </div>
-
-  <div class="card" id="lastAnalysisCard" style="border-color:rgba(59,130,246,.35);background:linear-gradient(145deg,#101b2a,#18181b)">
-    <div class="section-title" style="color:#60a5fa">📋 POSLEDNÍ ANALÝZA</div>
-    <div id="homeAnalysis" class="small" style="line-height:1.65">Po dokončení tréninku tady uvidíš krátké shrnutí výkonu.</div><button class="btn" style="width:100%;margin-top:10px" onclick="shareWorkoutSummary()">📤 Sdílet poslední trénink</button>
-  </div>
-
   <div class="card">
     <div class="section-title">Cíl</div>
     <div class="chips">
@@ -196,6 +184,35 @@ header{padding:12px 16px}
       <button type="button" class="btn primary" style="font-size:14px" onclick="generateWorkout()">⚡ Vygenerovat trénink</button>
       <button class="btn" style="font-size:14px" onclick="quickWorkout()">🔥 Rychlý trénink</button>
     </div>
+  </div>
+
+  
+  <details id="profileDetails" style="margin-bottom:12px"><summary class="btn" style="display:block;list-style:none;text-align:left;padding:13px">👤 Profil: věk, výška, váha</summary><div style="margin-top:8px"><div class="card" id="profileCard" style="border:2px solid var(--brand);background:linear-gradient(145deg,#10271f,#18181b)">
+    <div class="section-title green">1️⃣ TVŮJ PROFIL</div>
+    <h2 style="font-size:24px;margin-bottom:5px">Nastav svoje údaje</h2>
+    <p class="small muted">Věk, výška a váha se uloží automaticky do telefonu.</p>
+    <div class="grid3">
+      <div><label>VĚK</label><input id="profileAge" type="number" inputmode="numeric" placeholder="32"></div>
+      <div><label>VÝŠKA (CM)</label><input id="profileHeight" type="number" inputmode="decimal" placeholder="180"></div>
+      <div><label>VÁHA (KG)</label><input id="profileWeight" type="number" inputmode="decimal" placeholder="90"></div>
+    </div>
+    <button class="btn primary" style="width:100%;margin-top:12px" onclick="saveProfile()">💾 Uložit údaje</button>
+    <div id="profileStats" class="statgrid" style="margin-top:12px"></div>
+  </div>
+
+  </div></details>
+  <div class="card" id="coachCard" style="border-color:rgba(16,185,129,.35);background:linear-gradient(145deg,#0f211b,#18181b)">
+    <div class="row"><div>
+      <div class="section-title green">🧠 CHYTRÝ TRENÉR</div>
+      <h2 style="font-size:21px">Učím se z tvých tréninků</h2>
+    </div><span class="badge"><span id="coachVersion">V23.2</span> • AUTOMATICKY</span></div>
+    <p id="coachTip" class="small muted" style="margin-top:9px;line-height:1.55"></p>
+    <div id="coachStats" class="statgrid" style="margin-top:12px"></div>
+  </div>
+
+  <div class="card" id="lastAnalysisCard" style="border-color:rgba(59,130,246,.35);background:linear-gradient(145deg,#101b2a,#18181b)">
+    <div class="section-title" style="color:#60a5fa">📋 POSLEDNÍ ANALÝZA</div>
+    <div id="homeAnalysis" class="small" style="line-height:1.65">Po dokončení tréninku tady uvidíš krátké shrnutí výkonu.</div><button class="btn" style="width:100%;margin-top:10px" onclick="shareWorkoutSummary()">📤 Sdílet poslední trénink</button>
   </div>
 
   <div class="card" style="border-color:rgba(168,85,247,.35);background:linear-gradient(145deg,#1a1027,#18181b)">
@@ -255,6 +272,7 @@ header{padding:12px 16px}
   </div>
 
   <div id="exerciseList"></div>
+  <button class="btn" style="width:100%;margin-bottom:12px" onclick="openAddExercise()">➕ Přidat cvik do tréninku</button>
 
   <div class="card" style="border-color:rgba(168,85,247,.30);background:linear-gradient(145deg,#171022,#101012)">
     <div class="section-title" style="color:#c084fc">📝 ZÁZNAM TRÉNINKU</div>
@@ -269,6 +287,7 @@ header{padding:12px 16px}
     <textarea id="sessionNote" rows="2" placeholder="Např. bench šel dobře, málo spánku…" onchange="updateSessionField('note',this.value)"></textarea>
   </div>
   <button class="btn primary" style="width:100%;margin-top:4px" onclick="finishWorkout()">✅ Dokončit trénink</button>
+  <button class="btn danger" style="width:100%;margin-top:8px" onclick="discardWorkout()">🗑️ Zahodit trénink</button>
 </section>
 
 <section id="history" class="screen">
@@ -291,7 +310,7 @@ header{padding:12px 16px}
   <div class="card" style="border-color:rgba(245,158,11,.30)"><div class="section-title" style="color:#fbbf24">🎯 CÍLE</div><div id="progressGoals" class="small" style="line-height:1.7"></div></div>
   <div class="card"><div class="section-title">🤖 COACH ANALÝZA</div><div id="advancedCoach" class="small" style="line-height:1.65"></div></div>
   <div class="card"><div class="section-title">💪 ROZLOŽENÍ SVALŮ</div><div id="muscleBalance" class="stack"></div></div>
-  <div class="card"><div class="section-title">📅 KALENDÁŘ</div><div id="trainingCalendar" class="calendar-grid"></div></div>
+  <div class="card"><div class="row" style="margin-bottom:10px"><div class="section-title" style="margin:0">📅 KALENDÁŘ <span id="calLabel" class="muted"></span></div><div style="display:flex;gap:5px"><button class="move-btn" onclick="calMove(-1)">‹</button><button class="move-btn" onclick="calMove(1)">›</button></div></div><div id="trainingCalendar" class="calendar-grid"></div></div>
 
   <div class="card"><div class="section-title">🧮 KALKULAČKA SÍLY</div>
     <h2 style="font-size:21px">Maximálka + pracovní váhy</h2>
@@ -326,6 +345,7 @@ header{padding:12px 16px}
     <h2 style="font-size:22px">Maxima a nejlepší série</h2>
     <p class="small muted" style="margin-top:5px;line-height:1.5">Co znáš, zadej ručně. U ostatních nech „Nevím“ — nejlepší výkon se bude postupně hledat z historie.</p>
   </div>
+  <input id="perfSearch" placeholder="🔎 Hledat cvik nebo partii…" oninput="renderPerformances()" style="margin-bottom:12px">
   <div id="performanceList"></div>
 </section>
 
@@ -368,6 +388,7 @@ header{padding:12px 16px}
 </section>
 </main>
 
+<div id="addExModal" class="modal" onclick="if(event.target===this)this.classList.remove('show')"><div class="modal-card"><div class="row"><h2 style="font-size:20px">➕ Přidat cvik</h2><button class="btn" onclick="$('addExModal').classList.remove('show')">✕</button></div><input id="addExSearch" placeholder="🔎 Hledat cvik nebo partii…" oninput="renderAddList()" style="margin:12px 0"><div id="addExList"></div></div></div>
 <div id="editWorkoutModal" class="modal" onclick="if(event.target===this)closeEditWorkout()">
   <div class="modal-card">
     <div class="row"><div><div class="section-title" style="margin:0;color:#c084fc">✏️ ÚPRAVA TRÉNINKU</div><h2 id="editWorkoutTitle" style="font-size:22px;margin-top:5px">Trénink</h2></div><button class="btn" onclick="closeEditWorkout()">✕</button></div>
@@ -427,7 +448,7 @@ header{padding:12px 16px}
 </div>
 
 <script>
-const APP_VERSION='V25';
+const APP_VERSION='V27';
 const KEY='silovy_trener_v2';
 const equipmentLabels={barbell:'Velká osa',dumbbell:'Jednoručky',cable:'Kladka',machine:'Klasický stroj',kinesis:'Kinesis',octagon:'Octagon',pullup:'Hrazda',bodyweight:'Vlastní váha'};
 // Cviky, které trenér automaticky NEVYBÍRÁ. Zůstávají v databázi pro případné ruční použití.
@@ -514,7 +535,8 @@ db.push(
 {id:'oct_pushup',name:'Kliky na Octagonu',target:'Hrudník / triceps',equip:'octagon',sets:3,reps:'8-20',rest:75,base:0,sub:['bench','machine_press']}
 );
 
-// Ochrana proti duplicitám v databázi: pro každý ID zůstane první definice.
+db.push({id:'deadlift',name:'Mrtvý tah',target:'Záda / hamstringy / hýždě',equip:'barbell',sets:3,reps:'3-6',rest:180,base:100,sub:['rdl','legpress']});
+// Ochrana proti duplicitám v databázi: pro každý ID zůstane poslední definice.
 const seenExerciseIds=new Set();
 for(let i=db.length-1;i>=0;i--){if(seenExerciseIds.has(db[i].id))db.splice(i,1);else seenExerciseIds.add(db[i].id);}
 let state=loadState();
@@ -531,14 +553,10 @@ state.gymFilters=state.gymFilters||{machine:true,cable:true,barbell:true,dumbbel
 state.favorites=Array.isArray(state.favorites)?state.favorites:[];
 let favOnly=false;
 function lastPerformanceLabel(id){
-  const p=state.performances?.[id];
-  if(p&&p.weight&&p.reps)return`Minule: ${p.weight} kg × ${p.reps}`;
   const h=findLast(id);
-  if(h){
-    const ex=(h.exercises||[]).find(x=>x.id===id);
-    const ss=(ex?.sets||[]).filter(s=>(+s.weight||0)>0&&(+s.reps||0)>0);
-    if(ss.length){const s=ss[ss.length-1];return`Minule: ${s.weight} kg × ${s.reps}`;}
-  }
+  if(h){const ss=h.sets.filter(s=>(+s.weight||0)>0&&(+s.reps||0)>0);if(ss.length){const s=ss[ss.length-1];return`Minule: ${s.weight} kg × ${s.reps}`}}
+  const p=state.performances?.[id];
+  if(p&&p.weight&&p.reps)return`Ručně zadaný výkon: ${p.weight} kg × ${p.reps}`;
   return'Zatím bez zapsaného výkonu';
 }
 function toggleFavorite(id){
@@ -552,7 +570,7 @@ function toggleFavOnly(){
   renderLibrary();
 }
 function quickWorkout(){
-  settings.focus='full';settings.time=60;persistSettings();
+  selectFocus('full');selectTime(60);
   generateWorkout();toast('Rychlý 60min trénink připraven ⚡');
 }
 function updateSessionField(k,v){
@@ -585,11 +603,30 @@ const EXERCISE_GUIDES={
  deadlift:{steps:["Postav chodidla přibližně pod osu a nastav pevný úchop.","Zpevni záda a střed těla před odlepením osy.","Tlač nohama do země a drž osu blízko těla.","Dokonči pohyb pevným postavením bez zaklánění.","Spusť osu zpět kontrolovaně stejnou dráhou."],errors:["zakulacení zad pod velkou zátěží","osa daleko od těla","trhnutí ze země","zaklánění v horní pozici"],breath:"Zpevni střed před zdvihem a vydechuj po dokončení opakování.",tip:"Mysli na pohyb celé osy nahoru, ne na tahání rukama.",main:"Hamstringy • hýždě • záda",secondary:"Trapézy • předloktí",alt:"Rumunský mrtvý tah • hip thrust"}
 };
 
+const G=(main,secondary,steps,errors,breath,tip,alt)=>({main,secondary,steps,errors,breath,tip,alt});
+const PATTERN_GUIDES=[
+ [/rdl|rumun|hyperext|back_ext|backext|lowerback|spodní záda/,G('Hamstringy • hýždě • spodní záda','Střed těla',['Postav se stabilně, lehce pokrčená kolena, záda rovná.','Posuň pánev dozadu a nech trup klesat s rovnými zády.','Zastav, když cítíš protažení zadní strany stehen.','Zatni hýždě a vrať se do stoje, bez záklonu.'],['zakulacená záda','přílišné pokrčení kolen','hyperextenze v horní pozici'],'Nádech před sestupem, výdech při návratu.','Pohyb vychází z pánve, ne z ohýbání zad.','Zakopávání • hip thrust')],
+ [/pulldown|stahování horní|lat_machine|latpull|shyb|pullup|pullover|lat\b/,G('Široký sval zádový','Biceps • zadní ramena',['Nastav opěrku stehen a chyť úchop o něco širší než ramena.','Stáhni lopatky dolů a mírně se předkloň.','Táhni lokty dolů k tělu, tyč k horní části hrudníku.','Pomalu se vrať nahoru s plným protažením.'],['tahání rukama místo loktů','houpání trupem','neúplné natažení nahoře'],'Výdech při stahování, nádech při návratu.','Představ si, že lokty tlačíš do kapes.','Shyby • přítahy na stroji')],
+ [/row|přítah|veslov|tbar|rear|reverse|facepull|face pull/,G('Střed zad • zadní ramena','Biceps',['Nastav sedátko a hrudník opři nebo drž pevný trup.','Začni stažením lopatek k sobě.','Přitáhni lokty podél těla, krátce zadrž.','Pomalu se vrať s kontrolou lopatek.'],['švih trupem','zvedání ramen k uším','krátký rozsah pohybu'],'Výdech při přitahování.','Vést pohyb lokty, ne zápěstími.','Veslování na kladce • T-Bar Row')],
+ [/chest|hrud|fly|rozpažov|kliky|pushup|dip|vertical|decline/,G('Hrudník','Triceps • přední ramena',['Nastav sedátko tak, aby rukojeti byly u středu hrudi.','Lopatky stáhni dozadu a hrudník drž vzpřímeně.','Tlač rovnoměrně, lokty nezamykej.','Vrať se pomalu do protažení hrudníku.'],['zvedání ramen','zamykání loktů','příliš rychlý návrat'],'Nádech při návratu, výdech při tlaku.','Negativní fázi veď 2–3 sekundy.','Tlaky s jednoručkami • kladky')],
+ [/ohp|shoulder|tlaky nad|db_shoulder/,G('Přední a boční ramena','Triceps • horní hrudník',['Sedni stabilně, záda opři, střed těla zpevni.','Rukojeti drž mírně před tělem.','Tlač nahoru, ale ramena nezvedej k uším.','Spusť kontrolovaně do výšky brady.'],['prohnutí v bedrech','příliš velká váha','nedokončený rozsah'],'Výdech při tlaku nahoru.','Zpevni hýždě a břicho, ať se neprohýbáš.','Tlaky jednoruček • Shoulder Press stroj')],
+ [/lateral|upažov|front|předpaž/,G('Boční ramena','Trapézy',['Drž lehce pokrčené lokty.','Zdvihej paže do strany jen do výšky ramen.','Nahoře krátce zastav.','Pomalu spusť, bez švihu.'],['houpání tělem','zvedání ramen','příliš těžká váha'],'Výdech při zvedání.','Lehčí váha a čistá technika zabírají víc.','Kladka • stroj')],
+ [/(?<!leg_?)curl|biceps|bicepsov|kladivov|preacher|scott/,G('Biceps','Předloktí',['Lokty drž u těla.','Zvedej zátěž s kontrolou až do plné kontrakce.','Nahoře krátce zadrž.','Spouštěj pomalu, 2–3 s.'],['houpání trupem','pohyb loktů dopředu','neúplné natažení dole'],'Výdech při zvedání.','Pomalá negativní fáze je polovina práce.','Jednoručky • kladka')],
+ [/triceps|stahování lana|overhead|dip_machine|tricepsov/,G('Triceps','Ramena',['Lokty zpevni u těla, mírně se předkloň.','Natáhni paže do plné extenze.','Krátce zadrž a stáhni triceps.','Pomalu se vrať do 90° v lokti.'],['rozevírání loktů','pomoc trupem','neúplné natažení'],'Výdech při natažení.','Lokty nechej na místě, hýbou jen předloktí.','Tricepsový stroj • lano')],
+ [/legcurl|leg_curl|zakopáv|seated_legcurl/,G('Hamstringy','Lýtka',['Nastav stroj tak, aby osa kolene byla v ose stroje.','Pomalu pokrč nohy až do plné kontrakce.','Krátce zadrž.','Vrať se kontrolovaně, bez dopadu závaží.'],['zvedání pánve','švih','neúplný rozsah'],'Výdech při stahování.','Pomalá negativní fáze chrání kolena.','Rumunský tah')],
+ [/legext|leg_ext|předkop/,G('Kvadricepsy','—',['Nastav opěrku zad a osu kolene do osy stroje.','Natáhni nohy téměř do plné extenze.','Krátce zadrž.','Pomalu spusť.'],['švih','zamykání kolen silou','příliš rychlý návrat'],'Výdech při natažení.','Nahoře zatni stehna na 1 s.','Leg Press')],
+ [/legpress|leg press|hack|pendulum|smith_squat|dřep/,G('Stehna • hýždě','Lýtka',['Nastav sedátko tak, aby kolena šla ve směru špiček.','Chodidla pevně na plošině, záda opřená.','Sestup do hloubky, kterou zvládneš bez zvednutí pánve.','Tlač přes celé chodidlo, kolena nezamykej.'],['kolena dovnitř','zvedání zadku ze sedátka','příliš malý rozsah'],'Nádech při spouštění, výdech při tlaku.','Rozsah je důležitější než váha.','Hack Squat • dřep')],
+ [/glute|hip|hýžd|abdukc|adukc|addukc|kickback|pullthrough|pull through/,G('Hýždě • boky','Hamstringy',['Nastav stroj a zpevni střed těla.','Veď pohyb přes hýždě, ne přes záda.','V krajní poloze zatni na 1 s.','Vrať se pomalu.'],['prohýbání v bedrech','švih','příliš velká váha'],'Výdech při zatnutí.','Zaměř se na pocit v hýždích.','Hip thrust • rumunský tah')],
+ [/calf|lýtk|výpon/,G('Lýtka','—',['Postav se na špičky a nastav plný rozsah.','Zvedni se co nejvýš.','Nahoře zadrž 1 s.','Pomalu klesni do plného protažení.'],['krátký rozsah','odskakování','rychlé tempo'],'Výdech při zvednutí.','Dole zastav, ať se využije plné protažení.','Lýtka vsedě')],
+ [/abs|plank|crunch|břicho|leg_raise|zvedání nohou|woodchop|rotac|torso|core/,G('Břicho • core','Boky',['Zpevni střed těla.','Pohyb vede břicho, ne boky.','Nahoře stáhni břicho.','Pomalu se vrať.'],['tahání rukama','prohnutí zad','příliš rychlé tempo'],'Výdech při stažení.','Méně opakování, ale čistě.','Plank • kladka')]
+];
+function patternGuide(e){const k=((e.id||'')+' '+(e.name||'')).toLowerCase();const m=PATTERN_GUIDES.find(p=>p[0].test(k));return m?m[1]:null}
 function guideFor(e){
  const n=(e.name||'').toLowerCase();
  if(n.includes('bench')||n.includes('tlak')&&n.includes('velk'))return EXERCISE_GUIDES.bench;
  if(n.includes('dřep')||n.includes('squat'))return EXERCISE_GUIDES.squat;
  if(n.includes('mrtv')||n.includes('deadlift'))return EXERCISE_GUIDES.deadlift;
+ const pg=patternGuide(e);if(pg)return pg;
  return {
   steps:["Nastav stroj nebo stanoviště tak, aby byla výchozí pozice stabilní.","Zpevni střed těla a začni pohyb kontrolovaně.","Veď pohyb přes cílový sval a vyhni se švihu.","V krajní pozici krátce zkontroluj techniku.","Vrať se pomalu do výchozí pozice a opakuj."],
   errors:["švihání tělem","zbytečně rychlá negativní fáze","ztráta stabilní pozice","příliš velká váha na úkor techniky"],
@@ -648,7 +685,7 @@ function closeExerciseInfo(){$('exerciseModal')?.classList.remove('open')}
 
 function setGymFilter(v){
   if(v==='all'){
-    state.gymFilters={machine:true,cable:true,barbell:true,dumbbell:true};
+    state.gymFilters={machine:true,cable:true,barbell:true,dumbbell:true,kinesis:true,octagon:true,pullup:true,bodyweight:true};
   }else{
     state.gymFilters[v]=!state.gymFilters[v];
   }
@@ -668,6 +705,7 @@ function allowedForGym(ex){
 state.profile=state.profile||{age:'',height:'',weight:''};
 state.goals=state.goals||{bench:0,squat:0,deadlift:0};
 state.checkin=state.checkin||{date:'',sleep:'',energy:'',pain:''};
+normalizeState();
 let savedSettings={};try{savedSettings=JSON.parse(localStorage.getItem(KEY+'_settings')||'{}')}catch(e){}
 let settings={focus:savedSettings.focus||'full',time:savedSettings.time||75,goal:savedSettings.goal||'strength',warmupMode:savedSettings.warmupMode||'normal',equip:new Set(savedSettings.equip||['barbell','dumbbell','cable','machine','kinesis','octagon','pullup','bodyweight'])};
 let workout=null, timer=null, timerEnd=0, timerTotal=0, paused=false, progressChart=null;
@@ -675,7 +713,35 @@ let workout=null, timer=null, timerEnd=0, timerTotal=0, paused=false, progressCh
 const SCREEN_KEY='silovy_trener_last_screen_v1';
 const WORKOUT_KEY='silovy_trener_active_workout_v1';
 function loadState(){try{return JSON.parse(localStorage.getItem(KEY))||{history:[],prs:{}}}catch(e){return{history:[],prs:{}}}}
-function save(){localStorage.setItem(KEY,JSON.stringify(state)); updateStats()}
+function isoOf(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function todayISO(){return isoOf(new Date())}
+function histDate(h){if(h&&h.iso){const p=String(h.iso).split('-');return new Date(+p[0],+p[1]-1,+p[2])}const m=String(h?.date||'').match(/(\d+)\.\s*(\d+)\.\s*(\d{4})/);return m?new Date(+m[3],+m[2]-1,+m[1]):null}
+// Odcvičené série: odškrtnuté; u starých záznamů bez odškrtnutí se berou všechny.
+function workingSets(e){const s=Array.isArray(e?.sets)?e.sets:[];const d=s.filter(x=>x&&x.done);return d.length?d:s}
+function goalValue(k){const a=state.prs[k]?.e1rm||0;const p=state.performances?.[k];const b=p?.known&&p.weight&&p.reps?e1rm(+p.weight,+p.reps):0;return Math.round(Math.max(a,b)*10)/10}
+function muscleGroup(t){t=String(t||'').toLowerCase();if(/hrud/.test(t))return'Hrudník';if(/lat|zád|záda/.test(t))return'Záda';if(/ramen/.test(t))return'Ramena';if(/biceps/.test(t))return'Biceps';if(/triceps/.test(t))return'Triceps';if(/břich|core/.test(t))return'Břicho / core';if(/lýtk/.test(t))return'Lýtka';if(/hamstring|hýžd/.test(t))return'Hamstringy / hýždě';if(/kvadr|nohy|stehn/.test(t))return'Nohy';return t?t.charAt(0).toUpperCase()+t.slice(1):'Ostatní'}
+function normalizeState(){
+ const arr=v=>Array.isArray(v)?v:[],obj=v=>v&&typeof v==='object'&&!Array.isArray(v)?v:{};
+ state.customExercises=arr(state.customExercises).filter(e=>e&&/^[\w-]+$/.test(e.id||'')&&e.name);
+ state.customExercises.forEach(e=>{if(!db.some(x=>x.id===e.id))db.push(e)});
+ state.history=arr(state.history).filter(h=>h&&Array.isArray(h.exercises));
+ state.history.forEach((h,i)=>{
+  h.exercises=h.exercises.filter(e=>e&&typeof e.id==='string');
+  h.exercises.forEach(e=>{e.sets=arr(e.sets);if(!e.target||!e.equip){const d=db.find(x=>x.id===e.id);if(d){e.target=e.target||d.target;e.equip=e.equip||d.equip}}});
+  if(!h.iso){const d=histDate(h);if(d)h.iso=isoOf(d)}
+  h.tonnage=+h.tonnage||0;h.duration=+h.duration||0;h.name=h.name||'Trénink';h.id=+h.id||(Date.now()+i);
+ });
+ state.prs=obj(state.prs);state.performances=obj(state.performances);
+ state.favorites=arr(state.favorites).filter(x=>typeof x==='string');
+ state.gymFilters=Object.assign({machine:true,cable:true,barbell:true,dumbbell:true,kinesis:true,octagon:true,pullup:true,bodyweight:true},obj(state.gymFilters));
+ state.profile=Object.assign({age:'',height:'',weight:''},obj(state.profile));
+ state.goals=Object.assign({bench:0,squat:0,deadlift:0},obj(state.goals));
+ state.checkin=Object.assign({date:'',sleep:'',energy:'',pain:''},obj(state.checkin));
+}
+let wakeLock=null;
+async function keepAwake(){try{if('wakeLock' in navigator&&workout&&!wakeLock){wakeLock=await navigator.wakeLock.request('screen');wakeLock.addEventListener('release',()=>{wakeLock=null})}}catch(e){}}
+function releaseAwake(){try{if(wakeLock){wakeLock.release();wakeLock=null}}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){toast('⚠️ Data se nepodařilo uložit (plné úložiště?). Udělej zálohu v Nastavení.')}updateStats()}
 function saveActiveWorkout(){try{if(workout)localStorage.setItem(WORKOUT_KEY,JSON.stringify(workout));else localStorage.removeItem(WORKOUT_KEY)}catch(e){}}
 function loadActiveWorkout(){try{return JSON.parse(localStorage.getItem(WORKOUT_KEY))||null}catch(e){return null}}
 function saveLastScreen(id){try{localStorage.setItem(SCREEN_KEY,id)}catch(e){}}
@@ -688,7 +754,7 @@ function showScreen(id){
  document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');
  document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.screen===id));
  saveLastScreen(id);
- if(id==='history')renderHistory();if(id==='progress')renderProgress();if(id==='performances')renderPerformances();if(id==='library')renderLibrary();
+ if(id==='history')renderHistory();if(id==='progress')renderProgress();if(id==='performances')renderPerformances();if(id==='library')renderLibrary();if(id==='workout')renderWorkout();
 }
 function persistSettings(){try{localStorage.setItem(KEY+'_settings',JSON.stringify({focus:settings.focus,time:settings.time,goal:settings.goal,warmupMode:settings.warmupMode||'normal',equip:[...settings.equip]}))}catch(e){}}
 function selectFocus(v){settings.focus=v;persistSettings();document.querySelectorAll('[data-focus]').forEach(x=>x.classList.toggle('active',x.dataset.focus===v))}
@@ -715,11 +781,12 @@ function coachAdvice(){
 function renderCoachTip(){if($('coachTip'))$('coachTip').textContent=coachAdvice();renderCoachStats()}
 function toggleEquip(v){settings.equip.has(v)?settings.equip.delete(v):settings.equip.add(v);document.querySelector(`[data-equip="${v}"]`).classList.toggle('active',settings.equip.has(v))}
 function eligible(id){const x=db.find(x=>x.id===id);return !!x&&settings.equip.has(x.equip)}
-function findLast(id){for(const h of (Array.isArray(state.history)?state.history:[])){const exs=Array.isArray(h?.exercises)?h.exercises:[];const e=exs.find(x=>x&&x.id===id);if(e&&Array.isArray(e.sets)&&e.sets.length)return e}return null}
-function recentExerciseHistory(id,limit=5){return state.history.flatMap(h=>h.exercises.filter(e=>e.id===id).map(e=>({date:h.date,goal:h.goal,sets:e.sets||[]}))).slice(0,limit)}
+function findLast(id){for(const h of (Array.isArray(state.history)?state.history:[])){const exs=Array.isArray(h?.exercises)?h.exercises:[];const e=exs.find(x=>x&&x.id===id);if(e){const ws=workingSets(e);if(ws.length)return {...e,sets:ws}}}return null}
+function recentExerciseHistory(id,limit=5){return state.history.flatMap(h=>(h.exercises||[]).filter(e=>e.id===id).map(e=>({date:h.date,goal:h.goal,sets:e.sets||[]}))).slice(0,limit)}
 function parseRepRange(ex){const nums=String(ex.reps||'8-12').match(/\d+/g)||[8,12];return{min:+nums[0]||8,max:+nums[1]||(+nums[0]||8)}}
 function normalIncrement(ex,w){if(ex?.equip==='barbell')return w>=80?5:2.5;if(ex?.equip==='dumbbell')return 2.5;return w>=80?5:2.5}
-function isBodyweightExercise(ex){return ['bodyweight','pullup','octagon'].includes(ex?.equip)}
+function exEquip(ex){return ex?.equip||db.find(x=>x.id===ex?.id)?.equip}
+function isBodyweightExercise(ex){return ['bodyweight','pullup','octagon'].includes(exEquip(ex))}
 function effectiveLoad(ex,set){
  const w=+set?.weight||0;
  if(!isBodyweightExercise(ex))return w;
@@ -815,17 +882,19 @@ function makeWorkoutExercise(e){
 
 function generateWorkout(){
  try{
+  if(workout&&(workout.exercises||[]).some(e=>(e.sets||[]).some(s=>s.done))&&!confirm('Máš rozpracovaný trénink s odškrtnutými sériemi. Nahradit ho novým? Zapsaná data se ztratí.'))return;
   if(!(settings.equip instanceof Set))settings.equip=new Set(Array.isArray(settings.equip)?settings.equip:['barbell','dumbbell','cable','machine','kinesis','octagon','pullup','bodyweight']);
   const max={60:6,75:8,90:10}[settings.time]||8;
   let list=choose(getPlanIds(),max);
+  if(!list.length){toast('S vybraným vybavením nemám co zařadit. Zapni aspoň něco z vybavení.');return}
   const today=state.checkin||{};
-  const tired=today.date===new Date().toISOString().slice(0,10)&&((+today.energy>0&&+today.energy<=4)||(+today.sleep>0&&+today.sleep<5));
+  const tired=today.date===todayISO()&&((+today.energy>0&&+today.energy<=4)||(+today.sleep>0&&+today.sleep<5));
   if(tired&&list.length>5)list=list.slice(0,list.length-1);
 
   // Safety net: the generator can never put excluded exercises into an automatic plan.
   list=list.filter(e=>!AUTO_EXCLUDED_IDS.has(e.id));
   workout={title:settings.focus==='full'?'Full Body':settings.focus==='upper'?'Vrch těla':'Nohy & břicho',goal:settings.goal,time:settings.time,started:Date.now(),exercises:list.map(makeWorkoutExercise)};
-  renderWorkout();saveActiveWorkout();showScreen('workout');toast('Trénink je připraven v logickém pořadí 💪');
+  renderWorkout();saveActiveWorkout();showScreen('workout');keepAwake();toast('Trénink je připraven v logickém pořadí 💪');
  }catch(err){
   console.error('generateWorkout:',err);
   toast('Trénink se nepodařilo vygenerovat. Zkus to znovu.');
@@ -834,27 +903,9 @@ function generateWorkout(){
 
 function sanitizeActiveWorkout(){
  if(!workout?.exercises)return false;
- const original=workout.exercises;
- const hadExcluded=original.some(e=>e&&!AUTO_EXCLUDED_IDS.has(e.id));
- if(!hadExcluded)return false;
-
- // A previous version may have left a forbidden automatic exercise in the saved workout.
- // Rebuild the automatic plan in the current logical order, while preserving all logged
- // data for exercises that are still part of the plan. Exercises added manually remain available
- // only when the user explicitly adds/replaces them afterwards.
- const max={60:6,75:8,90:10}[settings.time]||8;
- const byId=new Map(original.filter(e=>e&&!AUTO_EXCLUDED_IDS.has(e.id)).map(e=>[e.id,e]));
- const next=[];
- for(const e of choose(getPlanIds(),max)){
-   if(byId.has(e.id)) next.push(byId.get(e.id));
-   else next.push(makeWorkoutExercise(e));
- }
- if(next.length){
-   workout.exercises=next;
-   saveActiveWorkout();
-   return true;
- }
- return false;
+ const keep=workout.exercises.filter(e=>e&&(e.manual||!AUTO_EXCLUDED_IDS.has(e.id)));
+ if(keep.length===workout.exercises.length)return false;
+ workout.exercises=keep;saveActiveWorkout();return true;
 }
 
 function getRecommendation(e){
@@ -863,10 +914,14 @@ function getRecommendation(e){
  if(drop<0.90||valid.some(s=>(+s.reps||0)<min))return`Minule výkon ke konci série klesl. 🛡️ Dnes ${next} kg a soustřeď se na čistou techniku a spodní hranici ${min} opakování.`;if(allMax)return`🔥 Všechny série byly na horní hranici (${max}). Dnes ${next} kg — tohle je prostor pro progres.`;if(settings.goal==='strength'&&allMin&&avgReps>=min+0.5)return`💪 Cíl splněn ve všech sériích. Dnes ${next} kg a míř na ${min}–${max} opakování.`;return`➡️ Dnes ${next} kg. Zkus dorovnat alespoň ${min} opakování v každé pracovní sérii.`
 }
 function renderWorkout(){
- if(!workout)return;
+ if(!workout||!Array.isArray(workout.exercises)){
+  $('workoutTitle').textContent='Žádný aktivní trénink';$('workoutTime').textContent='—';
+  $('exerciseList').innerHTML='<div class="empty">Zatím nemáš rozpracovaný trénink.<br><button class="btn primary" style="margin-top:12px" onclick="showScreen(\'home\')">⚡ Vytvořit trénink</button></div>';
+  $('workoutProgress').style.width='0%';$('workoutProgressText').textContent='0 / 0 pracovních sérií';$('workoutVolume').textContent='0 kg';return}
+ const curIdx=workout.exercises.findIndex(x=>x.sets.some(s=>!s.done));
  $('workoutTitle').textContent=workout.title;$('workoutTime').textContent=workout.time+' min';
  $('exerciseList').innerHTML=workout.exercises.map((e,ei)=>`
- <div class="exercise ${ei===0?'current':''}" id="ex-${ei}">
+ <div class="exercise ${ei===curIdx?'current':''}" id="ex-${ei}">
   <div class="row"><div class="row" style="justify-content:flex-start"><div><div class="exercise-name">${esc(e.name)}</div><div class="target">${esc(e.target)} • pauza ${Math.round(e.rest/60)} min</div><div class="small muted" style="margin-top:3px">${esc(lastPerformanceLabel(e.id))}</div></div></div><div style="display:flex;gap:5px"><button class="move-btn" onclick="moveExercise(${ei},-1)" title="Posunout nahoru">↑</button><button class="move-btn" onclick="moveExercise(${ei},1)" title="Posunout dolů">↓</button><button class="btn" onclick="replaceExercise(${ei})">🔄 Vyměnit</button></div></div>
   <div class="card" style="padding:10px;margin:10px 0 0;background:#101012">
     <div class="small green" style="font-weight:900">🎯 DNEŠNÍ DOPORUČENÍ</div>
@@ -875,27 +930,29 @@ function renderWorkout(){
   ${e.warmup?.length?`<div class="card" style="padding:10px;margin:10px 0;background:#101012">
     <div class="small" style="font-weight:900">🔥 ZAHŘÍVACÍ SÉRIE</div>
     <div class="small muted" style="margin:4px 0 8px">Nejsou započítané do pracovního objemu. Mají tě připravit, ne unavit.</div>
-    <div class="sets">${e.warmup.map((s,wi)=>`<div class="set ${s.done?'done':''}">
+    <div class="sets">${e.warmup.map((s,wi)=>`<div class="set wu ${s.done?'done':''}">
       <span>W${wi+1}</span><input type="number" inputmode="decimal" value="${s.weight}" onchange="updateWarmup(${ei},${wi},'weight',this.value)"><input type="number" inputmode="numeric" value="${s.reps}" onchange="updateWarmup(${ei},${wi},'reps',this.value)"><button class="check ${s.done?'done':''}" onclick="completeWarmup(${ei},${wi})">${s.done?'✓':'○'}</button>
     </div>`).join('')}</div>
   </div>`:''} 
   <div class="small green" style="font-weight:900;margin-top:12px">💪 PRACOVNÍ SÉRIE</div>
   <div class="small muted" style="margin:4px 0 7px;line-height:1.45">RIR = kolik čistých opakování by ti ještě zbylo. <strong>RIR 2</strong> = zvládl bys asi ještě 2.</div>
-  <div class="sets">${e.sets.map((s,si)=>`<div class="set ${s.done?'done':''}">
+  <div class="sets"><div class="set set-head ${isBodyweightExercise(e)?'bw':''}"><span>#</span>${isBodyweightExercise(e)?'<span>Typ</span>':''}<span>kg</span><span>opak.</span><span>RIR</span><span>✓</span></div>${e.sets.map((s,si)=>`<div class="set ${isBodyweightExercise(e)?'bw':''} ${s.done?'done':''}">
     <span>${si+1}</span>${isBodyweightExercise(e)?`<select data-loadmode="1" onchange="updateLoadMode(${ei},${si},this.value)" style="padding:8px;text-align:center"><option value="bodyweight" ${(s.loadMode||'bodyweight')==='bodyweight'?'selected':''}>Vlastní váha</option><option value="added" ${s.loadMode==='added'?'selected':''}>+ Přidat</option><option value="assisted" ${s.loadMode==='assisted'?'selected':''}>− Dopomoc</option></select>`:''}<input aria-label="${loadLabel(e,s)}" type="number" inputmode="decimal" value="${s.weight}" onchange="updateSet(${ei},${si},'weight',this.value)"><input type="number" inputmode="numeric" value="${s.reps}" onchange="updateSet(${ei},${si},'reps',this.value)"><select aria-label="RIR – opakování v rezervě" title="RIR = kolik opakování bys ještě zvládl navíc" onchange="updateSet(${ei},${si},'rir',this.value)" style="padding:8px;text-align:center"><option value="">RIR</option><option value="0" ${String(s.rir)==='0'?'selected':''}>0</option><option value="1" ${String(s.rir)==='1'?'selected':''}>1</option><option value="2" ${String(s.rir)==='2'?'selected':''}>2</option><option value="3" ${String(s.rir)==='3'?'selected':''}>3</option><option value="4" ${String(s.rir)==='4'?'selected':''}>4+</option></select><button class="check ${s.done?'done':''}" onclick="completeSet(${ei},${si})">${s.done?'✓':'○'}</button>
   </div>`).join('')}</div>
-  <div class="row small muted" style="margin-top:9px"><span>${e.sets.filter(s=>s.done).length}/${e.sets.length} sérií</span><button class="btn" onclick="startRest(${e.rest})">⏱️ Start pauzu</button></div>
+  <div class="row small muted" style="margin-top:9px"><span>${e.sets.filter(s=>s.done).length}/${e.sets.length} sérií</span><div style="display:flex;gap:5px"><button class="btn" onclick="addSet(${ei},-1)">−</button><button class="btn" onclick="addSet(${ei},1)">+ série</button><button class="btn" onclick="startRest(${e.rest})">⏱️ Pauza</button></div></div>
  </div>`).join('');
  updateWorkoutStats();renderSessionFields();
 }
-function updateSet(ei,si,k,v){workout.exercises[ei].sets[si][k]=Number(v)||0;saveActiveWorkout()}
+function updateSet(ei,si,k,v){const s=workout.exercises[ei].sets[si];if(k==='rir'){if(v==='')delete s.rir;else s.rir=Number(v)}else s[k]=Math.max(0,Number(v)||0);saveActiveWorkout();updateWorkoutStats()}
 function updateWarmup(ei,wi,k,v){workout.exercises[ei].warmup[wi][k]=Number(v)||0;saveActiveWorkout()}
 function completeWarmup(ei,wi){
  const s=workout.exercises[ei].warmup[wi];s.done=!s.done;saveActiveWorkout();renderWorkout();
  if(s.done){startRest(60);toast('Zahřívací série zapsaná 🔥')}
 }
 function completeSet(ei,si){
- const s=workout.exercises[ei].sets[si];s.done=!s.done;saveActiveWorkout();renderWorkout();
+ const s=workout.exercises[ei].sets[si];
+ if(!s.done&&!workout.exercises.some(e=>e.sets.some(x=>x.done)))workout.started=Date.now();
+ s.done=!s.done;saveActiveWorkout();renderWorkout();
  if(s.done){startRest(workout.exercises[ei].rest);toast('Pracovní série zapsaná — pauza spuštěna ⏱️')}
 }
 function moveExercise(i,dir){
@@ -906,63 +963,97 @@ function moveExercise(i,dir){
 }
 function replaceExercise(i){
  const old=workout.exercises[i],ex=db.find(x=>x.id===old.id),used=new Set(workout.exercises.map(x=>x.id));
- const alternatives=(ex?.sub||[]).map(id=>db.find(x=>x.id===id)).filter(x=>x&&settings.equip.has(x.equip)&&!used.has(x.id));
+ const ok=x=>x&&settings.equip.has(x.equip)&&!used.has(x.id);
+ let alternatives=(ex?.sub||[]).map(id=>db.find(x=>x.id===id)).filter(ok);
+ if(!alternatives.length&&ex){const key=String(ex.target||'').split(/[\/•]/)[0].trim().toLowerCase();alternatives=db.filter(x=>ok(x)&&!AUTO_EXCLUDED_IDS.has(x.id)&&key&&String(x.target||'').toLowerCase().includes(key))}
  if(!alternatives.length){toast('Nemám další vhodnou alternativu s vybraným vybavením.');return}
- alternatives.sort((a,b)=>recentExerciseHistory(a.id).length-recentExerciseHistory(b.id).length);const next=alternatives[0];const ww=roundTrainingWeight(next,recommendedWeight(next));
- workout.exercises[i]={id:next.id,name:next.name,target:next.target,warmup:makeWarmup(ww,next).map(x=>({weight:x[0],reps:x[1],done:false,warmup:true})),sets:Array.from({length:next.sets},()=>({weight:isBodyweightExercise(next)?(state.profile?.weight||0):ww,reps:parseInt(next.reps)||10,done:false,warmup:false,loadMode:isBodyweightExercise(next)?'bodyweight':'weight'})),rest:next.rest};saveActiveWorkout();renderWorkout();toast('Cvik vyměněn za '+next.name)
+ alternatives.sort((a,b)=>recentExerciseHistory(a.id).length-recentExerciseHistory(b.id).length);
+ const next=alternatives[0];
+ workout.exercises[i]={...makeWorkoutExercise(next),manual:true};
+ saveActiveWorkout();renderWorkout();toast('Cvik vyměněn za '+next.name)
+}
+function openAddExercise(){if(!workout){toast('Nejdřív vytvoř trénink.');return}$('addExSearch').value='';renderAddList();$('addExModal').classList.add('show')}
+function renderAddList(){
+ const q=$('addExSearch').value.toLowerCase().trim(),used=new Set(workout.exercises.map(x=>x.id));
+ $('addExList').innerHTML=db.filter(e=>!used.has(e.id)&&`${e.name} ${e.target}`.toLowerCase().includes(q)).slice(0,40).map(e=>`<div class="row" style="padding:9px 0;border-bottom:1px solid var(--border)"><div><strong>${esc(e.name)}</strong><div class="small muted">${esc(e.target)} • ${equipmentLabels[e.equip]||e.equip}</div></div><button class="btn" onclick="addExerciseToWorkout('${e.id}')">➕</button></div>`).join('')||'<div class="empty">Nic nenalezeno.</div>';
+}
+function addExerciseToWorkout(id){const e=db.find(x=>x.id===id);if(!e||!workout)return;workout.exercises.push({...makeWorkoutExercise(e),manual:true});saveActiveWorkout();renderWorkout();$('addExModal').classList.remove('show');toast('Přidáno: '+e.name)}
+function addSet(ei,d){
+ const e=workout.exercises[ei];
+ if(d>0){const l=e.sets[e.sets.length-1]||{weight:0,reps:10};e.sets.push({weight:l.weight,reps:l.reps,done:false,warmup:false,loadMode:l.loadMode||'weight'})}
+ else{if(e.sets.length<=1)return;if(e.sets[e.sets.length-1].done&&!confirm('Poslední série je odškrtnutá. Odebrat?'))return;e.sets.pop()}
+ saveActiveWorkout();renderWorkout();
+}
+function discardWorkout(){
+ if(!workout)return;
+ if(!confirm('Zahodit rozpracovaný trénink? Nic se neuloží do historie.'))return;
+ workout=null;saveActiveWorkout();stopTimer();releaseAwake();renderWorkout();showScreen('home');toast('Trénink zahozen');
 }
 function updateWorkoutStats(){
  if(!workout)return;
  let total=0,done=0,count=0,wDone=0,wCount=0;
- workout.exercises.forEach(e=>{(e.warmup||[]).forEach(s=>{wCount++;if(s.done)wDone++;});e.sets.forEach(s=>{count++;if(s.done)done++;total+=effectiveLoad(e,s)*(+s.reps||0)});});
+ workout.exercises.forEach(e=>{(e.warmup||[]).forEach(s=>{wCount++;if(s.done)wDone++;});e.sets.forEach(s=>{count++;if(s.done){done++;total+=effectiveLoad(e,s)*(+s.reps||0)}});});
  $('workoutProgressText').textContent=`${done} / ${count} pracovních sérií`; if($('workoutWarmupText'))$('workoutWarmupText').textContent=`🔥 ${wDone} / ${wCount} zahřívacích`;$('workoutVolume').textContent=Math.round(total).toLocaleString('cs-CZ')+' kg';
  $('workoutProgress').style.width=(count?done/count*100:0)+'%';
 }
 function startRest(sec){
- clearInterval(timer);timerTotal=sec;timerEnd=Date.now()+sec*1000;paused=false;$('timerBox').style.display='block';$('timerLabel').textContent='PAUZA';
+ unlockAudio();clearInterval(timer);timerTotal=sec;timerEnd=Date.now()+sec*1000;paused=false;$('timerBox').style.display='block';$('timerLabel').textContent='PAUZA';
  tickTimer();timer=setInterval(tickTimer,250);
 }
 function tickTimer(){
  if(paused)return;
  const left=Math.max(0,Math.ceil((timerEnd-Date.now())/1000));$('timerValue').textContent=fmt(left);$('timerProgress').style.width=(timerTotal?Math.max(0,Math.min(100,(timerTotal-left)/timerTotal*100)):0)+'%';
- if(left<=0){clearInterval(timer);timer=null;ringGong();toast('🥊 GONG! Pauza skončila — další série!');notify('Silový trenér','🥊 GONG! Pauza skončila. Další série!');$('timerBox').style.display='block';$('timerLabel').textContent='🥊 GONG — JDE SE';}
+ if(left<=0){clearInterval(timer);timer=null;timerEnd=0;ringGong();toast('🥊 GONG! Pauza skončila — další série!');notify('Silový trenér','🥊 GONG! Pauza skončila. Další série!');$('timerBox').style.display='block';$('timerLabel').textContent='🥊 GONG — JDE SE';}
 }
 function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
-function addTimer(s){if(!timerEnd)return;timerEnd+=s*1000;timerTotal=Math.max(timerTotal,Math.ceil((timerEnd-Date.now())/1000));tickTimer()}
-function toggleTimer(){paused=!paused;if(!paused)timerEnd=Date.now()+Math.max(0,parseInt($('timerValue').textContent.split(':')[0])*60+parseInt($('timerValue').textContent.split(':')[1]))*1000}
-function stopTimer(){clearInterval(timer);timer=null;$('timerBox').style.display='none'}
+function addTimer(s){if(!timerEnd)return;if(paused){pausedLeft=Math.max(0,pausedLeft+s*1000);$('timerValue').textContent=fmt(Math.ceil(pausedLeft/1000));return}timerEnd+=s*1000;timerTotal=Math.max(timerTotal,Math.ceil((timerEnd-Date.now())/1000));tickTimer()}
+let pausedLeft=0;
+function toggleTimer(){
+ if(!timerEnd)return;
+ if(!paused){paused=true;pausedLeft=Math.max(0,timerEnd-Date.now());clearInterval(timer);timer=null;$('timerLabel').textContent='⏸ ZASTAVENO'}
+ else{paused=false;timerEnd=Date.now()+pausedLeft;$('timerLabel').textContent='PAUZA';tickTimer();timer=setInterval(tickTimer,250)}
+}
+function stopTimer(){clearInterval(timer);timer=null;timerEnd=0;paused=false;$('timerBox').style.display='none'}
+let audioCtx=null;
+function unlockAudio(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;if(!audioCtx)audioCtx=new C();if(audioCtx.state==='suspended')audioCtx.resume()}catch(e){}}
 function ringGong(){
  try{
-  const C=window.AudioContext||window.webkitAudioContext;if(!C)return;
-  const c=new C();
+  if(navigator.vibrate)navigator.vibrate([250,120,250,120,400]);
+  unlockAudio();const c=audioCtx;if(!c)return;
   const ring=(t,gain)=>{
    const o=c.createOscillator(),g=c.createGain();
-   o.type='sine';
-   o.frequency.setValueAtTime(880,t);
-   o.frequency.exponentialRampToValueAtTime(660,t+.18);
-   g.gain.setValueAtTime(.0001,t);
-   g.gain.exponentialRampToValueAtTime(gain,t+.012);
-   g.gain.exponentialRampToValueAtTime(.0001,t+.55);
+   o.type='sine';o.frequency.setValueAtTime(880,t);o.frequency.exponentialRampToValueAtTime(660,t+.18);
+   g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(gain,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+.55);
    o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.6);
   };
-  const n=c.currentTime;
-  ring(n,.34); ring(n+.38,.30); ring(n+.76,.34);
-  setTimeout(()=>c.close(),1800);
+  const n=c.currentTime;ring(n,.34);ring(n+.38,.30);ring(n+.76,.34);
  }catch(e){}
 }
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){if(timer)tickTimer();if(workout)keepAwake()}});
 function notify(title,body){if('Notification' in window&&Notification.permission==='granted')new Notification(title,{body})}
 function requestNotifications(){if('Notification' in window)Notification.requestPermission().then(x=>toast(x==='granted'?'Notifikace povoleny 🔔':'Notifikace nebyly povoleny'))}
 function finishWorkout(){
- if(!workout)return;
- const exercises=workout.exercises.map(e=>({id:e.id,name:e.name,warmup:(e.warmup||[]).map(s=>({...s})),sets:e.sets.map(s=>({...s}))}));
+ if(!workout||!Array.isArray(workout.exercises))return;
+ const allSets=workout.exercises.flatMap(e=>e.sets||[]);
+ const anyDone=allSets.some(s=>s.done);
+ if(!anyDone){
+  if(!allSets.some(s=>(+s.weight||0)>0&&(+s.reps||0)>0)){toast('Zatím není zapsaná žádná série.');return}
+  if(!confirm('Žádná série není odškrtnutá. Uložit všechny série jako odcvičené?'))return;
+ }else{
+  const open=allSets.filter(s=>!s.done).length;
+  if(open&&!confirm(open+' sérií není odškrtnutých a do historie se neuloží. Dokončit trénink?'))return;
+ }
+ const exercises=workout.exercises.map(e=>({id:e.id,name:e.name,target:e.target,equip:exEquip(e),rest:e.rest,sets:(e.sets||[]).filter(s=>!anyDone||s.done).map(s=>({...s,done:true}))})).filter(e=>e.sets.length);
  const volume=exercises.reduce((a,e)=>a+e.sets.reduce((b,s)=>b+effectiveLoad(e,s)*(+s.reps||0),0),0);
- const duration=Math.max(1,Math.round((Date.now()-workout.started)/60000));
- let prs=0;
- exercises.forEach(e=>e.sets.forEach(s=>{if(s.warmup||!s.weight||!s.reps)return;const rm=e1rm(effectiveLoad(e,s),s.reps);const old=state.prs[e.id]?.e1rm||0;if(rm>old){state.prs[e.id]={weight:effectiveLoad(e,s),reps:s.reps,e1rm:Math.round(rm*10)/10,date:new Date().toLocaleDateString('cs-CZ')};prs++}}));
- state.history.unshift({id:Date.now(),name:workout.title,date:new Date().toLocaleDateString('cs-CZ'),duration,tonnage:Math.round(volume),prsHit:prs,goal:workout.goal,feeling:workout.feeling||'',energy:workout.energy||'',rpe:workout.rpe||'',note:workout.note||'',exercises});
- state.history=state.history.slice(0,100);makeAutoBackup();save();workout=null;saveActiveWorkout();stopTimer();showScreen('home');toast(`Trénink uložen • ${prs} nové PR 🏆`);
+ const duration=Math.min(300,Math.max(1,Math.round((Date.now()-workout.started)/60000)));
+ const hit=new Set();
+ exercises.forEach(e=>e.sets.forEach(s=>{const load=effectiveLoad(e,s);if(!load||!s.reps)return;const rm=e1rm(load,s.reps);const old=state.prs[e.id]?.e1rm||0;if(rm>old){state.prs[e.id]={weight:load,reps:s.reps,e1rm:Math.round(rm*10)/10,date:new Date().toLocaleDateString('cs-CZ')};hit.add(e.id)}}));
+ const prs=hit.size;
+ state.history.unshift({id:Date.now(),name:workout.title,date:new Date().toLocaleDateString('cs-CZ'),iso:todayISO(),duration,tonnage:Math.round(volume),prsHit:prs,goal:workout.goal,feeling:workout.feeling||'',energy:workout.energy||'',rpe:workout.rpe||'',note:workout.note||'',exercises});
+ state.history=state.history.slice(0,1000);
+ makeAutoBackup();save();workout=null;saveActiveWorkout();stopTimer();releaseAwake();renderWorkout();showScreen('home');toast(`Trénink uložen • PR: ${prs} 🏆`);
 }
-function e1rm(w,r){return r<=1?w:w*(1+r/30)}
+function e1rm(w,r){r=Math.min(+r||1,12);return r<=1?w:w*(1+r/30)}
 let rmMode='max';
 function setRMMode(mode){
  rmMode=mode;
@@ -1118,7 +1209,7 @@ function showWarmup(){
 document.addEventListener('input',e=>{
   if(e.target && e.target.id==='progWeight') showWarmup();
 });
-setTimeout(showWarmup,300);
+
 
 // Skutečné vybavení: bench osa 20 kg + kotouče 20 / 15 / 10 / 5 / 2,5 / 1,25 kg.
 // Kotouče jsou vždy párově na obou stranách osy.
@@ -1181,7 +1272,7 @@ function openEditWorkout(id){
    ${(e.sets||[]).map((set,si)=>`<div class="grid3" style="margin-top:8px;align-items:end">
     <div><label>SÉRIE ${si+1}</label><input id="edit-w-${ei}-${si}" type="number" inputmode="decimal" step="0.5" value="${Number(set.weight)||0}"></div>
     <div><label>OPAK.</label><input id="edit-r-${ei}-${si}" type="number" inputmode="numeric" step="1" value="${Number(set.reps)||0}"></div>
-    <div><label>RIR</label><select id="edit-rir-${ei}-${si}">${['0','1','2','3','4+'].map(v=>`<option value="${v}" ${String(set.rir??'')===v?'selected':''}>${v}</option>`).join('')}</select></div>
+    <div><label>RIR</label><select id="edit-rir-${ei}-${si}">${['','0','1','2','3','4+'].map(v=>`<option value="${v}" ${String(set.rir??'').replace(/^4$/,'4+')===v?'selected':''}>${v||'—'}</option>`).join('')}</select></div>
    </div>`).join('')}
   </div>`).join('');
  $('editWorkoutModal').classList.add('show');
@@ -1212,7 +1303,7 @@ function saveEditedWorkout(){
  h.exercises.forEach((e,ei)=>(e.sets||[]).forEach((set,si)=>{
   set.weight=Math.max(0,parseFloat($(`edit-w-${ei}-${si}`).value)||0);
   set.reps=Math.max(0,parseInt($(`edit-r-${ei}-${si}`).value,10)||0);
-  const rir=$(`edit-rir-${ei}-${si}`).value; set.rir=rir==='4+'?'4+':parseInt(rir,10);
+  const rir=$(`edit-rir-${ei}-${si}`).value; if(rir==='')delete set.rir;else set.rir=rir==='4+'?'4+':parseInt(rir,10);
  }));
  recalcHistoryMetrics(); makeAutoBackup(); save(); renderHistory(); renderProgress(); renderCoachTip(); closeEditWorkout(); toast('Trénink upraven a Coach používá nová data ✅');
 }
@@ -1265,7 +1356,7 @@ function renderProgressGoals(){
  const box=$('progressGoals');if(!box)return;
  const g=state.goals||{}, labels={bench:'Bench',squat:'Dřep',deadlift:'Mrtvý tah'};
  const rows=Object.keys(labels).map(k=>{
-   const goal=+g[k]||0, pr=state.prs[k]?.weight||0;
+   const goal=+g[k]||0, pr=goalValue(k);
    if(!goal)return '';
    const pct=Math.min(100,Math.round(pr/goal*100));
    return `<div style="margin-bottom:9px"><div class="row"><span>${labels[k]}</span><strong>${pr||0} / ${goal} kg</strong></div><div class="bar"><i style="width:${pct}%"></i></div></div>`;
@@ -1274,8 +1365,7 @@ function renderProgressGoals(){
 }
 
 function renderProgress(){
- const all=state.history.flatMap(h=>h.exercises.flatMap(e=>e.sets.map(s=>({...s,id:e.id}))));
- const vol=all.reduce((a,s)=>a+(+s.weight||0)*(+s.reps||0),0);const prs=Object.values(state.prs);
+ const vol=state.history.reduce((a,h)=>a+(h.tonnage||0),0);const prs=Object.values(state.prs);
  $('totalVolume').textContent=Math.round(vol).toLocaleString('cs-CZ');$('bestPR').textContent=prs.length;
  $('best1rm').textContent=(prs.length?Math.max(...prs.map(x=>x.e1rm)):0).toFixed(1);
  $('prList').innerHTML=prs.length?Object.entries(state.prs).map(([id,p])=>{const e=db.find(x=>x.id===id);return `<div class="row" style="padding:10px 0;border-bottom:1px solid var(--border)"><div><strong>${esc(e?.name||id)}</strong><div class="small muted">${p.date} • ${p.weight} kg × ${p.reps}</div></div><span class="green">${p.e1rm} kg 1RM</span></div>`}).join(''):'<div class="empty">Zatím žádné PR. První přijde při dokončení série.</div>';
@@ -1343,7 +1433,7 @@ function anatomyMini(e){
 }
 function bestHistoricalPerformance(id){
  let best=null;
- for(const h of (state.history||[]))for(const e of (h.exercises||[]))if(e.id===id)for(const s of (e.sets||[])){
+ for(const h of (state.history||[]))for(const e of (h.exercises||[]))if(e.id===id)for(const s of workingSets(e)){
    if(s.warmup||!(+s.weight>0)||!(+s.reps>0))continue;
    const rm=e1rm(+s.weight,+s.reps);
    if(!best||rm>best.e1rm)best={weight:+s.weight,reps:+s.reps,e1rm:rm,date:h.date};
@@ -1359,7 +1449,8 @@ function savePerformance(id){
 }
 function renderPerformances(){
  const box=$('performanceList');if(!box)return;
- box.innerHTML=db.map(e=>{
+ const pq=($('perfSearch')?.value||'').toLowerCase().trim();
+ box.innerHTML=db.filter(e=>!pq||`${e.name} ${e.target}`.toLowerCase().includes(pq)).map(e=>{
    const p=state.performances?.[e.id],best=bestHistoricalPerformance(e.id),active=p?.known?p:best,known=!!p?.known,rm=active?e1rm(active.weight,active.reps):0;
    return `<div class="perf-card">
     <div class="row" style="align-items:flex-start"><div class="row" style="justify-content:flex-start;flex:1"><div><strong>${esc(e.name)}</strong><div class="small muted" style="margin-top:3px">${esc(e.target)}</div></div></div><span class="badge">${known?'ULOŽENO':'AUTO'}</span></div>
@@ -1414,6 +1505,7 @@ function bmi(){
 }
 function renderProfile(){
  if(!$('profileAge'))return;
+ if($('profileDetails'))$('profileDetails').open=!state.profile.weight;
  $('profileAge').value=state.profile.age||'';
  $('profileHeight').value=state.profile.height||'';
  $('profileWeight').value=state.profile.weight||'';
@@ -1444,16 +1536,16 @@ function renderHomeAnalysis(){
 }
 function saveCheckin(){
  const sleep=+$('checkSleep').value||0,energy=+$('checkEnergy').value||0,pain=+$('checkPain').value||0;
- state.checkin={date:new Date().toISOString().slice(0,10),sleep,energy,pain};save();renderCheckin();toast('Dnešní stav uložen 🧠');
+ state.checkin={date:todayISO(),sleep,energy,pain};save();renderCheckin();toast('Dnešní stav uložen 🧠');
 }
-function renderCheckin(){const c=state.checkin||{};if($('checkSleep')){$('checkSleep').value=c.date===new Date().toISOString().slice(0,10)?(c.sleep||''):'';$('checkEnergy').value=c.date===new Date().toISOString().slice(0,10)?(c.energy||''):'';$('checkPain').value=c.date===new Date().toISOString().slice(0,10)?(c.pain||''):'';$('checkinSummary').textContent=c.date===new Date().toISOString().slice(0,10)?`Dnes: spánek ${c.sleep||'—'} h • energie ${c.energy||'—'}/10 • bolest ${c.pain||0}/10`:'Dnešní check-in zatím není uložen.';}}
+function renderCheckin(){const c=state.checkin||{};if($('checkSleep')){$('checkSleep').value=c.date===todayISO()?(c.sleep||''):'';$('checkEnergy').value=c.date===todayISO()?(c.energy||''):'';$('checkPain').value=c.date===todayISO()?(c.pain||''):'';$('checkinSummary').textContent=c.date===todayISO()?`Dnes: spánek ${c.sleep||'—'} h • energie ${c.energy||'—'}/10 • bolest ${c.pain||0}/10`:'Dnešní check-in zatím není uložen.';}}
 function saveGoals(){state.goals={bench:+$('goalBench').value||0,squat:+$('goalSquat').value||0,deadlift:+$('goalDeadlift').value||0};save();renderGoals();toast('Cíle uloženy 🏆')}
 function renderGoals(){
  const g=state.goals||{};
  ['bench','squat','deadlift'].forEach(k=>{const el=$('goal'+k.charAt(0).toUpperCase()+k.slice(1));if(el)el.value=g[k]||''});
  if($('goalSummary')){
   const labels={bench:'Bench',squat:'Dřep',deadlift:'Mrtvý tah'};
-  $('goalSummary').innerHTML=['bench','squat','deadlift'].map(k=>{const goal=+g[k]||0;const pr=state.prs[k]?.weight||0;return goal?`${labels[k]}: ${pr} / ${goal} kg`:''}).filter(Boolean).join(' • ')||'Nastav si cíle pro hlavní cviky.';
+  $('goalSummary').innerHTML=['bench','squat','deadlift'].map(k=>{const goal=+g[k]||0;const pr=goalValue(k);return goal?`${labels[k]}: ${pr} / ${goal} kg`:''}).filter(Boolean).join(' • ')||'Nastav si cíle pro hlavní cviky.';
  }
 }
 function advancedCoachText(){
@@ -1488,28 +1580,36 @@ function advancedCoachText(){
 }
 function renderAdvancedCoach(){if($('advancedCoach'))$('advancedCoach').innerHTML=advancedCoachText()}
 function renderMuscleBalance(){
- const counts={};
- const since=Date.now()-7*24*60*60*1000;
+ const counts={},since=new Date();since.setHours(0,0,0,0);since.setDate(since.getDate()-6);
  (state.history||[]).forEach(h=>{
-   const parts=String(h.date||'').split('.');
-   const d=parts.length>=3?new Date(+parts[2],(+parts[1]||1)-1,+parts[0]):null;
-   if(d && d.getTime()<since)return;
-   (h.exercises||[]).forEach(e=>{
-     const n=e.target||'Ostatní';
-     counts[n]=(counts[n]||0)+(e.sets||[]).filter(s=>s.done||((+s.weight||0)>0&&(+s.reps||0)>0)).length;
-   });
+  const d=histDate(h);if(d&&d<since)return;
+  (h.exercises||[]).forEach(e=>{
+   const n=muscleGroup(e.target||db.find(x=>x.id===e.id)?.target);
+   counts[n]=(counts[n]||0)+workingSets(e).filter(s=>(+s.reps||0)>0).length;
+  });
  });
  const total=Object.values(counts).reduce((a,b)=>a+b,0);
- $('muscleBalance').innerHTML=total?Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([n,v])=>`<div><div class="row small"><span>${esc(n)}</span><strong>${v} série</strong></div><div class="bar"><i style="width:${Math.round(v/total*100)}%"></i></div></div>`).join(''):'<div class="empty">Po prvním tréninku se tady zobrazí rozložení svalových partií za posledních 7 dní.</div>';
+ $('muscleBalance').innerHTML=total?Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([n,v])=>`<div><div class="row small"><span>${esc(n)}</span><strong>${v} ${v===1?'série':v<5?'série':'sérií'}</strong></div><div class="bar"><i style="width:${Math.round(v/total*100)}%"></i></div></div>`).join(''):'<div class="empty">Za posledních 7 dní zatím žádné odcvičené série.</div>';
 }
-
-function renderCalendar(){const box=$('trainingCalendar');if(!box)return;const now=new Date();const y=now.getFullYear(),m=now.getMonth();const first=new Date(y,m,1).getDay();const offset=(first+6)%7;const days=new Date(y,m+1,0).getDate();const done=new Set((state.history||[]).map(h=>{const p=h.date.split('.');return `${y}-${String((+p[1]||m+1)).padStart(2,'0')}-${String(+p[0]).padStart(2,'0')}`}));let html=['Po','Út','St','Čt','Pá','So','Ne'].map(x=>`<div class="small muted" style="text-align:center">${x}</div>`).join('');for(let i=0;i<offset;i++)html+='<div></div>';for(let d=1;d<=days;d++){const key=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;html+=`<div class="cal-day ${done.has(key)?'done':''} ${d===now.getDate()?'today':''}">${d}${done.has(key)?'<br>🏋️':''}</div>`}box.innerHTML=html}
+let calOffset=0;
+function calMove(n){calOffset=Math.min(0,calOffset+n);renderCalendar()}
+function renderCalendar(){
+ const box=$('trainingCalendar');if(!box)return;
+ const now=new Date(),ref=new Date(now.getFullYear(),now.getMonth()+calOffset,1),y=ref.getFullYear(),m=ref.getMonth();
+ const offset=(ref.getDay()+6)%7,days=new Date(y,m+1,0).getDate();
+ const done=new Set((state.history||[]).map(h=>{const d=histDate(h);return d?isoOf(d):''}));
+ if($('calLabel'))$('calLabel').textContent='• '+ref.toLocaleDateString('cs-CZ',{month:'long',year:'numeric'});
+ let html=['Po','Út','St','Čt','Pá','So','Ne'].map(x=>`<div class="small muted" style="text-align:center">${x}</div>`).join('');
+ for(let i=0;i<offset;i++)html+='<div></div>';
+ for(let d=1;d<=days;d++){const key=isoOf(new Date(y,m,d));const hit=done.has(key);html+=`<div class="cal-day ${hit?'done':''} ${calOffset===0&&d===now.getDate()?'today':''}">${d}${hit?'<br>🏋️':''}</div>`}
+ box.innerHTML=html;
+}
 function makeAutoBackup(){try{const payload={app:'Silovy trener',version:APP_VERSION+'-auto-backup',exportedAt:new Date().toISOString(),state:state,workout:workout};localStorage.setItem(KEY+'_last_backup',JSON.stringify(payload))}catch(e){}}
 function exportData(){
   const payload={app:'Silovy trener',version:APP_VERSION+'-backup',exportedAt:new Date().toISOString(),state:state,workout:workout,settings:{focus:settings.focus,time:settings.time,goal:settings.goal,warmupMode:settings.warmupMode||'normal',equip:[...settings.equip]}};
   const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download='silovy-trener-zaloha-'+new Date().toISOString().slice(0,10)+'.json';
+  const a=document.createElement('a');a.href=url;a.download='silovy-trener-zaloha-'+todayISO()+'.json';
   document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
   toast('Záloha stažena 💾');
 }
@@ -1522,18 +1622,23 @@ function importData(file){
       const incoming=raw&&raw.state?raw.state:raw;
       if(!incoming||!Array.isArray(incoming.history)||typeof incoming.prs!=='object')throw new Error('Neplatná záloha');
       if(!confirm(`Importovat ${incoming.history.length} tréninků a ${Object.keys(incoming.prs||{}).length} PR?\n\nStávající data v této aplikaci budou nahrazena.`))return;
-      makeAutoBackup();state={history:incoming.history,prs:incoming.prs||{},profile:incoming.profile||{age:'',height:'',weight:''},goals:incoming.goals||{bench:0,squat:0,deadlift:0},checkin:incoming.checkin||{date:'',sleep:'',energy:'',pain:''},gymFilters:incoming.gymFilters||state.gymFilters,customExercises:Array.isArray(incoming.customExercises)?incoming.customExercises:state.customExercises,favorites:Array.isArray(incoming.favorites)?incoming.favorites:[]};
+      makeAutoBackup();state=Object.assign({},incoming,{gymFilters:incoming.gymFilters||state.gymFilters});state.customExercises=Array.isArray(incoming.customExercises)?incoming.customExercises.filter(e=>e&&/^[\w-]+$/.test(e.id||'')):[];
       state.customExercises.forEach(e=>{if(e&&!db.some(x=>x.id===e.id))db.push(e)});
       workout=raw.workout||null;if(raw.settings){settings.focus=raw.settings.focus||settings.focus;settings.time=raw.settings.time||settings.time;settings.goal=raw.settings.goal||settings.goal;settings.warmupMode=raw.settings.warmupMode||settings.warmupMode||'normal';settings.equip=new Set(raw.settings.equip||[...settings.equip]);persistSettings();setWarmupMode(settings.warmupMode)}
-      save();renderProfile();renderProgress();renderHistory();renderPerformances();renderLibrary();renderCoachTip();renderCheckin();renderGoals();if(workout)saveActiveWorkout();
+      normalizeState();if(!workout||!Array.isArray(workout.exercises))workout=null;
+      save();renderProfile();renderProgress();renderHistory();renderPerformances();renderLibrary();renderCoachTip();renderCheckin();renderGoals();populateRMExercises();saveActiveWorkout();renderWorkout();
       toast('Data úspěšně importována ✅');
     }catch(e){alert('Tuto zálohu se nepodařilo načíst. Zkontroluj, že jde o JSON zálohu Silového trenéra.');}
   };
   reader.readAsText(file);
 }
 function confirmClearData(){
-  if(!confirm('Opravdu smazat celou historii, PR a uložený profil? Tohle nejde vrátit zpět.'))return;
-  state={history:[],prs:{},performances:{},customExercises:[],favorites:[],profile:{age:'',height:'',weight:''},goals:{bench:0,squat:0,deadlift:0},checkin:{date:'',sleep:'',energy:'',pain:''}};save();renderProfile();renderProgress();renderHistory();renderCoachTip();toast('Data byla smazána');
+ if(!confirm('Opravdu smazat celou historii, PR, výkony a profil? Tohle nejde vrátit zpět.\n\nDoporučuji nejdřív udělat export zálohy.'))return;
+ makeAutoBackup();
+ (state.customExercises||[]).forEach(c=>{const i=db.findIndex(x=>x.id===c.id);if(i>=0)db.splice(i,1)});
+ state={history:[],prs:{},performances:{},customExercises:[],favorites:[]};
+ normalizeState();workout=null;saveActiveWorkout();stopTimer();releaseAwake();
+ save();renderProfile();renderProgress();renderHistory();renderPerformances();renderLibrary();renderCheckin();renderGoals();renderCoachTip();populateRMExercises();renderWorkout();showScreen('home');closeSettings();toast('Data byla smazána');
 }
 
 function openSettings(){
@@ -1569,12 +1674,13 @@ function updateFromHtml(file){
 }
 document.addEventListener('DOMContentLoaded',()=>{
  applyAppVersion();
+ try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
  updateStats();renderLibrary();renderGymFilters();renderProgress();renderPerformances();renderProfile();populateRMExercises();calc1RM();renderCheckin();renderGoals();
  workout=loadActiveWorkout();
  setWarmupMode(settings.warmupMode||'normal');
  if(workout){
    const cleaned=sanitizeActiveWorkout();
-   renderWorkout();showScreen('workout');
+   renderWorkout();showScreen('workout');keepAwake();
    if(cleaned)toast('Aktivní trénink byl opraven podle nových plánů 💪');
    else toast('Pokračujeme v rozpracovaném tréninku 💪');
  }else{showScreen(getLastScreen())}
