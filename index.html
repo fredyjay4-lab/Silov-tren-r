@@ -2,6 +2,7 @@
 <html lang="cs" class="dark">
 <head>
 <meta charset="UTF-8">
+<meta name="theme-color" content="#07090d">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#09090b">
 <meta name="mobile-web-app-capable" content="yes">
@@ -119,6 +120,25 @@ input,select,textarea{font-size:16px}
 header{padding-top:calc(12px + env(safe-area-inset-top))}
 .toast{bottom:calc(92px + env(safe-area-inset-bottom))}
 .anatomy-svg{width:44px;height:52px}
+
+/* V28 nový vzhled */
+:root{--bg:#07090d;--card:#12151c;--card2:#1c212c;--border:#252b38;--brand:#22d3a0;--brand2:#5eead4;--accent:#f59e0b}
+.app{background:radial-gradient(120% 50% at 50% -8%,rgba(34,211,160,.14),transparent 60%),var(--bg)}
+header{background:rgba(7,9,13,.8);border-bottom:1px solid rgba(255,255,255,.06)}
+.logo-icon{background:linear-gradient(135deg,#22d3a0,#0ea5e9);box-shadow:0 6px 18px rgba(34,211,160,.35)}
+.title{letter-spacing:1.2px;font-weight:900}
+.card{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.008)),var(--card);border:1px solid rgba(255,255,255,.07);border-radius:22px;box-shadow:0 10px 26px rgba(0,0,0,.35)}
+.section-title{color:var(--brand2);letter-spacing:1.1px}
+.btn{border-radius:14px;transition:transform .08s}.btn:active{transform:scale(.96)}
+.btn.primary{background:linear-gradient(135deg,#22d3a0,#0ea5e9);color:#04121a;border-color:transparent;box-shadow:0 8px 22px rgba(34,211,160,.28)}
+.btn.active,.chip.active{background:rgba(34,211,160,.16);border-color:var(--brand);color:var(--brand2)}
+.nav{background:rgba(10,13,19,.88);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid rgba(255,255,255,.07)}
+.nav button.active b{filter:drop-shadow(0 0 8px rgba(94,234,212,.75))}
+.exercise{border-radius:20px}.exercise.current{border-color:var(--brand);box-shadow:0 0 0 1px rgba(34,211,160,.25),0 0 26px rgba(34,211,160,.12)}
+.bar i{background:linear-gradient(90deg,#22d3a0,#0ea5e9);box-shadow:0 0 10px rgba(34,211,160,.45)}
+.set.done{background:rgba(34,211,160,.1)}
+input,select,textarea{border-radius:12px;background:#0c0f15}
+.big{background:linear-gradient(135deg,#fff,#a7f3d0);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 </style>
 </head>
 <body>
@@ -187,6 +207,8 @@ header{padding-top:calc(12px + env(safe-area-inset-top))}
   </div>
 
   
+  <div class="card" id="weekCard"></div>
+  <div class="card"><div class="row" style="margin-bottom:8px"><div class="section-title" style="margin:0">📋 Vlastní plány</div><button class="btn" onclick="editPlan()">➕ Nový</button></div><div id="customPlansBox"></div></div>
   <details id="profileDetails" style="margin-bottom:12px"><summary class="btn" style="display:block;list-style:none;text-align:left;padding:13px">👤 Profil: věk, výška, váha</summary><div style="margin-top:8px"><div class="card" id="profileCard" style="border:2px solid var(--brand);background:linear-gradient(145deg,#10271f,#18181b)">
     <div class="section-title green">1️⃣ TVŮJ PROFIL</div>
     <h2 style="font-size:24px;margin-bottom:5px">Nastav svoje údaje</h2>
@@ -287,6 +309,7 @@ header{padding-top:calc(12px + env(safe-area-inset-top))}
     <textarea id="sessionNote" rows="2" placeholder="Např. bench šel dobře, málo spánku…" onchange="updateSessionField('note',this.value)"></textarea>
   </div>
   <button class="btn primary" style="width:100%;margin-top:4px" onclick="finishWorkout()">✅ Dokončit trénink</button>
+  <button class="btn" style="width:100%;margin-top:8px" onclick="saveWorkoutAsPlan()">💾 Uložit tento trénink jako plán</button>
   <button class="btn danger" style="width:100%;margin-top:8px" onclick="discardWorkout()">🗑️ Zahodit trénink</button>
 </section>
 
@@ -306,6 +329,7 @@ header{padding-top:calc(12px + env(safe-area-inset-top))}
     <button class="btn" onclick="showScreen('history')">📅 Historie tréninků</button>
     <button class="btn" onclick="showScreen('performances')">🏆 Všechny výkony</button>
   </div>
+  <div class="card"><div class="section-title">📈 Graf pokroku</div><select id="chartEx" onchange="renderProgressChart()" style="margin-bottom:8px"></select><div class="grid2" style="margin-bottom:8px"><button class="btn active" id="mBtn_e1rm" onclick="setChartMetric('e1rm')">Odhad 1RM</button><button class="btn" id="mBtn_weight" onclick="setChartMetric('weight')">Nejtěžší série</button></div><div id="progressChart"></div></div>
   <div class="card"><div class="section-title">Osobní rekordy</div><div id="prList" class="stack"></div></div>
   <div class="card" style="border-color:rgba(245,158,11,.30)"><div class="section-title" style="color:#fbbf24">🎯 CÍLE</div><div id="progressGoals" class="small" style="line-height:1.7"></div></div>
   <div class="card"><div class="section-title">🤖 COACH ANALÝZA</div><div id="advancedCoach" class="small" style="line-height:1.65"></div></div>
@@ -388,6 +412,7 @@ header{padding-top:calc(12px + env(safe-area-inset-top))}
 </section>
 </main>
 
+<div id="planModal" class="modal" onclick="if(event.target===this)this.classList.remove('show')"><div class="modal-card"><div class="row"><h2 style="font-size:20px">📋 Vlastní plán</h2><button class="btn" onclick="$('planModal').classList.remove('show')">✕</button></div><input id="planName" placeholder="Název plánu (např. Push den)" style="margin:12px 0 8px"><div class="section-title">Cviky v plánu</div><div id="planSelected"></div><input id="planSearch" placeholder="🔎 Přidat cvik…" oninput="renderPlanSearch()" style="margin:10px 0"><div id="planResults"></div><button class="btn primary" style="width:100%;margin-top:12px" onclick="savePlan()">💾 Uložit plán</button></div></div>
 <div id="addExModal" class="modal" onclick="if(event.target===this)this.classList.remove('show')"><div class="modal-card"><div class="row"><h2 style="font-size:20px">➕ Přidat cvik</h2><button class="btn" onclick="$('addExModal').classList.remove('show')">✕</button></div><input id="addExSearch" placeholder="🔎 Hledat cvik nebo partii…" oninput="renderAddList()" style="margin:12px 0"><div id="addExList"></div></div></div>
 <div id="editWorkoutModal" class="modal" onclick="if(event.target===this)closeEditWorkout()">
   <div class="modal-card">
@@ -405,7 +430,7 @@ header{padding-top:calc(12px + env(safe-area-inset-top))}
     <div class="card" style="margin-top:12px">
       <div class="section-title">🔔 Upozornění</div>
       <p class="small muted">Nastavení zvuku a upozornění po skončení pauzy.</p>
-      <button class="btn" style="width:100%;margin-top:8px" onclick="toggleSoundSetting()">🔔 Nastavit zvuková upozornění</button>
+      <button class="btn" style="width:100%;margin-top:8px" id="soundBtn" onclick="toggleSoundSetting()">🔔 Zvuk konce pauzy</button>
     </div>
 
     <div class="card">
@@ -448,7 +473,7 @@ header{padding-top:calc(12px + env(safe-area-inset-top))}
 </div>
 
 <script>
-const APP_VERSION='V27';
+const APP_VERSION='V31';
 const KEY='silovy_trener_v2';
 const equipmentLabels={barbell:'Velká osa',dumbbell:'Jednoručky',cable:'Kladka',machine:'Klasický stroj',kinesis:'Kinesis',octagon:'Octagon',pullup:'Hrazda',bodyweight:'Vlastní váha'};
 // Cviky, které trenér automaticky NEVYBÍRÁ. Zůstávají v databázi pro případné ruční použití.
@@ -737,6 +762,7 @@ function normalizeState(){
  state.profile=Object.assign({age:'',height:'',weight:''},obj(state.profile));
  state.goals=Object.assign({bench:0,squat:0,deadlift:0},obj(state.goals));
  state.checkin=Object.assign({date:'',sleep:'',energy:'',pain:''},obj(state.checkin));
+ state.customPlans=arr(state.customPlans).filter(p=>p&&/^[\w-]+$/.test(p.id||'')&&p.name&&Array.isArray(p.ids)).map(p=>({id:p.id,name:String(p.name).slice(0,40),ids:p.ids.filter(i=>typeof i==='string')}));
 }
 let wakeLock=null;
 async function keepAwake(){try{if('wakeLock' in navigator&&workout&&!wakeLock){wakeLock=await navigator.wakeLock.request('screen');wakeLock.addEventListener('release',()=>{wakeLock=null})}}catch(e){}}
@@ -922,7 +948,7 @@ function renderWorkout(){
  $('workoutTitle').textContent=workout.title;$('workoutTime').textContent=workout.time+' min';
  $('exerciseList').innerHTML=workout.exercises.map((e,ei)=>`
  <div class="exercise ${ei===curIdx?'current':''}" id="ex-${ei}">
-  <div class="row"><div class="row" style="justify-content:flex-start"><div><div class="exercise-name">${esc(e.name)}</div><div class="target">${esc(e.target)} • pauza ${Math.round(e.rest/60)} min</div><div class="small muted" style="margin-top:3px">${esc(lastPerformanceLabel(e.id))}</div></div></div><div style="display:flex;gap:5px"><button class="move-btn" onclick="moveExercise(${ei},-1)" title="Posunout nahoru">↑</button><button class="move-btn" onclick="moveExercise(${ei},1)" title="Posunout dolů">↓</button><button class="btn" onclick="replaceExercise(${ei})">🔄 Vyměnit</button></div></div>
+  <div class="row"><div class="row" style="justify-content:flex-start"><div><div class="exercise-name">${esc(e.name)}</div><div class="target">${esc(e.target)} • pauza ${Math.round(e.rest/60)} min</div><div class="small muted" style="margin-top:3px">${esc(lastPerformanceLabel(e.id))}</div></div></div><div style="display:flex;gap:5px"><button class="move-btn" onclick="moveExercise(${ei},-1)" title="Posunout nahoru">↑</button><button class="move-btn" onclick="moveExercise(${ei},1)" title="Posunout dolů">↓</button><button class="btn" onclick="replaceExercise(${ei})">🔄 Vyměnit</button><button class="btn danger" onclick="removeExercise(${ei})" title="Dnes nebudu cvičit">✕</button></div></div>
   <div class="card" style="padding:10px;margin:10px 0 0;background:#101012">
     <div class="small green" style="font-weight:900">🎯 DNEŠNÍ DOPORUČENÍ</div>
     <div style="font-size:13px;font-weight:800;margin-top:3px">${esc(getRecommendation(e))}</div>
@@ -953,7 +979,14 @@ function completeSet(ei,si){
  const s=workout.exercises[ei].sets[si];
  if(!s.done&&!workout.exercises.some(e=>e.sets.some(x=>x.done)))workout.started=Date.now();
  s.done=!s.done;saveActiveWorkout();renderWorkout();
- if(s.done){startRest(workout.exercises[ei].rest);toast('Pracovní série zapsaná — pauza spuštěna ⏱️')}
+ if(s.done){if(navigator.vibrate)navigator.vibrate(30);startRest(workout.exercises[ei].rest);toast('Pracovní série zapsaná — pauza spuštěna ⏱️')}
+}
+function removeExercise(i){
+ const e=workout.exercises[i];if(!e)return;
+ if(workout.exercises.length<=1){if(confirm('Je to poslední cvik. Zahodit celý trénink?'))discardWorkout();return}
+ const done=e.sets.filter(s=>s.done).length;
+ if(done&&!confirm(`U cviku „${e.name}“ máš ${done} odškrtnutých sérií. Odebrat ho i s nimi?`))return;
+ workout.exercises.splice(i,1);saveActiveWorkout();renderWorkout();toast(`Odebráno: ${e.name} (jen z tohoto tréninku)`);
 }
 function moveExercise(i,dir){
  if(!workout||!workout.exercises[i])return;
@@ -978,6 +1011,55 @@ function renderAddList(){
  $('addExList').innerHTML=db.filter(e=>!used.has(e.id)&&`${e.name} ${e.target}`.toLowerCase().includes(q)).slice(0,40).map(e=>`<div class="row" style="padding:9px 0;border-bottom:1px solid var(--border)"><div><strong>${esc(e.name)}</strong><div class="small muted">${esc(e.target)} • ${equipmentLabels[e.equip]||e.equip}</div></div><button class="btn" onclick="addExerciseToWorkout('${e.id}')">➕</button></div>`).join('')||'<div class="empty">Nic nenalezeno.</div>';
 }
 function addExerciseToWorkout(id){const e=db.find(x=>x.id===id);if(!e||!workout)return;workout.exercises.push({...makeWorkoutExercise(e),manual:true});saveActiveWorkout();renderWorkout();$('addExModal').classList.remove('show');toast('Přidáno: '+e.name)}
+let planDraft=null;
+function renderCustomPlans(){const b=$('customPlansBox');if(!b)return;const pl=state.customPlans||[];
+ b.innerHTML=pl.length?pl.map(p=>`<div class="row" style="padding:8px 0;border-bottom:1px solid var(--border)"><div><strong>${esc(p.name)}</strong><div class="small muted">${p.ids.length} cviků</div></div><div style="display:flex;gap:5px"><button class="btn primary" onclick="startCustomPlan('${p.id}')">▶</button><button class="btn" onclick="editPlan('${p.id}')">✏️</button><button class="btn danger" onclick="deletePlan('${p.id}')">🗑</button></div></div>`).join(''):'<div class="small muted">Zatím žádný vlastní plán. Vytvoř si třeba „Push den“ nebo „Doma s činkami“.</div>'}
+function editPlan(id){const p=(state.customPlans||[]).find(x=>x.id===id);planDraft=p?{id:p.id,ids:p.ids.filter(i=>db.some(x=>x.id===i))}:{id:'plan_'+Date.now(),ids:[]};$('planName').value=p?p.name:'';$('planSearch').value='';renderPlanDraft();$('planModal').classList.add('show')}
+function renderPlanDraft(){const sel=planDraft.ids.map(id=>db.find(x=>x.id===id));
+ $('planSelected').innerHTML=sel.map((e,i)=>`<div class="row" style="padding:6px 0"><span>${i+1}. ${esc(e.name)}</span><span style="display:flex;gap:4px"><button class="move-btn" onclick="planMove(${i},-1)">↑</button><button class="move-btn" onclick="planMove(${i},1)">↓</button><button class="move-btn" onclick="planRemove(${i})">✕</button></span></div>`).join('')||'<div class="small muted">Zatím prázdný — přidej cviky níže.</div>';renderPlanSearch()}
+function renderPlanSearch(){const q=$('planSearch').value.toLowerCase().trim();
+ $('planResults').innerHTML=db.filter(e=>!planDraft.ids.includes(e.id)&&(!q||`${e.name} ${e.target}`.toLowerCase().includes(q))).slice(0,25).map(e=>`<div class="row" style="padding:8px 0;border-bottom:1px solid var(--border)"><div><strong>${esc(e.name)}</strong><div class="small muted">${esc(e.target)}</div></div><button class="btn" onclick="planAdd('${e.id}')">➕</button></div>`).join('')||'<div class="empty">Nic nenalezeno.</div>'}
+function planMove(i,d){const a=planDraft.ids,j=i+d;if(j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];renderPlanDraft()}
+function planRemove(i){planDraft.ids.splice(i,1);renderPlanDraft()}
+function planAdd(id){if(!planDraft.ids.includes(id))planDraft.ids.push(id);renderPlanDraft()}
+function savePlan(){const name=$('planName').value.trim();if(!name){toast('Zadej název plánu.');return}if(!planDraft.ids.length){toast('Přidej aspoň jeden cvik.');return}
+ state.customPlans=state.customPlans||[];const i=state.customPlans.findIndex(x=>x.id===planDraft.id),p={id:planDraft.id,name:name.slice(0,40),ids:planDraft.ids};
+ if(i>=0)state.customPlans[i]=p;else state.customPlans.push(p);save();$('planModal').classList.remove('show');toast('Plán uložen ✅')}
+function deletePlan(id){const p=(state.customPlans||[]).find(x=>x.id===id);if(!p||!confirm(`Smazat plán „${p.name}“?`))return;state.customPlans=state.customPlans.filter(x=>x.id!==id);save()}
+function saveWorkoutAsPlan(){
+ if(!workout||!workout.exercises.length){toast('Není co uložit.');return}
+ const name=(prompt('Název plánu:',workout.title||'Můj plán')||'').trim().slice(0,40);
+ if(!name)return;
+ state.customPlans=state.customPlans||[];
+ const ids=workout.exercises.map(e=>e.id),ex=state.customPlans.find(p=>p.name===name);
+ if(ex){if(!confirm(`Plán „${name}“ už existuje. Přepsat ho?`))return;ex.ids=ids}
+ else state.customPlans.push({id:'plan_'+Date.now(),name,ids});
+ save();toast(`Plán „${name}“ uložen ✅ (najdeš ho na úvodní obrazovce)`);
+}
+function startCustomPlan(id){const p=(state.customPlans||[]).find(x=>x.id===id);if(!p)return;
+ if(workout&&workout.exercises.some(e=>e.sets.some(s=>s.done))&&!confirm('Máš rozpracovaný trénink s odškrtnutými sériemi. Nahradit ho novým?'))return;
+ const list=p.ids.map(i=>db.find(x=>x.id===i)).filter(Boolean);if(!list.length){toast('Plán neobsahuje žádné existující cviky.');return}
+ workout={title:p.name,goal:settings.goal,time:settings.time,started:Date.now(),exercises:list.map(e=>({...makeWorkoutExercise(e),manual:true}))};
+ renderWorkout();saveActiveWorkout();showScreen('workout');keepAwake();toast('Plán „'+p.name+'“ je připraven 💪')}
+let chartMetric='e1rm';
+function setChartMetric(m){chartMetric=m;['e1rm','weight'].forEach(k=>{const b=$('mBtn_'+k);if(b)b.classList.toggle('active',k===m)});renderProgressChart()}
+function renderProgressChart(){
+ const sel=$('chartEx'),box=$('progressChart');if(!sel||!box)return;
+ const hist=(state.history||[]).slice().reverse(),names={};
+ hist.forEach(h=>(h.exercises||[]).forEach(e=>{names[e.id]=e.name}));
+ const cur=sel.value;
+ sel.innerHTML='<option value="__vol">📊 Celkový objem tréninku</option>'+Object.entries(names).sort((a,b)=>String(a[1]).localeCompare(String(b[1]),'cs')).map(([id,n])=>`<option value="${esc(id)}">${esc(n)}</option>`).join('');
+ sel.value=cur&&(cur==='__vol'||names[cur])?cur:'__vol';
+ const id=sel.value,pts=[];
+ hist.forEach(h=>{const d=histDate(h);if(!d)return;let v=0;
+  if(id==='__vol')v=h.tonnage;else{const e=(h.exercises||[]).find(x=>x.id===id);if(!e)return;workingSets(e).forEach(s=>{const l=effectiveLoad(e,s),r=+s.reps||0;if(!l||!r)return;v=Math.max(v,chartMetric==='weight'?l:e1rm(l,r))})}
+  if(v>0)pts.push({d,v:Math.round(v*10)/10})});
+ if(pts.length<2){box.innerHTML='<div class="empty">Na graf jsou potřeba aspoň 2 odcvičené tréninky s tímto cvikem.</div>';return}
+ const W=320,H=150,P=30,vs=pts.map(p=>p.v),min=Math.min(...vs),max=Math.max(...vs),span=(max-min)||1;
+ const x=i=>P+i*(W-P-10)/(pts.length-1),y=v=>H-22-(v-min)/span*(H-40),f=d=>d.getDate()+'. '+(d.getMonth()+1)+'.';
+ const diff=Math.round((vs[vs.length-1]-vs[0])*10)/10;
+ box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto"><polyline points="${pts.map((p,i)=>x(i).toFixed(1)+','+y(p.v).toFixed(1)).join(' ')}" fill="none" stroke="#22d3a0" stroke-width="2.5" stroke-linejoin="round"/>${pts.map((p,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="3.5" fill="#5eead4"/>`).join('')}<text x="2" y="${y(max)+4}" fill="#a1a1aa" font-size="10">${max}</text><text x="2" y="${y(min)+4}" fill="#a1a1aa" font-size="10">${min}</text><text x="${P}" y="${H-4}" fill="#a1a1aa" font-size="10">${f(pts[0].d)}</text><text x="${W-10}" y="${H-4}" fill="#a1a1aa" font-size="10" text-anchor="end">${f(pts[pts.length-1].d)}</text></svg><div class="small muted" style="margin-top:6px">${pts.length} tréninků • změna ${diff>0?'+':''}${diff} kg</div>`;
+}
 function addSet(ei,d){
  const e=workout.exercises[ei];
  if(d>0){const l=e.sets[e.sets.length-1]||{weight:0,reps:10};e.sets.push({weight:l.weight,reps:l.reps,done:false,warmup:false,loadMode:l.loadMode||'weight'})}
@@ -997,12 +1079,12 @@ function updateWorkoutStats(){
  $('workoutProgress').style.width=(count?done/count*100:0)+'%';
 }
 function startRest(sec){
- unlockAudio();clearInterval(timer);timerTotal=sec;timerEnd=Date.now()+sec*1000;paused=false;$('timerBox').style.display='block';$('timerLabel').textContent='PAUZA';
+ unlockAudio();lastTick=-1;clearInterval(timer);timerTotal=sec;timerEnd=Date.now()+sec*1000;paused=false;$('timerBox').style.display='block';$('timerLabel').textContent='PAUZA';
  tickTimer();timer=setInterval(tickTimer,250);
 }
 function tickTimer(){
  if(paused)return;
- const left=Math.max(0,Math.ceil((timerEnd-Date.now())/1000));$('timerValue').textContent=fmt(left);$('timerProgress').style.width=(timerTotal?Math.max(0,Math.min(100,(timerTotal-left)/timerTotal*100)):0)+'%';
+ const left=Math.max(0,Math.ceil((timerEnd-Date.now())/1000));if(left>0&&left<=3&&left!==lastTick&&soundMode!=='off'){lastTick=left;tickBeep()}$('timerValue').textContent=fmt(left);$('timerProgress').style.width=(timerTotal?Math.max(0,Math.min(100,(timerTotal-left)/timerTotal*100)):0)+'%';
  if(left<=0){clearInterval(timer);timer=null;timerEnd=0;ringGong();toast('🥊 GONG! Pauza skončila — další série!');notify('Silový trenér','🥊 GONG! Pauza skončila. Další série!');$('timerBox').style.display='block';$('timerLabel').textContent='🥊 GONG — JDE SE';}
 }
 function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
@@ -1016,19 +1098,21 @@ function toggleTimer(){
 function stopTimer(){clearInterval(timer);timer=null;timerEnd=0;paused=false;$('timerBox').style.display='none'}
 let audioCtx=null;
 function unlockAudio(){try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;if(!audioCtx)audioCtx=new C();if(audioCtx.state==='suspended')audioCtx.resume()}catch(e){}}
-function ringGong(){
- try{
-  if(navigator.vibrate)navigator.vibrate([250,120,250,120,400]);
-  unlockAudio();const c=audioCtx;if(!c)return;
-  const ring=(t,gain)=>{
-   const o=c.createOscillator(),g=c.createGain();
-   o.type='sine';o.frequency.setValueAtTime(880,t);o.frequency.exponentialRampToValueAtTime(660,t+.18);
-   g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(gain,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+.55);
-   o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.6);
-  };
-  const n=c.currentTime;ring(n,.34);ring(n+.38,.30);ring(n+.76,.34);
- }catch(e){}
+let soundMode=(()=>{try{return localStorage.getItem('st_sound')||'gong'}catch(e){return'gong'}})();
+let lastTick=-1;
+function tickBeep(){try{unlockAudio();const c=audioCtx;if(!c)return;const o=c.createOscillator(),g=c.createGain(),t=c.currentTime;o.type='sine';o.frequency.value=740;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.25,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+.12);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.14)}catch(e){}}
+function playGong(kind){
+ unlockAudio();const c=audioCtx;if(!c)return;
+ const t0=c.currentTime+.02,out=c.createGain(),comp=c.createDynamicsCompressor();out.gain.value=.9;out.connect(comp);comp.connect(c.destination);
+ const partial=(f,t,peak,dur)=>{const o=c.createOscillator(),g=c.createGain();o.type='sine';o.frequency.setValueAtTime(f,t);o.frequency.exponentialRampToValueAtTime(f*.985,t+dur);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(peak,t+.006);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g);g.connect(out);o.start(t);o.stop(t+dur+.05)};
+ const strike=(t,vol)=>{const len=Math.floor(c.sampleRate*.12),b=c.createBuffer(1,len,c.sampleRate),d=b.getChannelData(0);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,3);const s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();s.buffer=b;f.type='bandpass';f.frequency.value=2200;g.gain.value=vol;s.connect(f);f.connect(g);g.connect(out);s.start(t)};
+ if(kind==='bell'){[0,.2,.4].forEach(d=>{const t=t0+d;strike(t,.45);[[1,.32,1.1],[2.76,.22,.8],[5.4,.14,.5],[8.93,.07,.3]].forEach(([r,p,du])=>partial(1050*r,t,p,du))})}
+ else{strike(t0,.9);[[1,.55,4.2],[1.5,.3,3.4],[2.01,.34,3],[2.44,.2,2.4],[3.18,.16,1.8],[4.07,.1,1.2],[5.3,.06,.8]].forEach(([r,p,du])=>{partial(92*r,t0,p,du);partial(92*r*1.004,t0+.01,p*.6,du*.9)})}
 }
+function ringGong(){
+ try{if(navigator.vibrate)navigator.vibrate([250,120,250,120,400]);if(soundMode!=='off')playGong(soundMode)}catch(e){}
+}
+function refreshSoundLabel(){const n={gong:'🥊 Gong',bell:'🔔 Zvonek',off:'🔇 Vypnuto'};if($('soundBtn'))$('soundBtn').textContent='Zvuk konce pauzy: '+n[soundMode]+' (klepni pro změnu)'}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){if(timer)tickTimer();if(workout)keepAwake()}});
 function notify(title,body){if('Notification' in window&&Notification.permission==='granted')new Notification(title,{body})}
 function requestNotifications(){if('Notification' in window)Notification.requestPermission().then(x=>toast(x==='granted'?'Notifikace povoleny 🔔':'Notifikace nebyly povoleny'))}
@@ -1364,7 +1448,7 @@ function renderProgressGoals(){
  box.innerHTML=rows||'Cíle nastavíš na Domů. Jakmile budeš mít výkon, progres se začne plnit.';
 }
 
-function renderProgress(){
+function renderProgress(){renderProgressChart();
  const vol=state.history.reduce((a,h)=>a+(h.tonnage||0),0);const prs=Object.values(state.prs);
  $('totalVolume').textContent=Math.round(vol).toLocaleString('cs-CZ');$('bestPR').textContent=prs.length;
  $('best1rm').textContent=(prs.length?Math.max(...prs.map(x=>x.e1rm)):0).toFixed(1);
@@ -1517,7 +1601,7 @@ function renderProfile(){
  <div class="stat"><strong>${bmr||'—'}</strong><span>BMR kcal/den</span></div>
  <div class="stat"><strong>${state.profile.weight||'—'}</strong><span>kg aktuálně</span></div>`;
 }
-function updateStats(){
+function updateStats(){renderWeekCard();renderCustomPlans();
  $('statWorkouts').textContent=state.history.length;$('statPR').textContent=Object.keys(state.prs).length;
  const v=state.history.reduce((a,h)=>a+(h.tonnage||0),0);$('statVolume').textContent=v>999?(v/1000).toFixed(1)+'k':v;
  if(state.history[0])$('lastWorkout').textContent=`${state.history[0].name} • ${state.history[0].date} • ${state.history[0].tonnage.toLocaleString('cs-CZ')} kg`;renderCoachTip();renderHomeAnalysis();
@@ -1593,7 +1677,17 @@ function renderMuscleBalance(){
 }
 let calOffset=0;
 function calMove(n){calOffset=Math.min(0,calOffset+n);renderCalendar()}
+function renderWeekCard(){
+ const b=$('weekCard');if(!b)return;
+ const mon=d=>{const x=new Date(d);x.setHours(0,0,0,0);x.setDate(x.getDate()-((x.getDay()+6)%7));return x.getTime()};
+ const wk={};(state.history||[]).forEach(h=>{const d=histDate(h);if(d){const k=mon(d);wk[k]=(wk[k]||0)+1}});
+ const cur=mon(new Date());let t=cur,streak=0;if(!wk[t])t=mon(new Date(t-6.5*864e5));
+ while(wk[t]){streak++;t=mon(new Date(t-6.5*864e5))}
+ const n=wk[cur]||0;
+ b.innerHTML=`<div class="row"><div><div class="section-title" style="margin:0">Tento týden</div><div class="big">${n} <span class="small muted">${n===1?'trénink':n<5&&n>0?'tréninky':'tréninků'}</span></div></div><div style="text-align:right"><div class="big">🔥 ${streak}</div><div class="small muted">týdnů v řadě</div></div></div>`;
+}
 function renderCalendar(){
+ renderWeekCard();
  const box=$('trainingCalendar');if(!box)return;
  const now=new Date(),ref=new Date(now.getFullYear(),now.getMonth()+calOffset,1),y=ref.getFullYear(),m=ref.getMonth();
  const offset=(ref.getDay()+6)%7,days=new Date(y,m+1,0).getDate();
@@ -1650,8 +1744,10 @@ function closeSettings(){
  if(modal)modal.classList.remove('show');
 }
 function toggleSoundSetting(){
- const ok=confirm('Povolit zvukové/notifikační upozornění na konec pauzy?');
- if(ok){requestNotifications();toast('Zvuková upozornění povolena 🔔')}else{toast('Nastavení zvuku beze změny')}
+ const modes=['gong','bell','off'];soundMode=modes[(modes.indexOf(soundMode)+1)%3];
+ try{localStorage.setItem('st_sound',soundMode)}catch(e){}
+ if(soundMode!=='off'){requestNotifications();playGong(soundMode)}
+ refreshSoundLabel();
 }
 function updateFromHtml(file){
  if(!file)return;
@@ -1673,7 +1769,7 @@ function updateFromHtml(file){
  reader.readAsText(file);
 }
 document.addEventListener('DOMContentLoaded',()=>{
- applyAppVersion();
+ applyAppVersion();refreshSoundLabel();
  try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
  updateStats();renderLibrary();renderGymFilters();renderProgress();renderPerformances();renderProfile();populateRMExercises();calc1RM();renderCheckin();renderGoals();
  workout=loadActiveWorkout();
